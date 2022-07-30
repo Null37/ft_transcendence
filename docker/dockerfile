@@ -1,4 +1,4 @@
-from debian:bullseye
+from node
 
 workdir /root
 
