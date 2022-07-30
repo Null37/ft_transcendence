@@ -1,0 +1,19 @@
+version: "3.7"
+
+services:
+  postgres:
+    image: postgres
+  back-end:
+      image:  node
+      depends_on:
+        - postgres
+  fron-end:
+      image: node
+      depends_on:
+        - back-end
+  pgadmin: # UI for database
+    image: dpage/pgadmin4
+    depends_on:
+        - postgres
+
+  
