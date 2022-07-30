@@ -1,9 +1,10 @@
-version: "3.7"
+version: "3.9"
 
 services:
 
 ############################################### database ######################################
   postgres:
+    container_name: postgresql 
     image: postgres
     environment:
       - POSTGRES_DB=chat_pong
@@ -13,14 +14,16 @@ services:
       - 5432:5432
   ############################################### start backend ################################
   back-end:
-      image:  node
+      container_name: back-end 
+      build: docker/.
       depends_on:
         - postgres
       ports:
         - 1337:1337
   ############################################### start front-end ###############################
   fron-end:
-      image: node
+      container_name: front-end 
+      build: docker/.
       depends_on:
         - back-end
       ports:
@@ -28,6 +31,7 @@ services:
         - 443:443
   ############################################### start UI ###############################
   pgadmin: # UI for database
+    container_name: pgadmin
     image: dpage/pgadmin4
     depends_on:
         - postgres
