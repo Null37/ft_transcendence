@@ -6,9 +6,11 @@ services:
   postgres:
     image: postgres
     environment:
-        - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_DB=chat_pong
+      - POSTGRES_USER=transcendence
+      - POSTGRES_PASSWORD=transcendence
     ports:
-      - 5433:5433
+      - 5432:5432
   ############################################### start backend ################################
   back-end:
       image:  node
@@ -33,6 +35,6 @@ services:
         - PGADMIN_DEFAULT_EMAIL=admin@admin.com
         - PGADMIN_DEFAULT_PASSWORD=admin
     ports:
-      - 5432:80
+      - 8888:80
 
   
