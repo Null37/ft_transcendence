@@ -1,26 +1,38 @@
 version: "3.7"
 
 services:
+
+############################################### database ######################################
   postgres:
     image: postgres
+    environment:
+        - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - 5433:5433
+  ############################################### start backend ################################
   back-end:
       image:  node
       depends_on:
         - postgres
       ports:
-        - 1337
+        - 1337:1337
+  ############################################### start front-end ###############################
   fron-end:
       image: node
       depends_on:
         - back-end
       ports:
-        - 8080
-        - 443
+        - 8080:8080
+        - 443:443
+  ############################################### start UI ###############################
   pgadmin: # UI for database
     image: dpage/pgadmin4
     depends_on:
         - postgres
+    environment:
+        - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+        - PGADMIN_DEFAULT_PASSWORD=admin
     ports:
-      - 5432
+      - 5432:80
 
   
