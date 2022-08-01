@@ -121,7 +121,31 @@ export default Vue.extend({
       <v-sheet
         height="128"
         width="100%"
-      ></v-sheet>
+      >
+      
+        <v-list
+          class="pl-14"
+          shaped
+        >
+          <v-list-item
+            link
+          >
+            <v-list-item-content>
+              <v-list-item-title>Play a Game</v-list-item-title>
+            </v-list-item-content>
+            
+          </v-list-item>
+          <v-list-item
+            link
+          >
+            <v-list-item-content>
+              <v-list-item-title>Community</v-list-item-title>
+            </v-list-item-content>
+            
+          </v-list-item>
+        </v-list>
+      
+      </v-sheet>
       <FriendList />
     </v-navigation-drawer>
 
