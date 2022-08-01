@@ -9,4 +9,3 @@ RUN bash /root/build.sh
 
 
 CMD bash /root/enterpoint.sh
-
