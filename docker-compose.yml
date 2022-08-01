@@ -15,15 +15,20 @@ services:
   ############################################### start backend ################################
   back-end:
       container_name: back-end 
-      build: docker/.
+      build:
+        context: ./docker/.
+        dockerfile: back-end.dockerfile
       depends_on:
         - postgres
       ports:
         - 1337:1337
+        - 3000:3000
   ############################################### start front-end ###############################
   fron-end:
       container_name: front-end 
-      build: docker/.
+      build:
+        context: ./docker/.
+        dockerfile: front-end.dockerfile
       depends_on:
         - back-end
       ports:
