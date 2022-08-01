@@ -2,8 +2,8 @@ from node
 
 workdir /root
 
-copy tools/build.sh /root/.
-copy tools/enterpoint.sh /root/.
+copy tools/back-end/build.sh /root/.
+copy tools/back-end/enterpoint.sh /root/.
 
 RUN bash /root/build.sh
 
