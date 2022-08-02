@@ -7,13 +7,15 @@ import ChannelList from '../components/FriendsStatus.vue';
 
 export default Vue.extend({
     name: "App",
-    mounted: function () {
-        this.loaded()
-    },
-    methods: {
-        loaded: function () {
-            console.log(this.$refs.scrooll);
-        }
+    mounted() {
+      var el = document.getElementById("scrooll");
+      if (el != null)
+      {
+        el.scrollIntoView({
+          block: "end",
+          behavior: "auto"
+        });
+      }
     },
     data: () => ({
         drawer: null,
@@ -21,21 +23,21 @@ export default Vue.extend({
           {
             id: 0,
             from: 'John Josh',
-            message: `Sure, I'll see you later.`,
+            message: `Sure, I'll see yasdfou later.`,
             time: '10:42am',
             color: 'deep-purple lighten-1',
           },
           {
             id: 1,
             from: 'John Doe',
-            message: 'Yeah, sure. Does 1:00pm work?',
+            message: 'Yeah, sure. Doesasdf 1:00pm work?',
             time: '10:37am',
             color: 'green',
           },
           {
             id: 2,
             from: 'John Josh',
-            message: `Sure, I'll see you later.`,
+            message: `Sure, I'll seesadf you later.`,
             time: '10:42am',
             color: 'deep-purple lighten-1',
           },
@@ -175,11 +177,11 @@ export default Vue.extend({
     <ChannelList />
     <v-main>
 
-      <v-container fluid style="height:100%;" v-scroll:#scrooll="0">
-        <v-row justify="space-around d-flex flex-column">
-          <v-card v-for="message in messages" :key="message.time" flat>              
+      <v-container fluid style="height:100%;">
+        <v-row class="space-around flex-column">
+          <v-card v-for="message in messages" :key="message.id" flat>              
                   <v-list-item
-                      :key="message.time"
+                      :key="message.id"
                       class=""
                     >
                       <v-list-item-avatar class="align-self-start mr-2">                     
@@ -190,9 +192,9 @@ export default Vue.extend({
                       <v-list-item-content class="received-message">
                         <v-card color="grey darken-3" class="flex-none">                        
                           <v-card-text class="white--text pa-2 d-flex flex-column">
-                            <span ref="scrooll" v-if="message.id == messages.length - 1"  class="text-body-2 font-weight-bold">{{message.from}} <span class="text-caption">{{message.time}}</span> </span>  
-                            <span v-else class="text-body-2 font-weight-bold">{{message.from}} <span class="text-caption">{{message.time}}</span> </span>                                              
-                            <span class="align-self-start text-subtitle-1">{{ message.message }}</span>
+                            <span   class="text-body-2 font-weight-bold">{{message.from}} <span class="text-caption">{{message.time}}</span> </span>                                             
+                            <span id="scrooll" v-if="message.id == messages.length - 1" class="align-self-start text-subtitle-1">{{ message.message }}</span>
+                            <span v-else class="align-self-start text-subtitle-1">{{ message.message }}</span>
                             
                           </v-card-text>
                         </v-card>                   

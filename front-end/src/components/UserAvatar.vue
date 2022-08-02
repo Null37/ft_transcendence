@@ -1,3 +1,12 @@
+<script lang="ts">
+import Vue from 'vue';
+
+export default Vue.extend({
+    data: () => ({drawer: null})
+});
+</script>
+
+
 <template>
     <v-navigation-drawer
         v-model="drawer"
@@ -15,8 +24,6 @@
             :class="{ 'on-hover': hover }"
           >
             <v-btn
-              v-bind="attrs"
-              v-on="on"
               class="settings avatar-padding"
               min-width="36px"
               :elevation="1"
@@ -46,11 +53,6 @@
             size="28"
           ></v-avatar>
         </v-hover>
-        <v-dialog v-model="dialog" fullscreen scrollable>
-          <v-card>
-            This is a test
-          </v-card>
-        </v-dialog>
       </v-navigation-drawer>
 </template>
 
