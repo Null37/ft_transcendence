@@ -1,6 +1,7 @@
-import { Controller, Get, Logger, Post, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Logger, Post, Request, UseFilters, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { Unauthorized } from './auth.filter'
 
 @Controller()
 export class AppController {
@@ -10,6 +11,7 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
+  @UseFilters(Unauthorized)
   getProfile(@Request() req) {
     return req.user;
   }
@@ -18,9 +20,9 @@ export class AppController {
   hoho(@Request() req):string {
 	return 'it is working'
   }
-  @Get()
+  @Get("login")
   hehe(): string
   {
-	return'home';
+	  return'fuckyou';
   }
 }
