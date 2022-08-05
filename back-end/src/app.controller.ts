@@ -11,8 +11,6 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
-	Logger.log("akojdkajdkqajd;las");
-	process.stdout.write("akldl;aksdasdl;'");
     return req.user;
   }
 
