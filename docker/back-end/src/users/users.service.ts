@@ -12,9 +12,10 @@ export class UsersService {
     private readonly  usersdata: Repository<Users>
   ){}
 
-async findOne(id: string) {
+async findOne(username: string) {
   
-   const test = await this.usersdata.findOneBy({id});
+   const test = await this.usersdata.findOneBy({username});
+  //  vat b = this.usersdata.find();
   
    return test;
   }

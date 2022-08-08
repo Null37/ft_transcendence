@@ -8,4 +8,4 @@ sudo docker system prune -f
 
 sudo docker volume rm $(sudo docker volume ls -q);
 sudo docker network rm $(sudo docker network ls -q) 2>/dev/null
-sudo docker-compose up
+sudo docker-compose up --build
