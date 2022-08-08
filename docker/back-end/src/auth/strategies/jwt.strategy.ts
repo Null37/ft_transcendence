@@ -19,6 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 		console.log(accessToken);
 		console.log(accessToken);
 		console.log(refreshToken);
+		console.log(profile.id);
 		return cb(null, profile)
 	});
   }

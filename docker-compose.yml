@@ -7,7 +7,6 @@ services:
     container_name: postgresql 
     image: postgres
     environment:
-      - POSTGRES_DB=chat_pong
       - POSTGRES_USER=transcendence
       - POSTGRES_PASSWORD=transcendence
     ports:
