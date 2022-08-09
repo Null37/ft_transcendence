@@ -12,17 +12,29 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 	constructor(private readonly usra: UsersService) {
     super({
 		clientSecret: jwtConstants.secret,
-		clientID: '3f898cb71115b6afcb8219bbfc835014640317c0d8b46306fc6b69b869d988f1',
-		callbackURL: 'http://127.0.0.1:3000/profile',
+		clientID: 'ef83b7d3fe620b89e5e1defe0d47a56f796f2e037454c8fab1533bd0f9676cac',
+		callbackURL: 'http://10.11.43.175:3000/profile',
     },
-	function verify(accessToken, refreshToken, profile, cb) 
+	async function verify(accessToken, refreshToken, profile, cb) 
 	{
-		// console.log(accessToken);
-		// console.log(accessToken);
-		// console.log(refreshToken);
-		// console.log(profile.id);
-		usra.findOne('bruh');
-		return cb(null, profile)
+		console.log(accessToken);
+		console.log(accessToken);
+		console.log(refreshToken);
+		console.log(profile.id);
+		console.log(profile.username);
+		var vr = await usra.findOne(profile.username);
+		console.log(vr);
+		if(vr ==  null)
+		{
+			console.log("not found new user -- start create ----");
+			var test_user = usra.create({
+				username: null, // nake name in future
+				intra_login: profile.username,
+				avatart: profile._json.new_image_url,
+				status: "login"
+			})
+		}
+		return cb(null, test_user)
 	});
   }
 }
