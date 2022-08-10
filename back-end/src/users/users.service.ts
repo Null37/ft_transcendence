@@ -30,8 +30,6 @@ async findOne(intra_login: string)
 {
 
      const test = await this.usersdata.findOneBy({intra_login});
-     if(!test)
-        console.log(test.username);
     return test;
 }
 

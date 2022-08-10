@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { pass_42Guard } from './auth/guards/passport-42-auth.guard';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -21,6 +21,6 @@ import { UsersModule } from './users/users.module';
     }
   )],
   controllers: [AppController],
-  providers: [AppService, JwtAuthGuard],
+  providers: [AppService, pass_42Guard],
 })
 export class AppModule {}

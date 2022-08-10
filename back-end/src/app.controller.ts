@@ -1,7 +1,8 @@
-import { Controller, Get, Header, Logger, Post, Request, UseFilters, UseGuards } from '@nestjs/common';
+import { Controller, Get, Header, Logger, Post, Redirect, Request, Response, UseFilters, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { Unauthorized } from './auth.filter'
+import { pass_42Guard } from './auth/guards/passport-42-auth.guard';
+// import { Unauthorized } from './auth.filter'
+import { response } from 'express';
 
 @Controller()
 export class AppController {
@@ -9,12 +10,13 @@ export class AppController {
 
 
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(pass_42Guard)
   @Get('profile')
-  
   //@UseFilters(Unauthorized)
-  getProfile(@Request() req) {
-    return req.user;
+  getProfile(@Request()  req, @Response() res) 
+  {
+  
+    return res.redirect("http://localhost:8080/Community");
   }
 
   @Get('working')
