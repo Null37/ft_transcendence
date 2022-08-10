@@ -9,7 +9,7 @@ export default Vue.extend({
 <template>
 <div id="app">
   <v-app id="inspire">
-   <v-main>
+   <v-main :style="{ 'background-color': 'red'}"> <!-- Change style here a si mouad-->
       <v-container
         class="fill-height"
         fluid
