@@ -19,3 +19,4 @@ npm i -g @nestjs/cli
 # install Passport strategy for authenticating with 42 using the OAuth 2.0 API.
 
 npm i  -g passport-42
+# npm install

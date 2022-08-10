@@ -17,6 +17,8 @@ services:
       build:
         context: ./docker/.
         dockerfile: back-end.dockerfile
+      volumes:
+        - /home/null37/Desktop/ft_transcendence/docker/back-end:/root/back-end
       depends_on:
         - postgres
       ports:

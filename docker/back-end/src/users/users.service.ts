@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/Entity/users.entity';
 import { Repository } from 'typeorm';
@@ -29,6 +30,8 @@ async findOne(intra_login: string)
 {
 
      const test = await this.usersdata.findOneBy({intra_login});
+     if(!test)
+        console.log(test.username);
     return test;
 }
 
