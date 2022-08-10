@@ -1,12 +1,18 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
+import Community from '../views/Community.vue';
+import Login from '../views/Login.vue';
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
     path: '/',
-    name: 'home',
+    component: Login
+  },
+  {
+    path: '/Community',
+    component: Community
   },
 ]
 
