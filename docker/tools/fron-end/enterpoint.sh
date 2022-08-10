@@ -1,4 +1,3 @@
 #!/bin/bash
-
-
-tail -f /dev/null
+npm install
+npm run serve

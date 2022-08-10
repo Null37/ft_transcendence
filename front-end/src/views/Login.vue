@@ -23,26 +23,27 @@ export default Vue.extend({
             md="4"
           >
             <div class="text-center">
+              <a href="http://localhost:3000/profile">
                 <v-btn
                 color="white"
                 class="black--text"
                 x-large
                 >
+                  <v-avatar
+                      size="36"
+                      tile
+                      left
+                  >
+                      <img
+                      :elevation="2"
+                      alt="Avatar"
+                      src="../assets/logo.png"
+                      >
+                  </v-avatar>
 
-                <v-avatar
-                    size="36"
-                    tile
-                    left
-                >
-                    <img
-                    :elevation="2"
-                    alt="Avatar"
-                    src="../assets/logo.png"
-                    >
-                </v-avatar>
-
-                Login
-                </v-btn>
+                  Login
+                  </v-btn>
+                </a>
             </div>
           </v-col>
         </v-row>

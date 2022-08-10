@@ -9,6 +9,7 @@ copy tools/back-end/enterpoint.sh /root/.
 
 RUN bash /root/build.sh
 
+workdir /back-end
 
 CMD bash /root/enterpoint.sh
 

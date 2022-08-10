@@ -18,7 +18,7 @@ services:
         context: ./docker/.
         dockerfile: back-end.dockerfile
       volumes:
-        - /home/null37/Desktop/ft_transcendence/back-end:/root/back-end
+        - ./back-end:/back-end
       depends_on:
         - postgres
       ports:
@@ -32,9 +32,10 @@ services:
         dockerfile: front-end.dockerfile
       depends_on:
         - back-end
+      volumes:
+        - ./front-end:/front-end
       ports:
         - 8080:8080
-        - 443:443
   ############################################### start UI ###############################
   pgadmin: # UI for database
     container_name: pgadmin
