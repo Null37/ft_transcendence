@@ -7,38 +7,28 @@ import ChannelList from '../components/FriendsStatus.vue';
 
 export default Vue.extend({
     name: "App",
-    mounted() {
-      var el = document.getElementById("scrooll");
-      if (el != null)
-      {
-        el.scrollIntoView({
-          block: "end",
-          behavior: "auto"
-        });
+    methods: {
+      submitMessage: function(e: any) {
+        this.messages.push({id: 0, from: "", message: e.target.value, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
+        this.placeHolder = "";
+      },
+
+      updateMessage: function(e: any){
+        this.placeHolder = e.target.value;
       }
     },
-	methods: {
-		submitMessage: function(e: any) {
-			this.messages.push({id: 0, from: "", message: e.target.value, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
-			this.placeHolder = "";
-		},
-
-		updateMessage: function(e: any){
-			this.placeHolder = e.target.value;
-		}
-	},
     data: () => ({
-        drawer: null,
-		placeHolder: "",
-        messages: [
-          {
-            id: 0,
-            from: 'John Josh',
-            message: `Sure, I'll see yasdfou later.`,
-            time: '10:42am',
-            color: 'deep-purple lighten-1',
-          },
-        ],
+      drawer: null,
+      placeHolder: "",
+      messages: [
+        {
+          id: 0,
+          from: 'John Josh',
+          message: `Sure, I'll see yasdfou later.`,
+          time: '10:42am',
+          color: 'deep-purple lighten-1',
+        },
+      ],
     }),
     components: { TopBar, UserAvatar, FriendList, ChannelList }
 });
@@ -106,8 +96,7 @@ export default Vue.extend({
                         <v-card color="grey darken-3" class="flex-none">                        
                           <v-card-text class="white--text pa-2 d-flex flex-column">
                             <span   class="text-body-2 font-weight-bold">{{message.from}} <span class="text-caption">{{message.time}}</span> </span>                                             
-                            <span id="scrooll" v-if="message.id == messages.length - 1" class="align-self-start text-subtitle-1">{{ message.message }}</span>
-                            <span v-else class="align-self-start text-subtitle-1">{{ message.message }}</span>
+                            <span class="align-self-start text-subtitle-1">{{ message.message }}</span>
                             
                           </v-card-text>
                         </v-card>                   
