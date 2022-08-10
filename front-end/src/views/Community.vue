@@ -17,112 +17,25 @@ export default Vue.extend({
         });
       }
     },
+	methods: {
+		submitMessage: function(e: any) {
+			this.messages.push({id: 0, from: "", message: e.target.value, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
+			this.placeHolder = "";
+		},
+
+		updateMessage: function(e: any){
+			this.placeHolder = e.target.value;
+		}
+	},
     data: () => ({
         drawer: null,
+		placeHolder: "",
         messages: [
           {
             id: 0,
             from: 'John Josh',
             message: `Sure, I'll see yasdfou later.`,
             time: '10:42am',
-            color: 'deep-purple lighten-1',
-          },
-          {
-            id: 1,
-            from: 'John Doe',
-            message: 'Yeah, sure. Doesasdf 1:00pm work?',
-            time: '10:37am',
-            color: 'green',
-          },
-          {
-            id: 2,
-            from: 'John Josh',
-            message: `Sure, I'll seesadf you later.`,
-            time: '10:42am',
-            color: 'deep-purple lighten-1',
-          },
-          {
-            id: 3,
-            from: 'John Doe',
-            message: 'Yeah, sure. Does 1:00pm work?',
-            time: '10:37am',
-            color: 'green',
-          },
-          {
-            id: 4,
-            from: 'John Josh',
-            message: `Sure, I'll see you later.`,
-            time: '10:42am',
-            color: 'deep-purple lighten-1',
-          },
-          {
-            id: 5,
-            from: 'John Doe',
-            message: 'Yeah, sure. Does 1:00pm work?',
-            time: '10:37am',
-            color: 'green',
-          },
-          {
-            id: 6,
-            from: 'John Josh',
-            message: `Sure, I'll see you later.`,
-            time: '10:42am',
-            color: 'deep-purple lighten-1',
-          },
-          {
-            id: 7,
-            from: 'John Doe',
-            message: 'Yeah, sure. Does 1:00pm work?',
-            time: '10:37am',
-            color: 'green',
-          },
-          {
-            id: 8,
-            from: 'John Josh',
-            message: `Sure, I'll see you later.`,
-            time: '10:42am',
-            color: 'deep-purple lighten-1',
-          },
-          {
-            id: 9,
-            from: 'John Doe',
-            message: 'Yeah, sure. Does 1:00pm work?',
-            time: '10:37am',
-            color: 'green',
-          },
-          {
-            id: 10,
-            from: 'John Josh',
-            message: `Sure, I'll see you later.`,
-            time: '10:42am',
-            color: 'deep-purple lighten-1',
-          },
-          {
-            id: 11,
-            from: 'John Doe',
-            message: 'Yeah, sure. Does 1:00pm work?',
-            time: '10:37am',
-            color: 'green',
-          },
-          {
-            id: 12,
-            from: 'John Josh',
-            message: `Sure, I'll see you later.`,
-            time: '10:42am',
-            color: 'deep-purple lighten-1',
-          },
-          {
-            id: 13,
-            from: 'John Doe',
-            message: 'Yeah, sure. Does 1:00pm work?',
-            time: '10:37am',
-            color: 'green',
-          },
-          {
-            id: 14,
-            from: 'John Josh',
-            message: 'Did you still want to grab lunch today?Did you still want to grab lunch today?Did you still want to grab lunch today?Did you still want to grab lunch today?Did you still want to grab lunch today?Did you still want to grab lunch today?Did you still want to grab lunch today?Did you still want to grab lunch today?Did you still want to grab lunch today?Did you still want to grab lunch today?',
-            time: '9:47am',
             color: 'deep-purple lighten-1',
           },
         ],
@@ -217,6 +130,8 @@ export default Vue.extend({
         hide-details
         rounded
         solo
+		v-model="placeHolder"
+		@keyup.enter="submitMessage"
       ></v-text-field>
     </v-footer>
   </v-app>
