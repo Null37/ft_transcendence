@@ -5,11 +5,17 @@ import UserAvatar from '../components/UserAvatar.vue';
 import FriendList from '../components/FriendList.vue';
 import ChannelList from '../components/FriendsStatus.vue';
 
+// SocketInstance.on('msgToClient')
+// SocketInstance.on('msgToClient', (msg: any) => {
+// 	console.log(`received a message: ${msg}`)
+// 	// this.messages.push({id: 0, from: "", message: msg, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
+// })
 export default Vue.extend({
     name: "App",
     methods: {
       submitMessage: function(e: any) {
-        this.messages.push({id: 0, from: "", message: e.target.value, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
+        // this.messages.push({id: 0, from: "", message: e.target.value, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
+		this.$socket.emit('msgToServer', this.placeHolder)
         this.placeHolder = "";
       },
 
@@ -30,6 +36,12 @@ export default Vue.extend({
         },
       ],
     }),
+	mounted () {
+		// this.$socket.
+		this.sockets.subscribe("msgToClient", (msg: any) => {
+			this.messages.push({id: 0, from: "", message: msg, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
+		})
+	},
     components: { TopBar, UserAvatar, FriendList, ChannelList }
 });
 </script>
