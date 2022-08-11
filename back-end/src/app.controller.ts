@@ -11,17 +11,20 @@ export class AppController {
 
 
   @UseGuards(pass_42Guard)
-  @Get('profile')
+  @Get('login')
   //@UseFilters(Unauthorized)
   getProfile(@Request()  req, @Response() res) 
   {
-  
+    res.cookie("test", "lol")
+
     return res.redirect("http://localhost:8080/Community");
   }
 
   @Get('working')
-  hoho(@Request() req):string {
-	return 'it is working'
+  hoho(@Request() req, @Response() res )
+  {
+
+  	// return res.cookie("test", "lol").send()
   }
   @Get("login")
   hehe(): string

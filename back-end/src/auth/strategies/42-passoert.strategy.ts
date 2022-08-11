@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { cp } from 'fs';
-import { userInfo } from 'os';
 import { Strategy } from 'passport-42';
 import { UsersService } from 'src/users/users.service';
 import { jwtConstants } from '../constants';
@@ -14,7 +12,7 @@ export class passport_42 extends PassportStrategy(Strategy) {
     super({
 		clientSecret: jwtConstants.secret,
 		clientID: 'ef83b7d3fe620b89e5e1defe0d47a56f796f2e037454c8fab1533bd0f9676cac',
-		callbackURL: 'http://localhost:3000/profile',
+		callbackURL: 'http://localhost:3000/login',
     },
 	async function verify(accessToken, refreshToken, profile, cb) 
 	{
