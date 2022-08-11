@@ -16,13 +16,8 @@ export class passport_42 extends PassportStrategy(Strategy) {
     },
 	async function verify(accessToken, refreshToken, profile, cb) 
 	{
-		// console.log(accessToken);
-		// console.log(accessToken);
-		// console.log(refreshToken);
-		// console.log(profile.id);
-		// console.log(profile.username);
 		var vr = await usra.findOne(profile.username);
-		// console.log(vr);
+		console.log(vr);
 		if(vr ==  null)
 		{
 			console.log("not found new user -- start create ----");

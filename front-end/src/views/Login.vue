@@ -23,7 +23,7 @@ export default Vue.extend({
             md="4"
           >
             <div class="text-center">
-              <a href="http://localhost:3000/profile">
+              <a href="http://localhost:3000/Login">
                 <v-btn
                 color="white"
                 class="black--text"
