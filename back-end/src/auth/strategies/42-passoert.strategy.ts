@@ -29,7 +29,8 @@ export class passport_42 extends PassportStrategy(Strategy) {
 			})
 		}
 		// if  create token and set cookie 
-		return cb(null, profile);
+		return cb(null, vr);
 	});
   }
+
 }

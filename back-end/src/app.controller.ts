@@ -3,6 +3,10 @@ import { AuthService } from './auth/auth.service';
 import { pass_42Guard } from './auth/guards/passport-42-auth.guard';
 // import { Unauthorized } from './auth.filter'
 import { response } from 'express';
+import { Users } from './Entity/users.entity';
+import { jwtGuard } from './auth/guards/jwt-auth.guard';
+import { retryWhen } from 'rxjs';
+import { FastifyRequest } from 'fastify';
 
 @Controller()
 export class AppController {
@@ -13,22 +17,25 @@ export class AppController {
   @UseGuards(pass_42Guard)
   @Get('login')
   //@UseFilters(Unauthorized)
-  getProfile(@Request()  req, @Response() res) 
+  login(@Request() req, @Response() res) 
   {
-    res.cookie("test", "lol")
-
+    // var token:string
+    const accessToken = this.authService.login(req.user)
+    console.log(accessToken)
+    res.cookie('token', accessToken, {
+      sameSite: 'strict',
+      httpOnly: true,
+      // withCredentials: true
+    });
     return res.redirect("http://localhost:8080/Community");
   }
 
-  @Get('working')
-  hoho(@Request() req, @Response() res )
+  @UseGuards(jwtGuard)
+  @Get('verify')
+  verify_user(@Request() req)
   {
-
+    console.log("najaaaa7")
+    return req.user
   	// return res.cookie("test", "lol").send()
-  }
-  @Get("login")
-  hehe(): string
-  {
-	  return'fuckyou';
   }
 }
