@@ -20,10 +20,11 @@ export class AppController {
   login(@Request() req, @Response() res) 
   {
     // var token:string
+    // let profile = req.user
     const accessToken = this.authService.login(req.user)
     console.log(accessToken)
     res.cookie('token', accessToken, {
-      sameSite: 'strict',
+      //sameSite: 'strict',
       httpOnly: true,
       // withCredentials: true
     });

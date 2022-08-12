@@ -21,13 +21,15 @@ export class passport_42 extends PassportStrategy(Strategy) {
 		if(vr ==  null)
 		{
 			console.log("not found new user -- start create ----");
-			var test_user = usra.create({
+			vr = await usra.create({
 				username: null, // nake name in future
 				intra_login: profile.username,
 				avatart: profile._json.new_image_url,
 				status: "login"
 			})
+			// vr = test_user;
 		}
+		// vr = await usra.findOne(test_user.intra_login);
 		// if  create token and set cookie 
 		return cb(null, vr);
 	});

@@ -13,7 +13,7 @@ export class jwtStrategy extends PassportStrategy(Strategy)
         super({
             ignoreExpiration: false,
             secretOrKey:"My random secret key never let others",
-            jwtFromRequest:ExtractJwt.fromExtractors([(request:Request) => {
+            jwtFromRequest: ExtractJwt.fromExtractors([(request:Request) => {
                 let data = request?.cookies["token"];
                 console.log(data)
                 if(data == undefined){
@@ -27,7 +27,7 @@ export class jwtStrategy extends PassportStrategy(Strategy)
     async validate(payload:any){
         console.log("test1")
         if(payload === null){
-            throw new UnauthorizedException();
+            // throw new UnauthorizedException();
         }
         console.log(payload)
         return {
