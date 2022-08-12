@@ -1,4 +1,4 @@
-import { Controller, Get, Header, Logger, Post, Redirect, Request, Response, UseFilters, UseGuards } from '@nestjs/common';
+import { Controller, Get, Header, HttpStatus, Logger, Post, Redirect, Request, Response, UseFilters, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { pass_42Guard } from './auth/guards/passport-42-auth.guard';
 // import { Unauthorized } from './auth.filter'
@@ -33,10 +33,9 @@ export class AppController {
 
   @UseGuards(jwtGuard)
   @Get('verify')
-  verify_user(@Request() req)
+  verify_user(@Response() res)
   {
-    console.log("najaaaa7")
-    return req.user
-  	// return res.cookie("test", "lol").send()
+      //check if user have true token
+    return res.status(HttpStatus.OK).send()
   }
 }

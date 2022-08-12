@@ -27,10 +27,7 @@ export class passport_42 extends PassportStrategy(Strategy) {
 				avatart: profile._json.new_image_url,
 				status: "login"
 			})
-			// vr = test_user;
 		}
-		// vr = await usra.findOne(test_user.intra_login);
-		// if  create token and set cookie 
 		return cb(null, vr);
 	});
   }
