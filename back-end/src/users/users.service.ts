@@ -26,10 +26,10 @@ export class UsersService {
     private readonly  usersdata: Repository<Users>
   ){}
 
-async findOne(intra_login: string) 
+async findOne(intra_login: string): Promise<Users | null> 
 {
-
-     const test = await this.usersdata.findOneBy({intra_login});
+    const test = await this.usersdata.findOneBy({intra_login});
+    console.log("value ===> ", test)
     return test;
 }
 
@@ -37,5 +37,10 @@ async findOne(intra_login: string)
   {
       var test  = this.usersdata.create(users_id);
       return this.usersdata.save(test);
+  }
+
+  findAll()
+  {
+    return this.usersdata.find();
   }
 }

@@ -6,7 +6,7 @@ import { Users } from 'src/Entity/users.entity';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService, private readonly jwt: JwtService
+    private readonly userdata: UsersService, private readonly jwt: JwtService
   ) {}
 
   login(userdata: Users){
@@ -14,5 +14,14 @@ export class AuthService {
 
 
 	return this.jwt.sign(payload)
+  }
+
+  get_all()
+  {
+    return this.userdata.findAll()
+  }
+  get_user(intra: string ): Promise<Users | null> 
+  {
+    return this.userdata.findOne(intra)
   }
 }
