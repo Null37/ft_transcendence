@@ -88,27 +88,31 @@ export class AppController {
   }
 
   
-  // @UseGuards(jwtGuard)
-  @Post('upload/image')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: './upload/profile',
-      filename: (req, file, cp) => {
-        const filename: string = path.parse(file.originalname).name.replace('\/s/g', '') + uuid();
-        console.log("random string ", uuid());
-        console.log("first part", filename)
-        console.log("file name object", file);
-        console.log("file orginalename", file.originalname);
-        const extention: string = path.parse(file.originalname).ext; 
-        cp(null, `${filename}${extention}`)
-      }
-    })
-  }))
-  update_avatar(@UploadedFile() file) 
-  {
-    console.log("start upload file")
-    console.log(file);
-  }
+  // // @UseGuards(jwtGuard)
+  // @Post('upload/image')
+  // @UseInterceptors(FileInterceptor('file', {
+  //   storage: diskStorage({
+  //     destination: './upload/profile',
+  //     filename: (req, file, cp) => {
+  //       console.log('start save image file ==>', file.originalname)
+  //       //parse(file.originalname).name.replace('\/s/g', '')
+  //       let test:string =  file.originalname
+  //       let test2:string = path.parse(test).name
+  //       // const filename: string = path.parse(test) + uuid();
+  //       console.log("random string ", uuid());
+  //       // console.log("first part", filename)
+  //       console.log("file name object", file);
+  //       console.log("file orginalename", file.originalname);
+  //       const extention: string = path.parse(file.originalname).ext; 
+  //       cp(null, `${extention}`)
+  //     }
+  //   })
+  // }))
+  // update_avatar(@UploadedFile() file) 
+  // {
+  //   console.log("start upload file")
+  //   console.log(file);
+  // }
   
 
 
