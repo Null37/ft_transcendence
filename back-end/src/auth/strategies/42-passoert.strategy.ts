@@ -21,10 +21,9 @@ export class passport_42 extends PassportStrategy(Strategy) {
 		if(vr ==  null)
 		{
 			console.log("not found new user -- start create ----");
-			vr = await usra.create({
-				username: "", // nake name in future // for fornt-end check
+			vr = await usra.create({ // nake name in future // for fornt-end check
 				intra_login: profile.username,
-				avatar: profile._json.new_image_url,
+				avatar: profile._json.image_url,
 				status: "login"
 			})
 			console.log(vr)

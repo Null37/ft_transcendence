@@ -3,7 +3,7 @@
 
 export class user_dto
 {
-    username: string
+    username?: string
 
     intra_login: string
 

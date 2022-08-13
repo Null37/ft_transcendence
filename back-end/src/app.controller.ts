@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Header, HttpStatus, Logger, NotFoundException, Param, Patch, Post, Query, Redirect, Request, Res, Response, UseFilters, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Header, HttpStatus, Logger, NotFoundException, Param, Patch, Post, Query, Redirect, Request, Res, Response, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { pass_42Guard } from './auth/guards/passport-42-auth.guard';
 // import { Unauthorized } from './auth.filter'
@@ -8,6 +8,9 @@ import { jwtGuard } from './auth/guards/jwt-auth.guard';
 import { NotFoundError, retryWhen } from 'rxjs';
 import { FastifyRequest } from 'fastify';
 import path from 'path';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { profile } from 'console';
 
 @Controller()
 export class AppController {
@@ -72,7 +75,7 @@ export class AppController {
       this.authService.update_info({id: req.user.sub, status: "logout"})
       console.log("logout")
       // let test = await this.authService.get_all()
-      console.log(test);
+     // console.log(test);
       res.clearCookie('token').send(); // remove token from cookie
   }
   @UseGuards(jwtGuard)
@@ -88,6 +91,24 @@ export class AppController {
       throw new BadRequestException('USERNAME NOT UNIQ')   // 400  bad req
      this.authService.update_info({id: req.user.sub, username: body.username,  status: body.status, avatar: body.avatar});
   }
+
   
+  // @UseGuards(jwtGuard)
+  // @Post('uplod/image')
+  // @UseInterceptors(FileInterceptor('file', {
+  //   storage: diskStorage({
+  //     destination: './upload/profile',
+  //     filename: (req, file, cp) => {
+  //       // let filename: string = path.p arse()
+  //     }
+  //   })
+  // }))
+  // update_avatar()
+  // {
+
+  // }
+  
+
+
 
 }

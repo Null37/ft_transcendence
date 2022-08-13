@@ -16,7 +16,7 @@ export class UsersService {
 
 async findOne(username: string): Promise<Users | null> 
 {
-    const test = await this.usersdata.findOneBy({username});
+    const test = await this.usersdata.findOneBy( { intra_login: username });
     console.log("value ===> ", test)
     return test;
 }
