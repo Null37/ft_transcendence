@@ -18,7 +18,7 @@
       right
     >
       <v-list dense>
-      <v-subheader>REPORTS</v-subheader>
+      <v-subheader>Friends</v-subheader>
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
@@ -26,15 +26,65 @@
         >
           <v-list-item-icon>
 
-            <v-icon color="primaty" v-text="item.icon"></v-icon>
+           <v-avatar
+              color="indigo"
+              size="24"
+            >
+               <img
+                        src="https://cdn.vuetifyjs.com/images/john.jpg"
+                        alt="John"
+                    >
+            </v-avatar>
             <v-badge
               bottom
+              v-if="item.status === 'Online'"
               color="success"
+              dot
+            ></v-badge>
+            <v-badge
+              bottom
+              v-else-if="item.status === 'Offline'"
+              color="grey"
+              dot
+            ></v-badge>
+            <v-badge
+              bottom
+              v-else-if="item.status === 'In-Game'"
+              color="red"
               dot
             ></v-badge>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title v-text="item.text"></v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+    </v-list>
+    <v-list dense>
+      <v-subheader>Users</v-subheader>
+        <v-list-item
+          v-for="i in 100"
+          :key="i"
+          link
+        >
+          <v-list-item-icon>
+
+           <v-avatar
+              color="indigo"
+              size="24"
+            >
+               <img
+                        src="https://cdn.vuetifyjs.com/images/john.jpg"
+                        alt="John"
+                    >
+            </v-avatar>
+            <v-badge
+              bottom
+              color="grey"
+              dot
+            ></v-badge>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title >Null37</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
     </v-list>

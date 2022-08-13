@@ -47,11 +47,25 @@ export default Vue.extend({
         :key="n"
         >
           <v-avatar
-            class="d-block text-center mx-auto mb-9"
-            color="grey lighten-1"
+            class="d-block mx-auto mb-9"
+            color="grey darken-4"
             :class="{ 'on-hover': hover }"
             size="28"
-          ></v-avatar>
+          >
+            <span class="text-h6">R</span>
+          </v-avatar>
+        </v-hover>
+        <v-hover
+        v-slot="{ hover }"
+        >
+          <v-avatar
+            class="d-block mx-auto mb-9"
+            color="grey darken-4"
+            :class="{ 'on-hover': hover }"
+            size="28"
+          >
+            <span class="text-h6">+</span>
+          </v-avatar>
         </v-hover>
       </v-navigation-drawer>
 </template>

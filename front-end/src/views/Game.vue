@@ -52,14 +52,46 @@ export default Vue.extend({
 
 <template>
    <v-app id="inspire">
-    <TopBar />
+    
 
     <v-navigation-drawer
       v-model="drawer"
       app
       width="300"
     >
-      <UserAvatar />
+      <v-navigation-drawer
+        v-model="drawer"
+        absolute
+
+        mini-variant
+      >
+        <v-hover
+        v-slot="{ hover }"
+        >
+          <v-avatar
+            class="d-block text-center mx-auto mt-4"
+            color="primary"
+            size="36"
+            :class="{ 'on-hover': hover }"
+          >
+            <v-btn
+              class="settings avatar-padding"
+              min-width="36px"
+              :elevation="1"
+            >
+              <v-icon
+              dark
+              >mdi-cog</v-icon>
+            </v-btn>
+
+            <img
+              :elevation="2"
+              alt="Avatar"
+              src="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
+            >
+          </v-avatar>
+        </v-hover>
+      </v-navigation-drawer>
 
       <v-sheet
         height="128"
@@ -93,80 +125,58 @@ export default Vue.extend({
         </v-list>
       
       </v-sheet>
-      <FriendList />
+
     </v-navigation-drawer>
 
     <FriendsStatus />
     <v-main>
 
-      <v-container fluid style="height:100%;">
-        <v-row class="space-around flex-column">
-          <v-card v-for="message in messages" :key="message.id" flat>              
-                  <v-list-item
-                      :key="message.id"
-                      class=""
-                    >
-                      <v-list-item-avatar class="align-self-start mr-2">                     
-                        <v-avatar size="40">
-                          <v-img src="https://i.pinimg.com/736x/35/d5/0e/35d50ea7dac12997c537c9c7e59e5498.jpg"></v-img>
-                        </v-avatar>                     
-                      </v-list-item-avatar>
-                      <v-list-item-content class="received-message">
-                        <v-card color="grey darken-3" class="flex-none">                        
-                          <v-card-text class="white--text pa-2 d-flex flex-column">
-                            <span   class="text-body-2 font-weight-bold">{{message.from}} <span class="text-caption">{{message.time}}</span> </span>                                             
-                            <span class="align-self-start text-subtitle-1">{{ message.message }}</span>
-                            
-                          </v-card-text>
-                        </v-card>                   
-                      </v-list-item-content>
-                  </v-list-item>
-                </v-card>
+      <v-container
+            class="fill-height"
+            fluid
+        >
+            <v-row
+            justify="center"
+            >
+          <v-col
+            cols="12"
+          >
+            <div class="text-center">
+                <v-btn
+                color="white"
+                class="black--text"
+                x-large
+                >
+                  Search for Game
+                  </v-btn>
+            </div>
+          </v-col>
         </v-row>
       </v-container>
 
     </v-main>
-    <v-footer
-      app
-      height="72"
-      inset
-    >
-      <v-text-field
-        dense
-        flat
-        hide-details
-        rounded
-        solo
-		v-model="placeHolder"
-		@keyup.enter="submitMessage"
-      ></v-text-field>
-    </v-footer>
   </v-app>
 </template>
 
 <style lang="scss" scoped>
-.chat-message {
-  display: unset !important;
-  white-space: break-spaces;
+.v-avatar.on-hover
+{
+  box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
-.chat-screen {
-  max-height: 320px;
-  overflow-y: auto;
+
+.avatar-padding
+{
+  padding: 0 !important;
 }
-.flex-none {
-  flex: unset;
+.settings
+{
+  display: none;
+  background-color: rgba(0, 0, 0, 0.2);
 }
-.sent-message::after {
-    content: ' ';
-    position: absolute;
-    width: 0;
-    height: 0;
-    left: auto;    
-    right: 54px;
-    top: 12px;
-    bottom: auto;
-    border: 12px solid;
-    border-color: #1976d2 transparent transparent transparent;
+
+.v-avatar.on-hover > .settings
+{
+  display: inline-flex;
 }
 </style>
 

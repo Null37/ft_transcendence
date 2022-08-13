@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Community from '../views/Community.vue';
 import Login from '../views/Login.vue';
+import Game from '../views/Game.vue';
 
 Vue.use(VueRouter)
 
@@ -13,6 +14,10 @@ const routes: Array<RouteConfig> = [
   {
     path: '/Community',
     component: Community
+  },
+  {
+    path: '/Game',
+    component: Game
   },
 ]
 
