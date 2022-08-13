@@ -1,16 +1,11 @@
-import { BadRequestException, Body, Controller, Get, Header, HttpStatus, Logger, NotFoundException, Param, Patch, Post, Query, Redirect, Request, Res, Response, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Header, HttpStatus, Logger, NotFoundException, Param, Patch, Post, Query, Redirect, Request, Res, Response, UploadedFile, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { pass_42Guard } from './auth/guards/passport-42-auth.guard';
-// import { Unauthorized } from './auth.filter'
-import { response } from 'express';
-import { Users } from './Entity/users.entity';
-import { jwtGuard } from './auth/guards/jwt-auth.guard';
-import { NotFoundError, retryWhen } from 'rxjs';
-import { FastifyRequest } from 'fastify';
+ import { jwtGuard } from './auth/guards/jwt-auth.guard';
 import path from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { profile } from 'console';
+import { uuid } from 'uuidv4';
 
 @Controller()
 export class AppController {
@@ -94,19 +89,26 @@ export class AppController {
 
   
   // @UseGuards(jwtGuard)
-  // @Post('uplod/image')
-  // @UseInterceptors(FileInterceptor('file', {
-  //   storage: diskStorage({
-  //     destination: './upload/profile',
-  //     filename: (req, file, cp) => {
-  //       // let filename: string = path.p arse()
-  //     }
-  //   })
-  // }))
-  // update_avatar()
-  // {
-
-  // }
+  @Post('upload/image')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './upload/profile',
+      filename: (req, file, cp) => {
+        const filename: string = path.parse(file.originalname).name.replace('\/s/g', '') + uuid();
+        console.log("random string ", uuid());
+        console.log("first part", filename)
+        console.log("file name object", file);
+        console.log("file orginalename", file.originalname);
+        const extention: string = path.parse(file.originalname).ext; 
+        cp(null, `${filename}${extention}`)
+      }
+    })
+  }))
+  update_avatar(@UploadedFile() file) 
+  {
+    console.log("start upload file")
+    console.log(file);
+  }
   
 
 
