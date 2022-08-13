@@ -75,14 +75,27 @@ export class AppController {
       res.clearCookie('token').send(); // remove token from cookie
 
   }
-
+  @UseGuards(jwtGuard)
   @Patch('update')
-  update_user(@Body() body)
+  update_user(@Request() req , @Body() body)
   {
-    console.log("test 1")
-    console.log("req body", body)
-    console.log(" body value", body.username)
-    this.authService.update_info(body);
+    console.log("check test ==> " , body.status)
+    if(body.status == undefined)
+    {
+        let uniq_test = this.authService.get_user(body.username)
+        if(uniq_test != null)
+          throw new BadRequestException('USERNAME NOT UNIQ')   // 404  bad req
+        else
+          this.authService.update_info({id: req.user.sub, username: body.username});
+    }
+    else
+    {
+       console.log("test 1")
+      console.log("req body", body)
+      // console.log(" body value", body.username)
+      this.authService.update_info(body);
+    }
+   
   }
   
 
