@@ -17,9 +17,9 @@ export class AuthService {
 	return this.jwt.sign(payload)
   }
 
-  get_all()
+   get_all()
   {
-    return this.userdata.findAll()
+    return  this.userdata.findAll()
   }
   get_user(username: string ): Promise<Users | null> 
   {

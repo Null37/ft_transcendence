@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { InjectRepository } from '@nestjs/typeorm';
 import { update_dto } from 'src/DTO/update.dto';
@@ -27,9 +27,9 @@ async findOne(username: string): Promise<Users | null>
       return this.usersdata.save(test);
   }
 
-  findAll()
+   findAll()
   {
-    return this.usersdata.find();
+    return  this.usersdata.find();
   }
   async update(dto_update: update_dto)
   {
@@ -47,7 +47,7 @@ async findOne(username: string): Promise<Users | null>
     {
       // if id not found the perload throw
       // if(newuser == null)
-        console.log("id is necessary")
+        throw new UnauthorizedException()
     }
       // console.log(newuser);
   }
