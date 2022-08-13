@@ -7,7 +7,6 @@ export default Vue.extend({
 </script>
 
 <template>
-<div id="app">
   <v-app id="inspire">
    <v-main>
       <v-container
@@ -50,5 +49,4 @@ export default Vue.extend({
       </v-container>
     </v-main>
   </v-app>
-</div>
 </template>
