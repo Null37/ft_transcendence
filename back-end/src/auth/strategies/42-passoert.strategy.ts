@@ -22,11 +22,12 @@ export class passport_42 extends PassportStrategy(Strategy) {
 		{
 			console.log("not found new user -- start create ----");
 			vr = await usra.create({
-				username: null, // nake name in future
+				username: "", // nake name in future // for fornt-end check
 				intra_login: profile.username,
-				avatart: profile._json.new_image_url,
+				avatar: profile._json.new_image_url,
 				status: "login"
 			})
+			console.log(vr)
 		}
 		return cb(null, vr);
 	});
