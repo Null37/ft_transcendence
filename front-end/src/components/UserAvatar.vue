@@ -1,8 +1,11 @@
 <script lang="ts">
 import Vue from 'vue';
+import EditProfile from './EditProfile.vue';
+import CreateRoom from './CreateRoom.vue';
 
 export default Vue.extend({
-    data: () => ({drawer: null})
+    data: () => ({ drawer: null }),
+    components: { EditProfile, CreateRoom }
 });
 </script>
 
@@ -14,32 +17,7 @@ export default Vue.extend({
 
         mini-variant
       >
-        <v-hover
-        v-slot="{ hover }"
-        >
-          <v-avatar
-            class="d-block text-center mx-auto mt-4"
-            color="primary"
-            size="36"
-            :class="{ 'on-hover': hover }"
-          >
-            <v-btn
-              class="settings avatar-padding"
-              min-width="36px"
-              :elevation="1"
-            >
-              <v-icon
-              dark
-              >mdi-cog</v-icon>
-            </v-btn>
-
-            <img
-              :elevation="2"
-              alt="Avatar"
-              src="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
-            >
-          </v-avatar>
-        </v-hover>
+        <EditProfile />
         <v-divider class="mx-3 my-5"></v-divider>
         <v-hover
         v-slot="{ hover }"
@@ -55,18 +33,7 @@ export default Vue.extend({
             <span class="text-h6">R</span>
           </v-avatar>
         </v-hover>
-        <v-hover
-        v-slot="{ hover }"
-        >
-          <v-avatar
-            class="d-block mx-auto mb-9"
-            color="grey darken-4"
-            :class="{ 'on-hover': hover }"
-            size="28"
-          >
-            <span class="text-h6">+</span>
-          </v-avatar>
-        </v-hover>
+        <CreateRoom />
       </v-navigation-drawer>
 </template>
 

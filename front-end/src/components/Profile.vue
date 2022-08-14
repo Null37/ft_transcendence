@@ -13,6 +13,18 @@
       persistent
       max-width="600px"
     >
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+              v-bind="attrs"
+              v-on="on"
+              size="40"
+              class="justify-center"
+              >
+          <v-avatar size="40">
+            <v-img src="https://i.pinimg.com/736x/35/d5/0e/35d50ea7dac12997c537c9c7e59e5498.jpg"></v-img>
+          </v-avatar>
+        </v-btn>
+      </template>
       <v-card >
         <v-card-title class="justify-center">
           <span class="text-h5">User Profile</span>
@@ -72,13 +84,6 @@
             @click="dialog = false"
           >
             Close
-          </v-btn>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="dialog = false"
-          >
-            Save
           </v-btn>
         </v-card-actions>
       </v-card>
