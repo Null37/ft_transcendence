@@ -15,7 +15,7 @@ export class Users
     intra_login: string
 
     @Column()
-    avatart: string
+    avatar: string
 
     @Column()
     status: string

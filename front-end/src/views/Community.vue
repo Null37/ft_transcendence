@@ -4,6 +4,7 @@ import TopBar from '../components/TopBar.vue';
 import UserAvatar from '../components/UserAvatar.vue';
 import FriendList from '../components/FriendList.vue';
 import FriendsStatus from '../components/FriendsStatus.vue';
+import Profile from '@/components/Profile.vue';
 
 // SocketInstance.on('msgToClient')
 // SocketInstance.on('msgToClient', (msg: any) => {
@@ -28,6 +29,7 @@ export default Vue.extend({
     },
     data: () => ({
       drawer: null,
+      showDialog: true,
       placeHolder: "",
       messages: [
         {
@@ -45,7 +47,7 @@ export default Vue.extend({
 			this.messages.push({id: 0, from: "", message: msg, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
 		})
 	},
-    components: { TopBar, UserAvatar, FriendList, FriendsStatus }
+    components: { TopBar, UserAvatar, FriendList, FriendsStatus, Profile }
 });
 </script>
 
@@ -106,10 +108,9 @@ export default Vue.extend({
                       :key="message.id"
                       class=""
                     >
-                      <v-list-item-avatar class="align-self-start mr-2">                     
-                        <v-avatar size="40">
-                          <v-img src="https://i.pinimg.com/736x/35/d5/0e/35d50ea7dac12997c537c9c7e59e5498.jpg"></v-img>
-                        </v-avatar>                     
+                      <v-list-item-avatar class="align-self-start mr-2">
+                        <Profile />                   
+                                
                       </v-list-item-avatar>
                       <v-list-item-content class="received-message">
                         <v-card color="grey darken-3" class="flex-none">                        

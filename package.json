@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@nestjs/jwt": "^9.0.0",
+    "cookie-parser": "^1.4.6",
+    "passport-jwt": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.3",
+    "@types/multer": "^1.4.7",
+    "@types/passport-jwt": "^3.0.6"
+  }
+}

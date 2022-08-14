@@ -14,6 +14,37 @@
       persistent
       max-width="600px"
     >
+      <template v-slot:activator="{ on, attrs }">
+        <v-hover
+        v-slot="{ hover }"
+        >
+          <v-avatar
+            class="d-block text-center mx-auto mt-4"
+            color="primary"
+            size="36"
+            :class="{ 'on-hover': hover }"
+          >
+            
+            <v-btn
+              class="settings avatar-padding"
+              min-width="36px"
+              :elevation="1"
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-icon
+              dark
+              >mdi-cog</v-icon>
+            </v-btn>
+            <img
+              :elevation="2"
+              alt="Avatar"
+              src="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
+            >
+          </v-avatar>
+        </v-hover>
+        
+      </template>
       <v-card>
         <v-card-title class="justify-center">
           <span class="text-h5">Edit your profile</span>
@@ -71,3 +102,25 @@
   </v-row>
 </template>
 
+<style lang="scss" scoped>
+.v-avatar.on-hover
+{
+  box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.avatar-padding
+{
+  padding: 0 !important;
+}
+.settings
+{
+  height: 38px;
+  display: none;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.v-avatar.on-hover > .settings
+{
+  display: inline-flex;
+}
+</style>

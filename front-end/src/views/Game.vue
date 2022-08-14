@@ -4,6 +4,7 @@ import TopBar from '../components/TopBar.vue';
 import UserAvatar from '../components/UserAvatar.vue';
 import FriendList from '../components/FriendList.vue';
 import FriendsStatus from '../components/FriendsStatus.vue';
+import EditProfile from '@/components/EditProfile.vue';
 
 // SocketInstance.on('msgToClient')
 // SocketInstance.on('msgToClient', (msg: any) => {
@@ -45,7 +46,7 @@ export default Vue.extend({
 			this.messages.push({id: 0, from: "", message: msg, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
 		})
 	},
-    components: { TopBar, UserAvatar, FriendList, FriendsStatus }
+    components: { TopBar, UserAvatar, FriendList, FriendsStatus, EditProfile }
 });
 </script>
 
@@ -68,28 +69,7 @@ export default Vue.extend({
         <v-hover
         v-slot="{ hover }"
         >
-          <v-avatar
-            class="d-block text-center mx-auto mt-4"
-            color="primary"
-            size="36"
-            :class="{ 'on-hover': hover }"
-          >
-            <v-btn
-              class="settings avatar-padding"
-              min-width="36px"
-              :elevation="1"
-            >
-              <v-icon
-              dark
-              >mdi-cog</v-icon>
-            </v-btn>
-
-            <img
-              :elevation="2"
-              alt="Avatar"
-              src="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
-            >
-          </v-avatar>
+          <EditProfile />
         </v-hover>
       </v-navigation-drawer>
 
