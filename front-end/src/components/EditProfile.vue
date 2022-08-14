@@ -1,12 +1,3 @@
-<script lang="ts">
-  export default {
-    data: () => ({
-      dialog: false,
-    }),
-  }
-</script>
-
-
 <template>
   <v-row justify="center">
     <v-dialog
@@ -67,6 +58,7 @@
               <v-col>
                 <v-text-field
                   label="Username*"
+                  v-model="myUsername"
                   required
                 ></v-text-field>
                 <v-file-input
@@ -92,7 +84,7 @@
           <v-btn
             color="blue darken-1"
             text
-            @click="dialog = false"
+            @click="updateusername()"
           >
             Save
           </v-btn>
@@ -101,6 +93,21 @@
     </v-dialog>
   </v-row>
 </template>
+
+<script lang="ts">
+  export default {
+    data: () => ({
+      dialog: false,
+      myUsername: ""
+    }),
+    methods: {
+      updateusername()
+      {
+        console.log(this.myUsername);
+      }
+    }
+  }
+</script>
 
 <style lang="scss" scoped>
 .v-avatar.on-hover
