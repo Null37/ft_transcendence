@@ -26,6 +26,10 @@ export class AuthService {
     return this.userdata.findOne(username)
   }
 
+  check_username(username: string)
+  {
+    return this.userdata.find_username(username) 
+  }
   update_info(upd: update_dto)
   {
       let user =  this.userdata.update(upd)

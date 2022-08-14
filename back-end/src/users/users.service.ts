@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
 import { InjectRepository } from '@nestjs/typeorm';
 import { update_dto } from 'src/DTO/update.dto';
 import { user_dto } from 'src/DTO/user.dto';
@@ -14,9 +13,9 @@ export class UsersService {
     private readonly  usersdata: Repository<Users>
   ){}
 
-async findOne(username: string): Promise<Users | null> 
+async findOne(intra_log: string): Promise<Users | null> 
 {
-    const test = await this.usersdata.findOneBy( { intra_login: username });
+    const test = await this.usersdata.findOneBy( { intra_login: intra_log });
     console.log("value ===> ", test)
     return test;
 }
@@ -27,9 +26,15 @@ async findOne(username: string): Promise<Users | null>
       return this.usersdata.save(test);
   }
 
-   findAll()
+  findAll()
   {
     return  this.usersdata.find();
+  }
+  async find_username(username: string)
+  {
+    const test = await this.usersdata.findOneBy( { username: username });
+    console.log("value ===> ", test)
+    return test;
   }
   async update(dto_update: update_dto)
   {

@@ -1,11 +1,10 @@
-import { BadRequestException, Body, Controller, Get, Header, HttpStatus, Logger, NotFoundException, Param, Patch, Post, Query, Redirect, Request, Res, Response, UploadedFile, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, Body, Controller, FileTypeValidator, Get, Header, HttpStatus, Logger, NotFoundException, Param, ParseFilePipe, Patch, Post, Query, Redirect, Req, Request, Res, Response, UploadedFile, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { pass_42Guard } from './auth/guards/passport-42-auth.guard';
- import { jwtGuard } from './auth/guards/jwt-auth.guard';
-import path from 'path';
+import { jwtGuard } from './auth/guards/jwt-auth.guard';
+import * as path from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { uuid } from 'uuidv4';
 
 @Controller()
 export class AppController {
@@ -80,39 +79,41 @@ export class AppController {
     console.log("check test ==> " , body.username)
     let uniq_test = null
     if(body.username != undefined)
-      uniq_test = await this.authService.get_user(body.username) // test if usernane exit
+      uniq_test = await this.authService.check_username(body.username) // check username with database
     console.log(uniq_test)
     if(uniq_test != null)
       throw new BadRequestException('USERNAME NOT UNIQ')   // 400  bad req
      this.authService.update_info({id: req.user.sub, username: body.username,  status: body.status, avatar: body.avatar});
   }
 
-  
-  // // @UseGuards(jwtGuard)
-  // @Post('upload/image')
-  // @UseInterceptors(FileInterceptor('file', {
-  //   storage: diskStorage({
-  //     destination: './upload/profile',
-  //     filename: (req, file, cp) => {
-  //       console.log('start save image file ==>', file.originalname)
-  //       //parse(file.originalname).name.replace('\/s/g', '')
-  //       let test:string =  file.originalname
-  //       let test2:string = path.parse(test).name
-  //       // const filename: string = path.parse(test) + uuid();
-  //       console.log("random string ", uuid());
-  //       // console.log("first part", filename)
-  //       console.log("file name object", file);
-  //       console.log("file orginalename", file.originalname);
-  //       const extention: string = path.parse(file.originalname).ext; 
-  //       cp(null, `${extention}`)
-  //     }
-  //   })
-  // }))
-  // update_avatar(@UploadedFile() file) 
-  // {
-  //   console.log("start upload file")
-  //   console.log(file);
-  // }
+
+  @UseGuards(jwtGuard)
+  @Post('upload/image')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './upload/profile', // uoload location
+      filename: (req, file, cp) => {
+        console.log('start save image file ==>', file.originalname)
+        //parse(file.originalname).name.replace('\/s/g', '')
+        const fullpath: string =  file.originalname // full path of requset file
+        const path_parse: path.ParsedPath = path.parse(fullpath)
+        let file_name = path_parse.name
+        const extension: string = path_parse.ext.toLowerCase();
+        if(extension == '.png' || extension == '.jpeg' ||  extension == '.jpg' || extension == '.bmp' || extension == '.ico')
+          cp(null, `${file_name}${extension}`)
+       else 
+          cp(null, 'not image')
+      }
+
+    })
+  }))
+  update_avatar(@UploadedFile() file) 
+  {
+    if(file.filename == 'not image')
+      throw new BadGatewayException("not an image") // req 502
+    console.log("start upload file") 
+    console.log(file);
+  }
   
 
 
