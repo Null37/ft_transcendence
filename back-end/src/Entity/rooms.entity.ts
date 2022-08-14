@@ -1,48 +1,12 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm"
-
-
-export class RoomUserDTO
-{
-	@Column()
-	role: string
-
-	@Column()
-	status: number
-	/*
-		status: 0 ==>  normal
-		status: 1 ==>  muted
-		status: 2 ==>  banned
-	*/
-}
-
-@Entity()
-export class Users
-{
-	@PrimaryGeneratedColumn()
-    id: number
-
-	@Column()
-	role: string
-
-	@OneToOne(() => Rooms, (users) => users.users)
-	@JoinColumn()
-	rooms: Rooms
-
-	@Column()
-	status: number
-	/*
-		status: 0 ==>  normal
-		status: 1 ==>  muted
-		status: 2 ==>  banned
-	*/
-}
-
-// =========================================================
+import { RoomUsers } from "./roomsUser.entity";
 
 export class RoomsDTO
 {
+	roomName: string;
 	password: string;
 	state: number;
+	users: RoomUsers;
 }
 @Entity()
 export class Rooms
@@ -53,9 +17,12 @@ export class Rooms
     @Column({nullable: true})
     password: string
 
-	@OneToOne(() => Users, (rooms) => (rooms.rooms))
+    @Column()
+    roomName: string
+
+	@OneToOne(() => RoomUsers, (users) => (users.rooms), {onDelete: 'CASCADE', cascade: true})
 	@JoinColumn()
-	users: Users
+	users: RoomUsers
 
     @Column()
     state: number // or string

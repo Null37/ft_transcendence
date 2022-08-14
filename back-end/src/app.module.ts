@@ -24,6 +24,6 @@ import { RoomsModule } from './rooms/rooms.module';
     }
   )],
   controllers: [AppController],
-  providers: [AppService, pass_42Guard],
+  providers: [AppService, pass_42Guard, AppGateway],
 })
 export class AppModule {}
