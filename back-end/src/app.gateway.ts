@@ -31,18 +31,23 @@ import {
 	handleConnection(client: Socket, ...args: any[]) {
 	  this.logger.log(`Client connected:    ${client.id}`);
 	}
-  
-	@SubscribeMessage('msgToServer')
-	handleMessage(client: Socket, text: string): WsResponse<string> {
-	  this.logger.log(`Received message from: ${client.id}, content: ${text}`);
-	//   this.wss.emit('msgToClient', text);
-	  return { event: 'msgToClient', data: text };
+
+	@SubscribeMessage('userJoinedChat')
+	joinChatRoom(client: Socket): void {
+		this.logger.log(`A user joined this chat room`);
 	}
-	// @SubscribeMessage('msgToServer')
-	// handleMessage(client: Socket, text: string): void {
+	// @SubscribeMessage('msgToServer') 
+	// handleMessage(client: Socket, text: string): WsResponse<string> {
 	//   this.logger.log(`Received message from: ${client.id}, content: ${text}`);
-	//   this.wss.emit('msgToClient', text);
-	// //   return { event: 'msgToClient', data: text };
+	// //   this.wss.emit('msgToClient', text);
+	//   return { event: 'msgToClient', data: text };
 	// }
+
+	@SubscribeMessage('msgToServer')
+	handleMessage(client: Socket, text: string): void {
+	  this.logger.log(`Received message from: ${client.id}, content: ${text}`);
+	  client.broadcast.emit('msgToClient', text); // the client doesn't receive it
+	//   return { event: 'msgToClient', data: text };
+	}
   
   }	

@@ -6,10 +6,12 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { UsersModule } from './users/users.module';
 import { AppGateway } from './app.gateway';
+import { RoomsModule } from './rooms/rooms.module';
 
 @Module({
   imports: [AuthModule, 
-    UsersModule, 
+    UsersModule,
+	RoomsModule,
     TypeOrmModule.forRoot(
     {
         type: 'postgres',
