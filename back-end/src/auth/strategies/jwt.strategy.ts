@@ -13,14 +13,7 @@ export class jwtStrategy extends PassportStrategy(Strategy)
         super({
             ignoreExpiration: false,
             secretOrKey:"My random secret key never let others",
-            jwtFromRequest: ExtractJwt.fromExtractors([(request:Request) => {
-                let data = request?.cookies["token"];
-                console.log(data)
-                if(data == undefined){
-                    return null;
-                }
-                return data
-            }])
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
         });
     }
 

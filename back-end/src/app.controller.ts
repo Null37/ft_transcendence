@@ -27,7 +27,7 @@ export class AppController {
       httpOnly: true,
       // withCredentials: true
     });
-    return res.redirect("http://localhost:8080/Community");
+    return res.redirect("http://localhost:8080/Community?token="+accessToken);
   }
 
   @UseGuards(jwtGuard)

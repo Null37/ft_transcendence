@@ -24,6 +24,10 @@ services:
       ports:
         - 1337:1337
         - 3000:3000
+      networks:
+        default:
+          aliases:
+            - back-end
   ############################################### start front-end ###############################
   fron-end:
       container_name: front-end 
@@ -36,6 +40,10 @@ services:
         - ./front-end:/front-end
       ports:
         - 8080:8080
+      networks:
+        default:
+          aliases:
+            - front-end
   ############################################### start UI ###############################
   pgadmin: # UI for database
     container_name: pgadmin
