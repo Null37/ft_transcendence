@@ -6,11 +6,10 @@ import * as path from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 
+
 @Controller()
 export class AppController {
   constructor(private readonly authService: AuthService) {}
-
-
 
   @UseGuards(pass_42Guard)
   @Get('login')
@@ -91,7 +90,7 @@ export class AppController {
   @Post('upload/image')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      destination: './upload/profile', // uoload location
+      destination: 'images', // uoload location
       filename: (req, file, cp) => {
         console.log('start save image file ==>', file.originalname)
         //parse(file.originalname).name.replace('\/s/g', '')
@@ -107,13 +106,27 @@ export class AppController {
 
     })
   }))
-  update_avatar(@UploadedFile() file) 
+  async update_avatar(@Request() req, @UploadedFile() file) 
   {
     if(file.filename == 'not image')
       throw new BadGatewayException("not an image") // req 502
     console.log("start upload file") 
     console.log(file);
+    let path_file = "/upload/profile/" + file.filename
+    this.authService.update_info({id: req.user.sub, avatar: path_file})
   }
+
+  @UseGuards(jwtGuard)
+  @Get('ADD/friend/:id')
+  add_friend(@Request() req, @Param('id') par_id)
+  {
+      console.log("test ==> par_id", par_id)
+      console.log("test ==> user", req.user)
+      console.log("test ==> id", req.user.sub)
+
+
+  }
+
   
 
 
