@@ -5,6 +5,8 @@ import { jwtGuard } from './auth/guards/jwt-auth.guard';
 import * as path from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { request } from 'http';
+import { stringify } from 'querystring';
 
 
 @Controller()
@@ -92,11 +94,13 @@ export class AppController {
     storage: diskStorage({
       destination: 'images', // uoload location
       filename: (req, file, cp) => {
+        console.log("body ==> ", req.user)
+        // file.filename = req.user['name']
         console.log('start save image file ==>', file.originalname)
         //parse(file.originalname).name.replace('\/s/g', '')
         const fullpath: string =  file.originalname // full path of requset file
         const path_parse: path.ParsedPath = path.parse(fullpath)
-        let file_name = path_parse.name
+        let file_name = req.user['name']
         const extension: string = path_parse.ext.toLowerCase();
         if(extension == '.png' || extension == '.jpeg' ||  extension == '.jpg' || extension == '.bmp' || extension == '.ico')
           cp(null, `${file_name}${extension}`)
@@ -108,11 +112,13 @@ export class AppController {
   }))
   async update_avatar(@Request() req, @UploadedFile() file) 
   {
+    
+    file.filename = req.user.name
     if(file.filename == 'not image')
       throw new BadGatewayException("not an image") // req 502
     console.log("start upload file") 
     console.log(file);
-    let path_file = "/upload/profile/" + file.filename
+    let path_file = "/images/profile/" + file.filename
     this.authService.update_info({id: req.user.sub, avatar: path_file})
   }
 
