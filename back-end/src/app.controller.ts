@@ -112,8 +112,6 @@ export class AppController {
   }))
   async update_avatar(@Request() req, @UploadedFile() file) 
   {
-    
-    file.filename = req.user.name
     if(file.filename == 'not image')
       throw new BadGatewayException("not an image") // req 502
     console.log("start upload file") 
