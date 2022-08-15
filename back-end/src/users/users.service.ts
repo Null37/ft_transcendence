@@ -22,8 +22,8 @@ async findOne(intra_log: string): Promise<Users | null>
 
   create(users_id: user_dto) // dont forget to add real DTO
   {
-      var test  = this.usersdata.create(users_id);
-      return this.usersdata.save(test);
+      let newuser  = this.usersdata.create(users_id);
+      return this.usersdata.save(newuser);
   }
 
   findAll()
