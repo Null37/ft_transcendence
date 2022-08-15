@@ -19,6 +19,7 @@ services:
         dockerfile: back-end.dockerfile
       volumes:
         - ./back-end:/back-end
+        - ./images:/back-end/images
       depends_on:
         - postgres
       ports:
@@ -38,6 +39,7 @@ services:
         - back-end
       volumes:
         - ./front-end:/front-end
+        - ./images:/front-end/public/images
       ports:
         - 8080:8080
       networks:
