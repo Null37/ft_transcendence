@@ -1,11 +1,20 @@
-import { Entity } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Users } from "./users.entity";
+
 
 @Entity()
 export class friend
 {
-    // @join
-    user_id
-    friend_id
-    status
+    @PrimaryGeneratedColumn()
+    id: number
+
+    user_id: string
+
+    @OneToOne(() => Users)
+    @JoinColumn()
+    friend_id: Users
+
+    @Column()
+    status: boolean // true if friend and false block
 
 }

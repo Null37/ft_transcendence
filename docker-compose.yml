@@ -29,7 +29,7 @@ services:
           aliases:
             - back-end
   ############################################### start front-end ###############################
-  fron-end:
+  front-end:
       container_name: front-end 
       build:
         context: ./docker/.
