@@ -74,7 +74,7 @@ export default Vue.extend({
       </v-navigation-drawer>
 
       <v-sheet
-        height="128"
+        height="164"
         width="100%"
       >
       
@@ -98,6 +98,16 @@ export default Vue.extend({
                 >
                     <v-list-item-content>
                     <v-list-item-title>Community</v-list-item-title>
+                    </v-list-item-content>
+                    
+                </v-list-item>
+            </router-link>
+            <router-link style="text-decoration: none;" to="/Logout">
+                <v-list-item
+                    link
+                >
+                    <v-list-item-content>
+                    <v-list-item-title>Logout</v-list-item-title>
                     </v-list-item-content>
                     
                 </v-list-item>

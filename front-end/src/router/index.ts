@@ -9,14 +9,17 @@ Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
+    name: 'Login',
     path: '/Login',
     component: Login
   },
   {
+    name: 'Community',
     path: '/Community',
     component: Community
   },
   {
+    name: 'Game',
     path: '/Game',
     component: Game
   },
@@ -28,38 +31,46 @@ const router = new VueRouter({
   routes
 })
 
-router.beforeEach(async (to, from, next) => {
-
-  if (to.path === "/Community" && to.query.token !== undefined)
-  {
-    console.log(to.query.token);
-    axios.defaults.headers.common['Authorization'] = "Bearer " + to.query.token;
-
-    
-    axios.get('/verify')
-      .then(function (response) {
-        // handle success
-        console.log(response);
-        next("/Community");
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
+async function verify() {
+  const token = localStorage.getItem('token');
+  var loggeIn = false;
+  if (token) {
+    await axios.get('/verify', {
+      headers: {
+        Authorization: token
+    }}).then(res => {
+      loggeIn = true;
     })
+    .catch(error => {
+      loggeIn = false;
+    });
+  }
+  return (loggeIn);
+}
 
-    next("/");
-    
-  }
-  else if (to.path === "/" && axios.defaults.headers.common['Authorization'] !== "")
-    next("/Community");
-  else if (to.path === "/")
-    next("/Login");
-  else if (to.path === "/Logout")
+router.beforeEach(async (to, from, next) => {
+  if (to.path === "/Logout")
   {
-    axios.defaults.headers.common['Authorization'] = "";
-    next("/");
+    localStorage.removeItem("token");
+    return next({ name: 'Login' });
   }
-  next();
+  verify().then(loggedIn => {
+    if (to.path === "/Login" && !loggedIn)
+      return next();
+    else if (to.path === "/" && !loggedIn)
+      return next({ name: 'Login' });
+    else if (to.path === "/" && loggedIn)
+      return next({ name: 'Game' });
+    else if (to.path === "/Game" && to.query.token !== undefined)
+    {
+      localStorage.setItem("token", "Bearer " + to.query.token);
+
+      return next({ name: 'Game' });
+    }
+    else if (!loggedIn)
+      return next({ name: 'Login' });
+    next();
+  })
 })
 
 
