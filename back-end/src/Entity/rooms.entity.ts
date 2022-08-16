@@ -6,7 +6,7 @@ export class RoomsDTO
 	roomName: string;
 	password: string;
 	state: number;
-	users: RoomUsers;
+	// users: RoomUsers;
 }
 @Entity()
 export class Rooms
@@ -19,10 +19,6 @@ export class Rooms
 
     @Column()
     roomName: string
-
-	@OneToOne(() => RoomUsers, (users) => (users.rooms), {onDelete: 'CASCADE', cascade: true})
-	@JoinColumn()
-	users: RoomUsers
 
     @Column()
     state: number // or string

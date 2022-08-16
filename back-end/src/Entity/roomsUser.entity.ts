@@ -3,24 +3,29 @@ import { Rooms } from "./rooms.entity"
 
 export class RoomUserDTO
 {
-    id: number
+    roomID: number
 	role: string
+	userID: number
 	status: number
-	rooms: Rooms
 }
 
 @Entity()
 export class RoomUsers
 {
-	// @PrimaryGeneratedColumn()
+	@PrimaryGeneratedColumn()
+	id: number
+
 	@PrimaryColumn()
-    id: number
+    roomID: number
+
+	@Column()
+	userID: number;
 
 	@Column()
 	role: string
 
-	@OneToOne(() => Rooms, (rooms) => rooms.users, {onDelete: 'CASCADE'})
-	// @JoinColumn()
+	@OneToOne(() => Rooms)
+	@JoinColumn()
 	rooms: Rooms
 
 	@Column()

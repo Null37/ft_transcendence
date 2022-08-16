@@ -7,6 +7,7 @@ import {
 	WebSocketServer} from '@nestjs/websockets';
   import { Logger } from '@nestjs/common';
   import { Socket, Server } from 'socket.io';
+import { RoomsService } from './rooms/rooms.service';
   
   @WebSocketGateway({
 	  cors: {
@@ -16,7 +17,10 @@ import {
   export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   
 	@WebSocketServer() wss: Server;
-  
+
+	constructor(
+		private readonly roomsService: RoomsService
+	){}
 	private logger: Logger = new Logger('AppGateway');
   
 	afterInit(server: Server) {
@@ -53,11 +57,16 @@ import {
 	}
 
 
-
-
+	@SubscribeMessage('joinRoom')
+	handleJoinRoom(client: Socket, message: {userID: number, room: string}): void {
+		//TODO: check if room is protected and if user is not banned etc...
+		client.join(message.room);
+		client.emit('joinedRoom', message.room);
+	}
 	@SubscribeMessage('msgToClientDM')
 	handleDmMessage(client: Socket, text: string, room: string): void {
 		// Add logic before sending a message here
 		client.broadcast.to(room).emit(text);
 	}
+
   }	

@@ -21,6 +21,12 @@ export class RoomController {
 		// check if room already exists with that name
 	let res = await this.roomService.create(body, "10");
 	return res;
-  }
+  	}
 
+	@Get('findRoom')
+	async findroom(@Body() body): Promise<void>
+	{
+		let res = await this.roomService.addUserToRoom(body.user_id, body.room_name);
+		return res;
+	}
 }
