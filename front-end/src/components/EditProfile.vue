@@ -116,7 +116,7 @@
 }
 
 .avatar-padding
-{
+{ 
   padding: 0 !important;
 }
 .settings
