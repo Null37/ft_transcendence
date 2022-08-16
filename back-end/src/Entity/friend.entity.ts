@@ -5,16 +5,14 @@ import { Users } from "./users.entity";
 @Entity()
 export class friend
 {
-    @PrimaryGeneratedColumn()
-    id: number
-
-    user_id: string
+    @PrimaryColumn()
+    user_id: number
 
     @OneToOne(() => Users)
     @JoinColumn()
     friend_id: Users
 
     @Column()
-    status: boolean // true if friend and false block
+    status: string // true if friend and false block
 
 }
