@@ -44,10 +44,10 @@ export default Vue.extend({
 	mounted () {
 		// this.$socket.
 		this.sockets.subscribe("msgToClient", (msg: any) => {
-			this.messages.push({id: 0, from: "", message: msg, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
-		})
-	},
-    components: { TopBar, UserAvatar, FriendList, FriendsStatus, Profile }
+      this.messages.push({id: 0, from: "", message: msg, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
+    })
+  },
+  components: { TopBar, UserAvatar, FriendList, FriendsStatus, Profile }
 });
 </script>
 

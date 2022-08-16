@@ -61,6 +61,8 @@ router.beforeEach(async (to, from, next) => {
       return next({ name: 'Login' });
     else if (to.path === "/" && loggedIn)
       return next({ name: 'Game' });
+    else if (to.path === "/Login" && loggedIn)
+      return next({ name: 'Game' });
     else if (to.path === "/Game" && to.query.token !== undefined)
     {
       localStorage.setItem("token", "Bearer " + to.query.token);
