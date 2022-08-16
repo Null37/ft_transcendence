@@ -2,14 +2,14 @@ import { Controller, Get, Param, Request, UseGuards } from "@nestjs/common";
 import { jwtGuard } from "./auth/guards/jwt-auth.guard";
 import { FriendService } from "./users/friend.service";
 
-@Controller('ADD')
+@Controller('friend')
 export class FrinedCtroller {
   constructor(private readonly friend_base: FriendService) {}
 
 
 
   @UseGuards(jwtGuard)
-  @Get('friend/:id')
+  @Get('add/:id')
   async add_friend(@Request() req, @Param('id') par_id)
   {
     console.log("start add friend ")
@@ -22,5 +22,15 @@ export class FrinedCtroller {
     console.log("databse",newdata)
     return newdata
   }
+
+  @UseGuards(jwtGuard)
+  @Get('find')
+  async find_all(@Request() req)
+  {
+    console.log(" find friend of user = ", req.user.sub)
+
+  }
+
+
 
 }
