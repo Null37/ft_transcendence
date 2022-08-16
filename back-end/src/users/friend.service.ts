@@ -15,7 +15,7 @@ export class FriendService {
   async find_friends(user_id: number) 
   {
     // need more test for this function
-    let stat = await this.friend_base.find({where: {user_id: user_id, status: 'friend'}, select:['friend_id']})
+    let stat = await this.friend_base.find({where: {user_id: user_id, status: 'friend'}, relations: ['friend_id']})
     console.log(" from friend ",stat)
     return stat
   }
