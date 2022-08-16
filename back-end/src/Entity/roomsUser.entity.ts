@@ -3,7 +3,7 @@ import { Rooms } from "./rooms.entity"
 
 export class RoomUserDTO
 {
-    roomID: number
+    roomID: string
 	role: string
 	userID: number
 	status: number
@@ -12,11 +12,12 @@ export class RoomUserDTO
 @Entity()
 export class RoomUsers
 {
+
 	@PrimaryGeneratedColumn()
 	id: number
 
-	@PrimaryColumn()
-    roomID: number
+	@Column()
+    roomID: string
 
 	@Column()
 	userID: number;
@@ -24,9 +25,9 @@ export class RoomUsers
 	@Column()
 	role: string
 
-	@OneToOne(() => Rooms)
-	@JoinColumn()
-	rooms: Rooms
+	// @OneToOne(() => Rooms, {cascade: true})
+	// @JoinColumn()
+	// rooms: Rooms
 
 	@Column()
 	status: number

@@ -15,7 +15,6 @@ export class RoomsService {
 	private readonly  rooms: Repository<Rooms>,
 	@InjectRepository(RoomUsers)
 	private readonly roomUser: Repository<RoomUsers>
-	// private readonly  roomUser: Repository<RoomUsers>
 	){}
 
 // async findOne(intra_login: string) 
@@ -36,43 +35,55 @@ export class RoomsService {
 			return null;
 		}
 		let tmp = this.rooms.create(roomElem);
-		let res = await this.rooms.save(tmp);
-
+		// let res = await this.rooms.save(tmp);
 
 		let usr = this.roomUser.create({
-			userID: Math.floor(Math.random() * 100), // should insert userID here
+			userID: Math.floor(Math.random() * 100), //! should insert userID here
 			role: "moderator",
 			status: 0,
-			roomID: res.id
-		})
-		this.roomUser.save(usr)
-		// tmp.users = usr
-		// console.log("reached here")
+			roomID: tmp.roomName
+		}) 
+		// tmp.users = u sr;
+		this.roomUser.save(usr);
+		let res = await this.rooms.save(tmp);
 		return  res;
 	}
 
-	async addUserToRoom(userID: string, room_name: string)
+	async addUserToRoom(userID: string, room_name: string): Promise<any>
 	{
 		/* 
 			1- Check if the room exists.
-			2- 
+			2- Check if user already joined the room or not
+			3- Check the state of the user (if he's banned from joining the room)
 		*/
 
 		let tmp = await this.rooms.findOne({where: {roomName: room_name}})
-		if (tmp)
-		{
-			console.log("found")
-			console.log(tmp)
-		}
-		else
+		if (tmp == null)
 		{
 			console.log("Room not found")
 			console.log(tmp)
 			return ;
 		}
-		let user = this.roomUser.create({userID: +userID, role:"user", status:0, roomID: tmp.id})
-		let res = await this.roomUser.save(user)
-		console.log(res)
+		else
+		{
+			console.log("Room already exists")
+			let usrexist = this.roomUser.find({where: {userID: +userID}})
+			if (usrexist == null)
+			{
+				console.log("user not found")
+				let user = this.roomUser.create({userID: +userID, role:"user", status:0, roomID: room_name})
+				console.log("RoomUser ===> ", user)
+				await this.roomUser.save(user)
+				let res = await this.roomUser.find({where: {roomID: room_name}})
+				console.log(res)
+			}
+			else
+			{
+				console.log("found user")
+				console.log(tmp)
+				return ;
+			}
+		}
 	}
 
 	async debuggingLog()
