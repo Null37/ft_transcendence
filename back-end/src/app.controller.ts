@@ -49,8 +49,10 @@ export class AppController {
 
   @UseGuards(jwtGuard)
   @Get('user/:id')
-  async get_user(@Param('id') par)
+  async get_user(@Request() Req, @Param('id') par)
   {
+    if (par === 'me')
+      par = Req.user.name;
     console.log("start get info about user")
     // find usr and get data
     console.log("user = ", par)
