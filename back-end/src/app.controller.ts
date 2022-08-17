@@ -15,10 +15,28 @@ export class AppController {
 
   @UseGuards(pass_42Guard)
   @Get('login')
-  login(@Request() req, @Response() res) 
+  async login(@Request() req, @Response() res) 
   {
+  //  if(req.user.two_factor_authentication == false)
+  //  {
+        // rediret to otp
+  //  }
+  //  else
+  //  {
+
+  //  }
+   
     const accessToken = this.authService.login(req.user)
+    console.log("==============================================")
+    console.log("first data ==> ", "<", req.user.two_factor_authentication, ">")
     console.log(accessToken)
+    console.log("username ==> ", req.user.username);
+    var speakeasy = require("speakeasy");
+    var secret = speakeasy.generateSecret()
+    const newdata = await this.authService.update_info({id: req.user.id, secret: secret.base32})
+    console.log("updated database", newdata);
+    console.log("secret is 2fa == > ", secret)
+    console.log("==============================================")
     return res.redirect("http://localhost:8080/Game?token="+accessToken);
   }
 

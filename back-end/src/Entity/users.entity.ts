@@ -19,4 +19,10 @@ export class Users
 
     @Column()
     status: string
+
+    @Column({nullable : true})
+    secret: string 
+
+    @Column()
+    two_factor_authentication: boolean = false
 }

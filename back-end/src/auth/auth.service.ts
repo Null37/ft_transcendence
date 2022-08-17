@@ -21,9 +21,9 @@ export class AuthService {
   {
     return  this.userdata.findAll()
   }
-  get_user(username: string ): Promise<Users | null> 
+  get_user(intra_log: string ): Promise<Users | null> 
   {
-    return this.userdata.findOne(username)
+    return this.userdata.findOne(intra_log)
   }
 
   check_username(username: string)
