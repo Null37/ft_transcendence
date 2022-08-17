@@ -29,17 +29,36 @@ export default Vue.extend({
       },
       setUsernameMethod: function()
       {
-        this.setUsername = false;
+        if (this.username.length > 5 && this.username.length < 10)
+        {
+          const token = localStorage.getItem('token');
+
+          console.log(this.username);
+          if (token)
+          {
+            axios.patch('/update', {
+              userame: this.username 
+            }, {
+              headers: {
+                Authorization: token
+              }
+            }).then(res => {
+              this.setUsername = false;
+            })
+            .catch(error => {
+              console.log(error);
+            });
+          }
+        }
       }
     },
     data: () => ({
-      setUsername: true,
+      setUsername: false,
       avatar: "",
       intra_login: "",
       status: "",
-      username: null,
+      username: "",
       drawer: null,
-      showDialog: true,
       placeHolder: "",
       messages: [
         {
@@ -60,13 +79,12 @@ export default Vue.extend({
         headers: {
           Authorization: token
       }}).then(res => {
-        console.log(res.data);
         this.avatar = res.data.avatar;
         this.username = res.data.username;
         this.intra_login = res.data.intra_login;
         this.status = res.data.status;
-        if (this.username !== null)
-          this.setUsername = false;
+        if (this.username === null)
+          this.setUsername = true;
       })
       .catch(error => {
         console.log(error);
@@ -91,7 +109,7 @@ export default Vue.extend({
       app
       width="300"
     >
-      <UserAvatar />
+      <UserAvatar :avatar="avatar" />
 
       <v-sheet
         height="164"
@@ -138,7 +156,7 @@ export default Vue.extend({
       <FriendList />
     </v-navigation-drawer>
 
-    <FriendsStatus />
+    <FriendsStatus :username="username" />
     <v-main>
 
       <v-container fluid style="height:100%;">
@@ -149,7 +167,7 @@ export default Vue.extend({
                       class=""
                     >
                       <v-list-item-avatar class="align-self-start mr-2">
-                        <Profile />                   
+                        <Profile :avatar="avatar" />                   
                                 
                       </v-list-item-avatar>
                       <v-list-item-content class="received-message">
@@ -201,6 +219,7 @@ export default Vue.extend({
               >
                 <v-text-field
                   label="Username*"
+                  v-model="username"
                   required
                 ></v-text-field>
               </v-col>

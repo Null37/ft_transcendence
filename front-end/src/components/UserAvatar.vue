@@ -4,6 +4,7 @@ import EditProfile from './EditProfile.vue';
 import CreateRoom from './CreateRoom.vue';
 
 export default Vue.extend({
+    props: ['avatar'],
     data: () => ({ drawer: null }),
     components: { EditProfile, CreateRoom }
 });
@@ -17,7 +18,7 @@ export default Vue.extend({
 
         mini-variant
       >
-        <EditProfile />
+        <EditProfile :avatar="avatar" />
         <v-divider class="mx-3 my-5"></v-divider>
         <v-hover
         v-slot="{ hover }"

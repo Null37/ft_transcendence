@@ -3,6 +3,7 @@
     data: () => ({
       dialog: false,
     }),
+    props: ['avatar']
   }
 </script>
 
@@ -21,7 +22,7 @@
               class="justify-center"
               >
           <v-avatar size="40">
-            <v-img src="https://i.pinimg.com/736x/35/d5/0e/35d50ea7dac12997c537c9c7e59e5498.jpg"></v-img>
+            <v-img :src="avatar"></v-img>
           </v-avatar>
         </v-btn>
       </template>

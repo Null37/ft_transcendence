@@ -5,55 +5,74 @@ import UserAvatar from '../components/UserAvatar.vue';
 import FriendList from '../components/FriendList.vue';
 import FriendsStatus from '../components/FriendsStatus.vue';
 import EditProfile from '@/components/EditProfile.vue';
+import axios from 'axios';  
 
-// SocketInstance.on('msgToClient')
-// SocketInstance.on('msgToClient', (msg: any) => {
-// 	console.log(`received a message: ${msg}`)
-// 	// this.messages.push({id: 0, from: "", message: msg, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
-// })
 export default Vue.extend({
     name: "App",
     methods: {
-      submitMessage: function(e: any) {
-        if (e.target.value !== '')
+      setUsernameMethod: function()
+      {
+        if (this.usernameEdit.length >= 5 && this.usernameEdit.length <= 10)
         {
-          this.messages.push({id: this.messages.length, from: "Akira", message: e.target.value, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
-          this.$socket.emit('msgToServer', this.placeHolder)
-          this.placeHolder = "";
-        }
-      },
+          const token = localStorage.getItem('token');
 
-      updateMessage: function(e: any){
-        this.placeHolder = e.target.value;
+
+          if (token)
+          {
+            axios.patch('/update', {
+              username: this.usernameEdit 
+            }, {
+              headers: {
+                Authorization: token
+              }
+            }).then(res => {
+              this.username = this.usernameEdit;
+              this.setUsername = false;
+            })
+            .catch(error => {
+              console.log(error);
+            });
+          }
+        }
       }
     },
     data: () => ({
-      drawer: null,
-      placeHolder: "",
-      messages: [
-        {
-          id: 0,
-          from: 'John Josh',
-          message: `Sure, I'll see yasdfou later.`,
-          time: '10:42am',
-          color: 'deep-purple lighten-1',
-        },
-      ],
+      usernameEdit: "",
+      setUsername: false,
+      avatar: "",
+      intra_login: "",
+      status: "",
+      username: "",
+      drawer: null
     }),
 	mounted () {
-		// this.$socket.
-		this.sockets.subscribe("msgToClient", (msg: any) => {
-			this.messages.push({id: 0, from: "", message: msg, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
-		})
+    const token = localStorage.getItem('token');
+    
+    if (token)
+    {
+      axios.get('/user/me', {
+        headers: {
+          Authorization: token
+      }}).then(res => {
+        this.avatar = res.data.avatar;
+        this.username = res.data.username;
+        this.intra_login = res.data.intra_login;
+        this.status = res.data.status;
+        if (this.username === null)
+          this.setUsername = true;
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    }
 	},
-    components: { TopBar, UserAvatar, FriendList, FriendsStatus, EditProfile }
+  components: { TopBar, UserAvatar, FriendList, FriendsStatus, EditProfile }
 });
 </script>
 
 
 <template>
    <v-app id="inspire">
-    
 
     <v-navigation-drawer
       v-model="drawer"
@@ -69,7 +88,7 @@ export default Vue.extend({
         <v-hover
         v-slot="{ hover }"
         >
-          <EditProfile />
+          <EditProfile :avatar="avatar" />
         </v-hover>
       </v-navigation-drawer>
 
@@ -145,6 +164,45 @@ export default Vue.extend({
       </v-container>
 
     </v-main>
+    <v-row justify="center">
+    <v-dialog
+      v-model="setUsername"
+      persistent
+      max-width="600px"
+    >
+      <v-card>
+        <v-card-title class="justify-center">
+          <span class="text-h5">Set your username</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col
+              >
+                <v-text-field
+                  label="Username*"
+                  v-model="usernameEdit"
+                  required
+                ></v-text-field>
+              </v-col>
+             
+            </v-row>
+          </v-container>
+          <small>*indicates required field</small>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="setUsernameMethod"
+          >
+            Save
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-row>
   </v-app>
 </template>
 
