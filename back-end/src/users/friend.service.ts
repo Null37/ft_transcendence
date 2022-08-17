@@ -25,25 +25,31 @@ export class FriendService {
     const newfriend = this.friend_base.create(friend_dto)
     return this.friend_base.save(newfriend)
   }
+  async find_blocked(user_id: number)
+  {
+    let stat = await this.friend_base.find({where: {user_id: user_id, status: 'blocked'}, relations: ['friend_id']})
+    console.log(" from block ", stat)
+    return stat
+  }
 
-  // async block_frind(block_dto: block_dto)
-  // {
-  //   try
-  //   {
-  //     const newfriend = await this.friend_base.preload(block_dto);
-  //     console.log("no error")
-  //     console.log(newfriend)
-  //     if(newfriend == undefined)
-  //         return null;
-  //     else
-  //       return this.friend_base.save(newfriend);
-  //   }
-  //   catch
-  //   {
-  //     // if id not found the perload throw
-  //     // if(newfriend == null)
-  //       throw new UnauthorizedException()
-  //   }
-  // }
+  async block_frind(block_dto: friend_dto)
+  {
+    try
+    {
+      const newfriend = await this.friend_base.preload(block_dto);
+      console.log("no error")
+      console.log(newfriend)
+      if(newfriend == undefined)
+          return null;
+      else
+        return this.friend_base.save(newfriend);
+    }
+    catch
+    {
+      // if id not found the perload throw
+      // if(newfriend == null)
+        throw new UnauthorizedException()
+    }
+  }
   
 }

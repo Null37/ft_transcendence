@@ -3,12 +3,11 @@ import { jwtGuard } from "./auth/guards/jwt-auth.guard";
 import { FriendService } from "./users/friend.service";
 
 @Controller('friend')
+@UseGuards(jwtGuard) // global guards
 export class FrinedCtroller {
   constructor(private readonly friend_base: FriendService) {}
 
 
-
-  @UseGuards(jwtGuard)
   @Get('add/:id')
   async add_friend(@Request() req, @Param('id') par_id)
   {
@@ -23,13 +22,25 @@ export class FrinedCtroller {
     return newdata
   }
 
-  @UseGuards(jwtGuard)
+ 
   @Get('find')
-  async find_all(@Request() req)
+  async find_all(@Request() req) // find all friend from this user(me)
   {
     console.log(" find friend of user = ", req.user.sub)
+    return await this.friend_base.find_friends(req.user.sub);
 
   }
+
+  @Get('block/:id')
+  async block_user(@Request() req, @Param('id') par_id)
+  {
+    console.log("block this user")
+    let for_test = await this.friend_base.block_frind({user_id: req.user.sub, friend_id: par_id, status:  'blocked'})
+
+    console.log("update ....", for_test)
+
+  }
+
 
 
 
