@@ -15,18 +15,10 @@ export class AppController {
 
   @UseGuards(pass_42Guard)
   @Get('login')
-  //@UseFilters(Unauthorized)
   login(@Request() req, @Response() res) 
   {
-    // var token:string
-    // let profile = req.user
     const accessToken = this.authService.login(req.user)
     console.log(accessToken)
-    res.cookie('token', accessToken, {
-      //sameSite: 'strict',
-      httpOnly: true,
-      // withCredentials: true
-    });
     return res.redirect("http://localhost:8080/Game?token="+accessToken);
   }
 
