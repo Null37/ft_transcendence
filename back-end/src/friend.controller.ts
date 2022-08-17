@@ -34,9 +34,9 @@ export class FrinedCtroller {
   @Get('block/:id')
   async block_user(@Request() req, @Param('id') par_id)
   {
-    console.log("block this user")
+    console.log("block this user", par_id)
+    console.log("me  ==> ", req.user.name)
     let for_test = await this.friend_base.block_frind({user_id: req.user.sub, friend_id: par_id, status:  'blocked'})
-
     console.log("update ....", for_test)
 
   }

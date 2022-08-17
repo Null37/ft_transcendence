@@ -64,18 +64,6 @@ export class AppController {
   }
 
   @UseGuards(jwtGuard)
-  @Get('logout')
-  log_out(@Request() req, @Response() res)
-  {
-      // remove token and set logout in status
-      console.log("id is ", req.user.sub)
-      this.authService.update_info({id: req.user.sub, status: "logout"})
-      console.log("logout")
-      // let test = await this.authService.get_all()
-     // console.log(test);
-      res.clearCookie('token').send(); // remove token from cookie
-  }
-  @UseGuards(jwtGuard)
   @Patch('update')
   async update_user(@Request() req , @Body() body)
   {
