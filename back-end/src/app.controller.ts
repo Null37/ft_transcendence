@@ -122,19 +122,5 @@ export class AppController {
     this.authService.update_info({id: req.user.sub, avatar: path_file})
   }
 
-  @UseGuards(jwtGuard)
-  @Get('ADD/friend/:id')
-  add_friend(@Request() req, @Param('id') par_id)
-  {
-      console.log("test ==> par_id", par_id)
-      console.log("test ==> user", req.user)
-      console.log("test ==> id", req.user.sub)
-
-
-  }
-
-  
-
-
 
 }

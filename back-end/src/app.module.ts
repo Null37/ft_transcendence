@@ -7,6 +7,7 @@ import { pass_42Guard } from './auth/guards/passport-42-auth.guard';
 import { UsersModule } from './users/users.module';
 import { AppGateway } from './app.gateway';
 import { RoomsModule } from './rooms/rooms.module';
+import { FrinedCtroller } from './friend.controller';
 
 @Module({
   imports: [AuthModule, 
@@ -23,7 +24,7 @@ import { RoomsModule } from './rooms/rooms.module';
         synchronize: true,
     }
   )],
-  controllers: [AppController],
+  controllers: [AppController, FrinedCtroller],
   providers: [AppService, pass_42Guard, AppGateway],
 })
 export class AppModule {}
