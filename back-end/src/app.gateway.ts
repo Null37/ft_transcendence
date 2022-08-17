@@ -8,6 +8,7 @@ import {
   import { Logger } from '@nestjs/common';
   import { Socket, Server } from 'socket.io';
 import { RoomsService } from './rooms/rooms.service';
+import { UsersService } from './users/users.service';
   
   @WebSocketGateway({
 	  cors: {
@@ -19,7 +20,8 @@ import { RoomsService } from './rooms/rooms.service';
 	@WebSocketServer() wss: Server;
 
 	constructor(
-		private readonly roomsService: RoomsService
+		private readonly roomsService: RoomsService,
+		private readonly usersService: UsersService
 	){}
 	private logger: Logger = new Logger('AppGateway');
   
@@ -56,6 +58,24 @@ import { RoomsService } from './rooms/rooms.service';
 	//   return { event: 'msgToClient', data: text };
 	}
 
+	@SubscribeMessage('InteractUsers')
+	async handleInteractUser(client: Socket, message: {user1: number, user2: number, interaction: string}): Promise<any> {
+
+		/* 
+			1- Check which interaction is required.
+			2- Check if the user has the permission to perform the action on the target.
+		*/
+		this.logger.log(`User ${message.user1} ${message.interaction}ed ${message.user2}`);
+		if (message.interaction == "mute")
+		{
+			
+			// let 
+		}
+	//   client.broadcast.emit('msgToClient', text); // the client doesn't receive it
+		// this.wss.to(client.id).emit('msgToClient', `Received ${text}`);
+	//   return { event: 'msgToClient', data: text };
+	}
+
 
 	@SubscribeMessage('joinRoom')
 	handleJoinRoom(client: Socket, message: {userID: number, room: string}): void {
@@ -63,10 +83,15 @@ import { RoomsService } from './rooms/rooms.service';
 		client.join(message.room);
 		client.emit('joinedRoom', message.room);
 	}
+
 	@SubscribeMessage('msgToClientDM')
-	handleDmMessage(client: Socket, text: string, room: string): void {
+	async handleDmMessage(client: Socket, message: {text: string, room: string, username: string}): Promise<any> {
 		// Add logic before sending a message here
-		client.broadcast.to(room).emit(text);
+		/* 
+			1- Check if the receiver is muted/blocked by the sender
+		*/
+		let usr = await this.usersService.find_username(message.username);
+		client.broadcast.to(message.room).emit(message.text);
 	}
 
   }	

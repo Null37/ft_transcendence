@@ -1,0 +1,13 @@
+list of  room [✔] http
+users in room [✔] http
+create room [✔] http
+edit password [✔] http
+ban/mute(change user state) []
+(edit all room variables)
+leave room [] 
+remove room if no user is there (to be checked) []
+give role(user to admin/ admin to user) []
+
+
+
+[id< --id>]  mount(){ socket.}
