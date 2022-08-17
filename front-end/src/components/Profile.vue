@@ -3,7 +3,7 @@
     data: () => ({
       dialog: false,
     }),
-    props: ['avatar']
+    props: ['avatar', 'username']
   }
 </script>
 
@@ -37,7 +37,7 @@
                 justify="center">
                  <v-avatar size="102">
                     <img
-                        src="https://cdn.vuetifyjs.com/images/john.jpg"
+                        :src="avatar"
                         alt="John"
                     >
                 </v-avatar>
@@ -48,10 +48,7 @@
               <v-col align="center"
                 justify="center">
                  <div class="text-h6">
-                      Akira
-                </div>
-                 <div class="text-caption">
-                      User since 16, march 2020
+                      {{username}}
                 </div>
               </v-col>
               

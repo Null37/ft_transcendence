@@ -38,8 +38,16 @@ async function verify() {
     await axios.get('/verify', {
       headers: {
         Authorization: token
-    }}).then(res => {
-      loggeIn = true;
+    }}).then(async (res) => {
+      await axios.get('/user/me', {
+        headers: {
+          Authorization: token
+      }}).then(res => {
+        loggeIn = true;
+      })
+      .catch(error => {
+        loggeIn = false;
+      });
     })
     .catch(error => {
       loggeIn = false;

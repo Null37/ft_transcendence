@@ -18,7 +18,7 @@
               size="24"
             >
                <img
-                        src="https://cdn.vuetifyjs.com/images/john.jpg"
+                        :src="user.avatar"
                         alt="John"
                     >
             </v-avatar>
@@ -29,7 +29,7 @@
             ></v-badge>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title >Null37</v-list-item-title>
+            <v-list-item-title >{{user.username}}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </template>
@@ -38,7 +38,7 @@
         <v-list-item
           link
         >
-          <v-list-item-title >Add friend</v-list-item-title>
+          <v-list-item-title @click="AddFriend()" >Add friend</v-list-item-title>
         </v-list-item>
          <v-list-item
           link
@@ -56,15 +56,29 @@
 </template>
 
 <script>
+import axios from 'axios';
   export default {
+    props: ['user'],
     data: () => ({
-      btns: [
-        ['Removed', '0'],
-        ['Large', 'lg'],
-        ['Custom', 'b-xl'],
-      ],
-      colors: ['deep-purple accent-4', 'error', 'teal darken-1'],
-      items: [...Array(4)].map((_, i) => `Item ${i}`),
     }),
+    methods: {
+      AddFriend: function()
+      {
+        const token = localStorage.getItem('token');
+    
+        if (token)
+        {
+          axios.get('/friend/add/'+this.user.id, {
+            headers: {
+              Authorization: token
+          }}).then(res => {
+            console.log(res);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        }
+      }
+    }
   }
 </script>

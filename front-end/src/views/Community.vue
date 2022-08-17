@@ -85,6 +85,7 @@ export default Vue.extend({
         this.status = res.data.status;
         if (this.username === null)
           this.setUsername = true;
+        console.log(this.avatar);
       })
       .catch(error => {
         console.log(error);
@@ -167,7 +168,7 @@ export default Vue.extend({
                       class=""
                     >
                       <v-list-item-avatar class="align-self-start mr-2">
-                        <Profile :avatar="avatar" />                   
+                        <Profile :avatar="avatar" :username="username" />                   
                                 
                       </v-list-item-avatar>
                       <v-list-item-content class="received-message">

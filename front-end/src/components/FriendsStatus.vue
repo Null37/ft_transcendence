@@ -25,7 +25,6 @@ export default {
         }
       }).then(res => {
         this.users = res.data;
-        console.log(res.data);
       })
       .catch(error => {
         console.log(error);
@@ -46,7 +45,7 @@ export default {
       <v-subheader>Friends</v-subheader>
         <v-list-item
           v-for="(user) in users"
-          v-if="user.username !== username"
+          v-if="user.username !== username && user.username !== null"
           :key="user.id"
           link
         >
@@ -57,8 +56,8 @@ export default {
               size="24"
             >
                <img
-                        :src="user.avatar"
-                        :alt="user.username"
+                :src="user.avatar"
+                :alt="user.username"
                     >
             </v-avatar>
             <v-badge
@@ -69,14 +68,14 @@ export default {
             ></v-badge>
             <v-badge
               bottom
-              v-else-if="user.status === 'Offline'"
-              color="grey"
+              v-else-if="user.status === 'In-Game'"
+              color="red"
               dot
             ></v-badge>
             <v-badge
               bottom
-              v-else-if="user.status === 'In-Game'"
-              color="red"
+              v-else
+              color="grey"
               dot
             ></v-badge>
           </v-list-item-icon>
@@ -89,11 +88,12 @@ export default {
       <v-subheader>Users</v-subheader>
         
         <v-list-item
-          v-for="i in 10"
-          :key="i"
+          v-for="user in users"
+          :key="user.id"
+          v-if="user.username !== username && user.username !== null"
           link
         >
-        <UserMenu />
+        <UserMenu :user="user" />
         </v-list-item>
     </v-list>
     </v-navigation-drawer>
