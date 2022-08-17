@@ -24,7 +24,7 @@ export class passport_42 extends PassportStrategy(Strategy) {
 			vr = await usra.create({ // nake name in future // for fornt-end check
 				intra_login: profile.username,
 				avatar: profile._json.image_url,
-				status: "login"
+				status: "Offline"
 			})
 			console.log(vr)
 		}

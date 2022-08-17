@@ -30,7 +30,7 @@
             <img
               :elevation="2"
               alt="Avatar"
-              src="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
+              :src="avatar"
             >
           </v-avatar>
         </v-hover>
@@ -47,7 +47,7 @@
                 justify="center">
                  <v-avatar size="102">
                     <img
-                        src="https://cdn.vuetifyjs.com/images/john.jpg"
+                        :src="avatar"
                         alt="John"
                     >
                 </v-avatar>
@@ -58,14 +58,16 @@
               <v-col>
                 <v-text-field
                   label="Username*"
-                  v-model="myUsername"
+                  v-model="usernameEdit"
                   required
                 ></v-text-field>
                 <v-file-input
                     accept="image/png, image/jpeg, image/bmp"
                     placeholder="Pick an avatar"
                     prepend-icon="mdi-camera"
+                    @change="loadImage($event)"
                     label="Avatar"
+                    v-model="image"
                 ></v-file-input>
               </v-col>
             </v-row>
@@ -95,16 +97,99 @@
 </template>
 
 <script lang="ts">
+import axios from 'axios';
+
   export default {
+    props: ['avatar'],
     data: () => ({
+      usernameEdit: "",
+      linkavatar: "",
+      intra_login: "",
+      status: "",
+      username: "",
+      image: null,
       dialog: false,
-      myUsername: ""
     }),
     methods: {
-      updateusername()
+      loadImage(event) {
+
+        console.log(event.File);
+      },
+      updateusername: function()
       {
-        console.log(this.myUsername);
+        if (this.usernameEdit.length >= 5 && this.usernameEdit.length <= 10 && this.usernameEdit !== this.username)
+        {
+          const token = localStorage.getItem('token');
+
+          if (token)
+          {
+            axios.patch('/update', {
+              username: this.usernameEdit,
+            }, {
+              headers: {
+                Authorization: token
+              }
+            }).then(res => {
+              this.username = this.usernameEdit;
+              console.log("bla");
+            })
+            .catch(error => {
+              console.log(error);
+            });
+          }
+          this.dialod = false;
+        }
+        if (this.image)
+        {
+          console.log(this.image);
+          let file = new FormData();
+          file.append('name', 'file')
+          file.append('file', this.image, this.image.name);
+          console.log(this.image);
+
+          const token = localStorage.getItem('token');
+
+          if (token)
+          {
+            axios.post('/upload/image', {
+              file
+            }, {
+              headers: {
+                Authorization: token,
+                'Content-Type': 'multipart/form-data'
+              }
+            }).then(res => {
+              console.log(res);
+              console.log("bla");
+            })
+            .catch(error => {
+              console.log(error);
+            });
+          }
+          this.dialod = false;
+        }
       }
+    },
+    mounted (){
+      const token = localStorage.getItem('token');
+    
+      if (token)
+      {
+        axios.get('/user/me', {
+          headers: {
+            Authorization: token
+        }}).then(res => {
+          this.linkavatar = res.data.avatar;
+          this.username = res.data.username;
+          this.usernameEdit = this.username;
+          this.intra_login = res.data.intra_login;
+          this.status = res.data.status;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      }
+
     }
   }
 </script>

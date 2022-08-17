@@ -1,15 +1,38 @@
 <script lang="ts">
 import UserMenu from "./UserMenu.vue";
-  export default {
-    data: () => ({
-        selectedItem: 1,
-        items: [
-            { status: "Online", text: "Real-Time", icon: "mdi-clock" },
-            { status: "Offline", text: "Audience", icon: "mdi-account" },
-            { status: "In-Game", text: "Conversions", icon: "mdi-flag" },
-        ],
-    }),
-    components: { UserMenu }
+import axios from 'axios';
+export default {
+  props: ['username'],
+  data: () => ({
+      
+      selectedItem: 1,
+      users: [],
+      items: [
+          { status: "Online", text: "Real-Time", icon: "mdi-clock" },
+          { status: "Offline", text: "Audience", icon: "mdi-account" },
+          { status: "In-Game", text: "Conversions", icon: "mdi-flag" },
+      ],
+  }),
+
+  mounted(){
+    const token = localStorage.getItem('token');
+
+    if (token)
+    {
+      axios.get('/users', {
+        headers: {
+          Authorization: token,
+        }
+      }).then(res => {
+        this.users = res.data;
+        console.log(res.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    }
+  },
+  components: { UserMenu }
 }
 </script>
 
@@ -22,8 +45,9 @@ import UserMenu from "./UserMenu.vue";
       <v-list dense>
       <v-subheader>Friends</v-subheader>
         <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
+          v-for="(user) in users"
+          v-if="user.username !== username"
+          :key="user.id"
           link
         >
           <v-list-item-icon>
@@ -33,31 +57,31 @@ import UserMenu from "./UserMenu.vue";
               size="24"
             >
                <img
-                        src="https://cdn.vuetifyjs.com/images/john.jpg"
-                        alt="John"
+                        :src="user.avatar"
+                        :alt="user.username"
                     >
             </v-avatar>
             <v-badge
               bottom
-              v-if="item.status === 'Online'"
+              v-if="user.status === 'Online'"
               color="success"
               dot
             ></v-badge>
             <v-badge
               bottom
-              v-else-if="item.status === 'Offline'"
+              v-else-if="user.status === 'Offline'"
               color="grey"
               dot
             ></v-badge>
             <v-badge
               bottom
-              v-else-if="item.status === 'In-Game'"
+              v-else-if="user.status === 'In-Game'"
               color="red"
               dot
             ></v-badge>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title v-text="item.text"></v-list-item-title>
+            <v-list-item-title v-text="user.username"></v-list-item-title>
           </v-list-item-content>
         </v-list-item>
     </v-list>
