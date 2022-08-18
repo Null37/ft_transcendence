@@ -5,7 +5,10 @@ import { Users } from "./users.entity";
 @Entity()
 export class friend
 {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
+    id:number
+
+    @Column()
     user_id: number
 
     @OneToOne(() => Users)

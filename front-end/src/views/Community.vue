@@ -15,6 +15,32 @@ import axios from 'axios';
 export default Vue.extend({
     name: "App",
     methods: {
+      removefriend: function(username: string)
+      {
+        this.users.push(this.friendlist.find(data => data.username === username));
+        this.friendlist = this.friendlist.filter(data => data.username !== username);
+        
+      },
+      Addfriend: function(username: string)
+      {
+        const token = localStorage.getItem('token');
+
+        if (token)
+        {
+          axios.get('/friend/add/'+this.users.find(data => data.username === username).id, {
+          headers: {
+            Authorization: token
+          }}).then(res => {
+
+            this.friendlist.push(this.users.find(data => data.username === username));
+            this.users = this.users.filter(data => data.username !== username);
+
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        }
+      },
       submitMessage: function(e: any) {
         if (e.target.value !== '')
         {
@@ -33,7 +59,6 @@ export default Vue.extend({
         {
           const token = localStorage.getItem('token');
 
-          console.log(this.username);
           if (token)
           {
             axios.patch('/update', {
@@ -69,6 +94,15 @@ export default Vue.extend({
           color: 'deep-purple lighten-1',
         },
       ],
+      users: [],
+      friendlist: [],
+      // users: [
+      //   {
+      //     id: 0,
+      //     username: "Boodeer",
+      //     avatar: "https://cdn.intra.42.fr/users/hboudhir.jpg",
+      //   },
+      // ],
     }),
 	mounted () {
     const token = localStorage.getItem('token');
@@ -85,11 +119,37 @@ export default Vue.extend({
         this.status = res.data.status;
         if (this.username === null)
           this.setUsername = true;
-        console.log(this.avatar);
       })
       .catch(error => {
         console.log(error);
       });
+
+
+      axios.get('/users', {
+        headers: {
+          Authorization: token
+      }}).then(res => {
+        this.users = res.data;
+        axios.get('/friend/find', {
+          headers: {
+            Authorization: token
+        }}).then(res => {
+          this.friendlist = res.data[0]['friend_id'];
+          // console.log(this.friendlist);
+          // this.friendlist = this.friendlist.filter(item => !this.users.includes(item));
+          // console.log(this.users);
+          console.log(this.friendlist[0].avatar  );
+
+        })
+        .catch(error => {
+          console.log(error);
+        });
+        
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
     }
 		// this.$socket.
 		this.sockets.subscribe("msgToClient", (msg: any) => {
@@ -157,7 +217,7 @@ export default Vue.extend({
       <FriendList />
     </v-navigation-drawer>
 
-    <FriendsStatus :username="username" />
+    <FriendsStatus @Addfriend="Addfriend" @removefriend="removefriend" :users="users" :friends="friendlist" :username="username" />
     <v-main>
 
       <v-container fluid style="height:100%;">
