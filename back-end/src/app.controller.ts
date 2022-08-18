@@ -5,7 +5,7 @@ import { jwtGuard } from './auth/guards/jwt-auth.guard';
 import * as path from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { request } from 'http';
+import { get, request } from 'http';
 import { stringify } from 'querystring';
 
 
@@ -17,28 +17,57 @@ export class AppController {
   @Get('login')
   async login(@Request() req, @Response() res) 
   {
-  //  if(req.user.two_factor_authentication == false)
-  //  {
-        // rediret to otp
-  //  }
-  //  else
-  //  {
-
+    console.log("==============================================")
+   
+  
+    //  else
+    //  {
+      
+      // rediret to otp
   //  }
    
     const accessToken = this.authService.login(req.user)
-    console.log("==============================================")
-    console.log("first data ==> ", "<", req.user.two_factor_authentication, ">")
+    
     console.log(accessToken)
     console.log("username ==> ", req.user.username);
-    var speakeasy = require("speakeasy");
-    var secret = speakeasy.generateSecret()
-    const newdata = await this.authService.update_info({id: req.user.id, secret: secret.base32})
-    console.log("updated database", newdata);
-    console.log("secret is 2fa == > ", secret)
+    
+    
+   
+   
     console.log("==============================================")
     return res.redirect("http://localhost:8080/Game?token="+accessToken);
   }
+  @UseGuards(jwtGuard)
+  @Get("QR")
+  async send_Qr_code(@Request() req)
+  {
+    let user = await this.authService.get_user(req.user.name)
+    if(user == null)
+      throw new NotFoundException('user not found')
+    console.log("adctive 2FA ==> ", "<", user.two_factor_authentication, ">")
+    if(user.two_factor_authentication == false)
+    {
+      // start generate secret 
+      var speakeasy = require("speakeasy");
+      if(user.secret == null)
+      {
+        var secret = speakeasy.generateSecret({name: "ft_transcendence"});
+        var newdata = await this.authService.update_info({id: user.id, secret: secret.base32})
+      }
+      // console.log("updated database", newdata);
+      console.log("secret is 2fa == > ", user.secret)
+      var new_url = speakeasy.otpauth_url({secret: secret.ascii})
+      console.log('QR code site: ', new_url)
+      var QRcode = require('qrcode')
+      // var data_url2: string
+      QRcode.toDataURL(new_url, function(err, data_url){
+       console.log("qr code is ", data_url)
+       return '<img src="' + data_url + '">'
+      })
+    }
+    // return data_url
+  }
+
 
   @UseGuards(jwtGuard)
   @Get('verify')
