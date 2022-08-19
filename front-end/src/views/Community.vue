@@ -19,7 +19,6 @@ export default Vue.extend({
       {
         this.users.push(this.friendlist.find(data => data.username === username));
         this.friendlist = this.friendlist.filter(data => data.username !== username);
-        
       },
       Addfriend: function(username: string)
       {
@@ -55,14 +54,14 @@ export default Vue.extend({
       },
       setUsernameMethod: function()
       {
-        if (this.username.length > 5 && this.username.length < 10)
+        if (this.me.username.length > 5 && this.me.username.length < 10)
         {
           const token = localStorage.getItem('token');
 
           if (token)
           {
             axios.patch('/update', {
-              userame: this.username 
+              userame: this.me.username 
             }, {
               headers: {
                 Authorization: token
@@ -79,6 +78,7 @@ export default Vue.extend({
     },
     data: () => ({
       setUsername: false,
+      me: [],
       avatar: "",
       intra_login: "",
       status: "",
@@ -112,12 +112,10 @@ export default Vue.extend({
       axios.get('/user/me', {
         headers: {
           Authorization: token
-      }}).then(res => {
-        this.avatar = res.data.avatar;
-        this.username = res.data.username;
-        this.intra_login = res.data.intra_login;
-        this.status = res.data.status;
-        if (this.username === null)
+      }}).then(async (res) => {
+        await this.me.push(res.data);
+        this.avatar = this.me[0].avatar;
+        if (this.me.username === null)
           this.setUsername = true;
       })
       .catch(error => {
@@ -130,15 +128,37 @@ export default Vue.extend({
           Authorization: token
       }}).then(res => {
         this.users = res.data;
+
         axios.get('/friend/find', {
           headers: {
             Authorization: token
         }}).then(res => {
-          this.friendlist = res.data[0]['friend_id'];
-          // console.log(this.friendlist);
-          // this.friendlist = this.friendlist.filter(item => !this.users.includes(item));
-          // console.log(this.users);
-          console.log(this.friendlist[0].avatar  );
+          var tmp;
+
+
+          tmp = res.data;
+
+          for (let i = 0; i < tmp.length; ++i)
+          {
+            this.friendlist.push(tmp[i].friend_id);
+          }
+          this.users = this.users.filter((el) => {
+            return this.friendlist.some((f) => {
+              return f.username !== el.username;
+            });
+          });
+
+          this.users = this.users.filter((el) => {
+            return this.me.some((f) => {
+              return f.username !== el.username;
+            });
+          });
+
+          this.friendlist = this.friendlist.filter((el) => {
+            return this.me.some((f) => {
+              return f.username !== el.username;
+            });
+          });
 
         })
         .catch(error => {
@@ -228,7 +248,7 @@ export default Vue.extend({
                       class=""
                     >
                       <v-list-item-avatar class="align-self-start mr-2">
-                        <Profile :avatar="avatar" :username="username" />                   
+                        <Profile :avatar="avatar" :username="me[0].username" />                   
                                 
                       </v-list-item-avatar>
                       <v-list-item-content class="received-message">
