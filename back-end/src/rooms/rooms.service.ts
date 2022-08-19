@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Rooms, RoomsDTO } from 'src/Entity/rooms.entity';
@@ -16,26 +15,14 @@ export class RoomsService {
 	public readonly roomUser: Repository<RoomUsers>
 	){}
 
-// async findOne(intra_login: string) 
-// {
-
-//      const test = await this.rooms.find();
-//      if(!test)
-//         console.log(test);
-//     return test;
-// }
 	//* Creates a new room and returns it.
 	async create(roomElem: RoomsDTO, userID: string): Promise<any>
 	{
 		let exist = await this.rooms.findBy({roomName: roomElem.roomName});
 		if (exist.length)
-		{
-			console.log("Chat room already exists")
 			return "Chat room already exists";
-		}
 
 		let tmp = this.rooms.create(roomElem);
-		// let res = await this.rooms.save(tmp);
 
 		let usr = this.roomUser.create({
 			userID: Math.floor(Math.random() * 100), //! should insert userID here
@@ -43,7 +30,7 @@ export class RoomsService {
 			status: 0,
 			roomID: tmp.roomName
 		}) 
-		// tmp.users = u sr;
+		
 		this.roomUser.save(usr);
 		await this.rooms.save(tmp);
 		return  usr;
@@ -108,14 +95,15 @@ export class RoomsService {
 		}
 	}
 	
+	//*  
 	async changeUserState(user: number, roomID, target: number, state: number): Promise<any> //! Sus function (double check)
 	{
 		let usr = await this.roomUser.findOne({where: {userID: user, roomID: roomID}})
 		if (usr.role == "admin" || usr.role == "moderator")
 		{
-			let room = await this.roomUser.findOne({where: {roomID: roomID, userID: target}})
-			room.status = state;
-			this.roomUser.save(room)
+			let usr = await this.roomUser.findOne({where: {roomID: roomID, userID: target}})
+			usr.status = state;
+			this.roomUser.save(usr)
 		}
 	}
 

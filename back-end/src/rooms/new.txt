@@ -8,3 +8,26 @@
 * remove room if no user is there (to be checked) [✔]
 * give role(user to admin/ admin to user) []
 
+
+~~~~~ Subject: ~~~~~
+
+* The user should be able to create a public, private and protect chat rooms. []
+* The user should be able to send DMs to other users (same thing as private chat rooms). []
+* The user should be able to block other users and won't receive messages from them. []
+* The creator of a channel is its Moderator. []
+* The channel owner (moderator) can set/change/remove password from a room. []
+* The channel owner can set other users to be admins. []
+
+~~~~~ Notes: ~~~~
+
+* A user can join a room with multiple sockets, I must save them in an array (or counter) so that the last time the user leaves he will be deleted from the roomsUser database.
+
+* 
+
+
+
+
+
+
+
+
