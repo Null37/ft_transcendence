@@ -3,7 +3,7 @@ import { Users } from "./users.entity";
 
 
 @Entity()
-export class friend
+export class block_list
 {
     @PrimaryGeneratedColumn()
     id: number
@@ -13,6 +13,7 @@ export class friend
 
     @OneToOne(() => Users)
     @JoinColumn()
-    friend_id: Users
+    block_list: Users
+
 
 }

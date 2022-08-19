@@ -16,7 +16,7 @@ export class FrinedCtroller {
     console.log("test ==> par_id", par_id)
     console.log("test ==> user", req.user)
     console.log("test ==> id", req.user.sub)
-    let test_user = await this.friend_base.add_frined({user_id: req.user.sub, friend_id: par_id, status:  'friend'})
+    let test_user = await this.friend_base.add_frined({user_id: req.user.sub, friend_id: par_id})
     console.log("new data" ,test_user)
     let newdata = await this.friend_base.find_friends(req.user.sub)
     console.log("databse",newdata)
@@ -49,15 +49,15 @@ export class FrinedCtroller {
 
   }
 
-  @Get('block/:id')
-  async block_user(@Request() req, @Param('id') par_id)
-  {
-    console.log("block this user", par_id)
-    console.log("me  ==> ", req.user.name)
-    let for_test = await this.friend_base.block_frind({user_id: req.user.sub, friend_id: par_id, status:  'blocked'})
-    console.log("update ....", for_test)
+  // @Get('block/:id')
+  // async block_user(@Request() req, @Param('id') par_id)
+  // {
+  //   console.log("block this user", par_id)
+  //   console.log("me  ==> ", req.user.name)
+  //   let for_test = await this.friend_base.block_frind({user_id: req.user.sub, friend_id: par_id, status:  'blocked'})
+  //   console.log("update ....", for_test)
 
-  }
+  // }
 
 
 
