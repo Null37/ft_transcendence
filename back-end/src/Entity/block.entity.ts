@@ -14,6 +14,4 @@ export class block_list
     @OneToOne(() => Users)
     @JoinColumn()
     block_list: Users
-
-
 }
