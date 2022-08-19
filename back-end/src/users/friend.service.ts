@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { friend_dto } from "src/DTO/frined.dto";
 import { friend } from "src/Entity/friend.entity";
+import { Users } from "src/Entity/users.entity";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -26,6 +27,18 @@ export class FriendService {
     console.log("data dto", friend_dto)
     const newfriend = this.friend_base.create(friend_dto)
     return this.friend_base.save(newfriend)
+  }
+
+  async remove_friend(row_id: number)
+  { 
+    console.log("start remove");
+    //  const userfound  = await this.friend_base.findOne({where: {id: row_id}})
+    const findrow  = await this.friend_base.createQueryBuilder('friend').leftJoinAndSelect("friend.friend_id", "friend_id").where("friend_id.id = :id", { id: row_id }).getOne()
+    // findrow.friend_id.
+    console.log("bruh", findrow.friend_id)
+    console.log("bruh id row ==>", findrow.id)
+    const userfound = await this.friend_base.findOneBy({id: findrow.id})
+    return this.friend_base.remove(userfound)
   }
   async find_blocked(user_id: number)
   {
