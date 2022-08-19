@@ -41,7 +41,22 @@ export class FrinedCtroller {
 
   }
 
+  @Get('remove/:row_id')
+  async remove_friend(@Request() req, @Param('row_id') par_id)
+  {
+    console.log("remove friend ")
+    console.log("test ==> par_id", par_id)
+    console.log("test ==> user", req.user)
+    console.log("test ==> id", req.user.sub)
+    // const target_user = await this.authService.get_user(req.user.name)
+    // console.log("found user ==> ", target_user)
 
+    let test_user = await this.friend_base.remove_friend(par_id);
+    console.log(test_user);
+   // let newdata = await this.friend_base.find_friends(req.user.sub)
+    //onsole.log("databse",newdata)
+    //return newdata
+  }
 
 
 }
