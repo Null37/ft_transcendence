@@ -13,7 +13,7 @@ export class RoomsService {
 	@InjectRepository(Rooms)
 	private readonly  rooms: Repository<Rooms>,
 	@InjectRepository(RoomUsers)
-	private readonly roomUser: Repository<RoomUsers>
+	public readonly roomUser: Repository<RoomUsers>
 	){}
 
 // async findOne(intra_login: string) 
@@ -57,12 +57,10 @@ export class RoomsService {
 			3- Check the state of the user (if he's banned from joining the room)
 			4- If the room is protected by password, then check if the given password if correct
 		*/
-
 		let tmp = await this.rooms.findOne({where: {roomName: room_name}})
 		if (tmp == null)
 		{
 			console.log("Room not found")
-			console.log(tmp)
 			return "Room not found";
 		}
 		else
@@ -84,6 +82,18 @@ export class RoomsService {
 				let res = await this.roomUser.find({where: {roomID: room_name}})
 				return res;
 			}
+		}
+	}
+
+	async leaveUserRoom(userID: string, room_name: string): Promise<any>
+	{
+		let usr = await this.roomUser.findOne({where: {roomID: room_name, userID: +userID}})
+		if (usr)
+		{
+			await this.roomUser.remove(usr);
+			let isempty = await this.roomUser.find({where: {roomID: room_name}})
+			if (isempty.length == 0)
+				await this.rooms.remove(await this.rooms.findOne({where: {roomName: room_name}}))
 		}
 	}
 
@@ -130,7 +140,7 @@ export class RoomsService {
 			room.state = state;
 			this.rooms.save(room)
 		}
-	}
+		}
 
 	async debuggingLog()
 	{

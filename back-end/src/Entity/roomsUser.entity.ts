@@ -7,6 +7,7 @@ export class RoomUserDTO
 	role: string
 	userID: number
 	status: number
+	duration: number
 }
 
 @Entity()
@@ -28,6 +29,9 @@ export class RoomUsers
 	// @OneToOne(() => Rooms, {cascade: true})
 	// @JoinColumn()
 	// rooms: Rooms
+
+	@Column({nullable: true})
+	duration: number
 
 	@Column()
 	status: number

@@ -20,7 +20,7 @@ export class RoomController {
 	@Post('create')
 	async createRoom(@Body() body): Promise<RoomsDTO> {
 		// check if room already exists with that name
-		let res = await this.roomService.create(body, "10");
+		let res = await this.roomService.create(body, body.userID);
 		if (res == "Chat room already exists")
 			throw new HttpException(res, HttpStatus.FORBIDDEN);
 		return res;
@@ -38,6 +38,12 @@ export class RoomController {
 			throw new HttpException(res, HttpStatus.OK)
 	}
 
+	@Post('leaveRoom')
+	async leaveRoom(@Body() body): Promise<any>
+	{
+		this.roomService.leaveUserRoom(body.userID, body.room_name);
+	}
+	
 	@Patch('changeRoompw')
 	async changeRoompw(@Body() body): Promise<any>
 	{
