@@ -20,6 +20,10 @@ export class Rooms
     @Column()
     roomName: string
 
+	// @OneToOne(() => RoomUsers, {cascade: true})
+	// @JoinColumn()
+	// users: RoomUsers;
+
     @Column()
     state: number // or string
 	/*
