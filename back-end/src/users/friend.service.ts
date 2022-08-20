@@ -23,8 +23,6 @@ export class FriendService {
             res.push(element.friend_id);
         });
       return res
-    console.log(" from friend ", stat)
-    return stat
   }
   add_frined(friend_dto: friend_dto )
   {
