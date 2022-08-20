@@ -8,7 +8,7 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 
 Vue.config.productionTip = false
-export const SocketInstance =  socketio('http://localhost:3000');
+export const SocketInstance =  socketio('http://127.0.0.1:3000');
 Vue.use(new VueSocketIO({
 	debug: true,
 	connection: SocketInstance
