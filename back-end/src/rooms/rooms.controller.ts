@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Header, HttpException, HttpStatus, Logger, Patch, Post, Request, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Header, HttpException, HttpStatus, Logger, Patch, Post, Req, Request, UseFilters, UseGuards } from '@nestjs/common';
+import { jwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RoomsDTO } from 'src/Entity/rooms.entity';
 import { RoomUserDTO } from 'src/Entity/roomsUser.entity';
 import { RoomsService } from './rooms.service';
 
 @Controller("rooms")
+@UseGuards(jwtGuard)
 export class RoomController {
 
 	constructor(private readonly roomService: RoomsService){}
@@ -17,9 +19,11 @@ export class RoomController {
 		// 	await this.roomService.create(body);
 // 	this.roomService.debuggingLog()
 //   }
+
 	@Post('create')
-	async createRoom(@Body() body): Promise<RoomsDTO> {
+	async createRoom(@Body() body, @Request() req): Promise<RoomsDTO> {
 		// check if room already exists with that name
+		req.user.sub;
 		let res = await this.roomService.create(body, body.userID);
 		if (res == "Chat room already exists")
 			throw new HttpException(res, HttpStatus.FORBIDDEN);

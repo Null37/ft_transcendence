@@ -122,9 +122,10 @@ import { UsersService } from './users/users.service';
 		*/
 		// let usr = await this.	usersService.find_username(message.username);
 		// if (usr.)
-		this.logger.log(`received a message: ${message.text} will be sent to ${message.room}`)
-		// this.logger.log(`${JSON.stringify( await (await this.wss.in(message.room).fetchSockets()))}`)
-		this.wss.to(message.room).emit('msgToClient',
+		
+		this.logger.log(`received a message: ${message.text} from ${client.id} will be sent to ${message.room}`)
+		
+		client.broadcast.to(message.room).emit('msgToClient',
 		{
 			roomName: message.room,
 			state: "DM",

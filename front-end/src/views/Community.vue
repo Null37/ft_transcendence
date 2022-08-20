@@ -16,6 +16,15 @@ import { SocketInstance } from '@/main';
 // })
 export default Vue.extend({
     name: "App",
+	sockets: {
+		msgToClient(data) {
+			console.log("reached the event")
+          this.messages.push({id: this.messages.length, from: "Akira", message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
+		}
+
+
+
+	},
     data: () => ({
       setUsername: false,
       Title: "Add new friends to chat with",
@@ -199,16 +208,19 @@ export default Vue.extend({
 
     }
   },
-  setup()
-  {
-    const socket = io("http://127.0.0.1:3000");
-    socket.on("msgToClient",  function(res) {
-      console.log("received == > ");
-      console.log(res);
-    })
-  },
+setup() {
+	// let  socket = io("http://127.0.0.1:3000");
+
+	// // socket.emit('joinDM', {roomName: 'foo'});
+	// socket.on('msgToClient',  (res) => {
+	// console.log("received == > ");
+	// console.log(res);
+	// })
+},
   components: { TopBar, UserAvatar, FriendList, FriendsStatus, Profile }
-});
+
+  },
+);
 </script>
 
 
