@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn,  OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn,  ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Users } from "./users.entity";
 
 
@@ -11,7 +11,7 @@ export class block_list
     @Column()
     user_id: number
 
-    @OneToOne(() => Users)
+    @ManyToOne(() => Users)
     @JoinColumn()
     block_list: Users
 }

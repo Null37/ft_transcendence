@@ -17,6 +17,10 @@ export class blockService {
   async get_blocked(user_id: number)
   {
     let stat = await this.block_base.find({where: {user_id: user_id}, relations: {block_list: true}})
+    let res = new Array()
+    stat.forEach(element => {
+            res.push(element.block_list);
+        });
     return stat;
   }
 
@@ -25,8 +29,16 @@ export class blockService {
     const user = await this.friend_base.remove_friend(friend_id, me)
     if(user == null)
       console.log("not frined")
-    const newfriend = this.block_base.create(block_dto)
-    return this.block_base.save(newfriend)
+      const findrow  = await this.block_base.createQueryBuilder('block')
+      .leftJoinAndSelect("block_list.block_list", "blocklist")
+      .where("block.user_id = :userid", {userid: me})
+      .andWhere("block_list.id = :id", { id: friend_id })
+      .getOne()
+    if(findrow ==  null)
+    {
+      const newfriend = this.block_base.create(block_dto)
+      return this.block_base.save(newfriend)
+    }
   }
 
  async  unblock(block_id: number, me: number)
