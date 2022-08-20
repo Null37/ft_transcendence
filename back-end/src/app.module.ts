@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { AppGateway } from './app.gateway';
 import { RoomsModule } from './rooms/rooms.module';
 import { FrinedCtroller } from './friend.controller';
+import { BlockCtroller } from './block.controller';
 
 @Module({
   imports: [AuthModule, 
@@ -24,7 +25,7 @@ import { FrinedCtroller } from './friend.controller';
         synchronize: true,
     }
   )],
-  controllers: [AppController, FrinedCtroller],
+  controllers: [AppController, FrinedCtroller, BlockCtroller],
   providers: [AppService, pass_42Guard, AppGateway],
 })
 export class AppModule {}

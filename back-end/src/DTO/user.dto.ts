@@ -10,4 +10,8 @@ export class user_dto
     avatar: string
 
     status: string
+
+    secret?: string 
+
+    two_factor_authentication?: boolean = false
 } 
