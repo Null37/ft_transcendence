@@ -18,7 +18,7 @@ export class FriendService {
     let stat = await this.friend_base.find({where: {user_id: user_id}, relations: {friend_id: true}})
   //  this.friend_base.findBy()
     // let stat = this.friend_base.get
-    console.log(" from friend ",stat)
+    console.log(" from friend ", stat)
     return stat
   }
 
@@ -29,27 +29,20 @@ export class FriendService {
     return this.friend_base.save(newfriend)
   }
 
-  async remove_friend(row_id: number, me: number)
+  async remove_friend(friend_id: number, me: number)
   { 
     console.log("start remove");
-    //  const userfound  = await this.friend_base.findOne({where: {id: row_id}})
-    //await this.roomRepository
-    // .createQueryBuilder("room")
-    // .leftJoinAndSelect("room.owner", "owner") 
-    // // .andWhere("room.id = :r", {r: 5})
-    // // .where("owner.id = :id", { id: 5 })
-    // .where("room.privacy = :p", { p: false })
-    // .andWhere("owner.id = :r", {r: 5})
-    // .getOne();
     const findrow  = await this.friend_base.createQueryBuilder('friend')
     .leftJoinAndSelect("friend.friend_id", "friend_id")
     .where("friend.user_id = :userid", {userid: me})
-    .andWhere("friend_id.id = :id", { id: row_id })
+    .andWhere("friend_id.id = :id", { id: friend_id })
     .getOne()
     // findrow.friend_id.
     console.log("bruh", findrow.friend_id)
     console.log("bruh id row ==>", findrow.id)
     const userfound = await this.friend_base.findOneBy({id: findrow.id})
+    if(userfound == null)
+      return userfound
     return this.friend_base.remove(userfound)
   }
   // async find_blocked(user_id: number)
