@@ -90,6 +90,7 @@
           >
             Save
           </v-btn>
+
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -111,9 +112,9 @@ import axios from 'axios';
       dialog: false,
     }),
     methods: {
-      loadImage(event) {
+      loadImage(event: any) {
 
-        console.log(event.File);
+        console.log(event.target);
       },
       updateusername: function()
       {

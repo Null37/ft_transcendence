@@ -18,7 +18,7 @@ import { UsersService } from './users/users.service';
   export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   
 	@WebSocketServer() wss: Server;
-
+	
 	constructor(
 		private readonly roomsService: RoomsService,
 		private readonly usersService: UsersService

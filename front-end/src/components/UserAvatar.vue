@@ -4,8 +4,11 @@ import EditProfile from './EditProfile.vue';
 import CreateRoom from './CreateRoom.vue';
 
 export default Vue.extend({
-    props: ['avatar'],
+    props: ['avatar', 'rooms'],
     data: () => ({ drawer: null }),
+    methods: {
+      
+    },
     components: { EditProfile, CreateRoom }
 });
 </script>
@@ -22,16 +25,17 @@ export default Vue.extend({
         <v-divider class="mx-3 my-5"></v-divider>
         <v-hover
         v-slot="{ hover }"
-        v-for="n in 6"
-        :key="n"
+        v-for="r in rooms"
+        :key="r.id"
         >
           <v-avatar
+            
             class="d-block mx-auto mb-9"
             color="grey darken-4"
             :class="{ 'on-hover': hover }"
             size="28"
           >
-            <span class="text-h6">R</span>
+            <span class="text-h6" :title="r.roomname" >{{r.roomname.charAt(0)}}</span>
           </v-avatar>
         </v-hover>
         <CreateRoom />
