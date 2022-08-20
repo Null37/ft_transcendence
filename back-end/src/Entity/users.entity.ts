@@ -20,7 +20,7 @@ export class Users
     @Column()
     status: string
 
-    @Column({nullable : true})
+    @Column({nullable : true, select: false})
     secret: string 
 
     @Column()

@@ -18,7 +18,7 @@ export class FriendService {
     let stat = await this.friend_base.find({where: {user_id: user_id}, relations: {friend_id: true}})
   //  this.friend_base.findBy()
     // let stat = this.friend_base.get
-    let res =  new Array()
+    let res = new Array()
     stat.forEach(element => {
             res.push(element.friend_id);
         });

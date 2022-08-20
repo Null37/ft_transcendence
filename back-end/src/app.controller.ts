@@ -45,25 +45,33 @@ export class AppController {
     if(user == null)
       throw new NotFoundException('user not found')
     console.log("adctive 2FA ==> ", "<", user.two_factor_authentication, ">")
+    // var secret = speakeasy.generateSecret({name: "ft_transcendence"});
+    
     if(user.two_factor_authentication == false)
     {
       // start generate secret 
-      var speakeasy = require("speakeasy");
       if(user.secret == null)
       {
+        console.log("here")
+        var speakeasy = require("speakeasy");
         var secret = speakeasy.generateSecret({name: "ft_transcendence"});
-        var newdata = await this.authService.update_info({id: user.id, secret: secret.base32})
+        console.log("secret obj", secret)
+        var newdata = await this.authService.update_info({id: user.id, secret: secret.otpauth_url})
       }
       // console.log("updated database", newdata);
       console.log("secret is 2fa == > ", user.secret)
-      var new_url = speakeasy.otpauth_url({secret: secret.ascii})
-      console.log('QR code site: ', new_url)
+      // var new_url = speakeasy.otpauth_url({secret: secret.ascii})
+      console.log('QR code site: ', newdata.secret)
       var QRcode = require('qrcode')
       // var data_url2: string
-      QRcode.toDataURL(new_url, function(err, data_url){
-       console.log("qr code is ", data_url)
-       return '<img src="' + data_url + '">'
+      var qr_url = null;
+     QRcode.toDataURL(newdata.secret, function(err, data_url){
+        qr_url = data_url
+       console.log("qr code is ", qr_url)
+       //return '<img src="' + qr_url + '">'
       })
+      await this.authService.update_info({id: user.id, secret: qr_url})
+      return qr_url
     }
     // return data_url
   }
@@ -79,10 +87,11 @@ export class AppController {
 
   @UseGuards(jwtGuard)
   @Get('users')
-  get_all_users() // get all users data
+  async get_all_users() // get all users data
   {
     console.log("start find users") // check with front-end if is work
-    return this.authService.get_all()
+    let users = await this.authService.get_all()
+    return users
   }
 
 
@@ -98,7 +107,7 @@ export class AppController {
     let user = await this.authService.get_user(par);
     console.log("valuse userv = ", user)
     if(user !=  null)
-      return user;
+      return user
     throw new NotFoundException('Not Found USER')
   }
 
