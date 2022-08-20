@@ -21,17 +21,6 @@ export class FriendService {
     console.log(" from friend ", stat)
     return stat
   }
-
-  async remove_friend(row_id: number)
-  { 
-    console.log("start remove");
-    //  const userfound  = await this.friend_base.findOne({where: {id: row_id}})
-    const userfound  = await this.friend_base.createQueryBuilder('friend').leftJoinAndSelect("friend.friend_id", "friend_id").where("friend_id.id = :id", { id: row_id }).getOne()
-    userfound.friend_id
-    console.log("|bruh", userfound.friend_id,"|")
-    // return this.friend_base.remove(userfound)
-  }
-
   add_frined(friend_dto: friend_dto )
   {
     console.log("data dto", friend_dto)

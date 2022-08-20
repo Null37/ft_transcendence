@@ -44,20 +44,22 @@ export default Vue.extend({
       {
         
 
-        for(let i = 0; i < this.users.length; ++i)
+        for(let i = 0; i < this.friendlist.length; ++i)
         {
-          if (this.users[i].username === username)
+
+          if (this.friendlist[i].username === username)
           {
+            console.log("found  ");
             const token = localStorage.getItem('token');
 
             if (token)
             {
-              console.log("id ==> ", this.users[i].id);
-              axios.get('/friend/remove/' + this.users[i].id, {
+              console.log("id ==> ", this.friendlist[i].id);
+              axios.get('/friend/remove/' + this.friendlist[i].id, {
               headers: {
                 Authorization: token
               }}).then(res => {
-
+                console.log("removed");
                 this.users.push(this.friendlist.find(data => data.username === username));
                 this.friendlist = this.friendlist.filter(data => data.username !== username);
 
