@@ -16,7 +16,10 @@ export class AuthService {
 
 	return this.jwt.sign(payload)
   }
-
+  async get_se(id: number)
+  {
+     await this.userdata.get_secret(id)
+  }
    get_all()
   {
     return  this.userdata.findAll()

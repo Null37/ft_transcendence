@@ -7,6 +7,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { get, request } from 'http';
 import { stringify } from 'querystring';
+import { write } from 'fs';
 
 
 @Controller()
@@ -42,37 +43,39 @@ export class AppController {
   async send_Qr_code(@Request() req)
   {
     let user = await this.authService.get_user(req.user.name)
+    console.log("user ====> ", user)
     if(user == null)
       throw new NotFoundException('user not found')
     console.log("adctive 2FA ==> ", "<", user.two_factor_authentication, ">")
     // var secret = speakeasy.generateSecret({name: "ft_transcendence"});
-    
+    var speakeasy = require("speakeasy");
+    var usera = null;
     if(user.two_factor_authentication == false)
     {
       // start generate secret 
-      if(user.secret == null)
-      {
         console.log("here")
-        var speakeasy = require("speakeasy");
-        var secret = speakeasy.generateSecret({name: "ft_transcendence"});
+        var secret = speakeasy.generateSecret({name: "ft_transcendence (" + user.username +")"});
         console.log("secret obj", secret)
-        var newdata = await this.authService.update_info({id: user.id, secret: secret.otpauth_url})
-      }
-      // console.log("updated database", newdata);
-      console.log("secret is 2fa == > ", user.secret)
-      // var new_url = speakeasy.otpauth_url({secret: secret.ascii})
-      console.log('QR code site: ', newdata.secret)
+        await this.authService.update_info({id: user.id, secret: secret.base32})
+        // console.log("base32==============> ", usera.secret)
+      // const urtl_test = speakeasy.otpauthURL({secret: usera.secret, label: "ft_transcendence (" + usera.username + ")"});
+      // console.log("userid ==>", user.id)
+      // const use = await this.authService.get_se(user.id);
+      // console.log(tes1t);
       var QRcode = require('qrcode')
-      // var data_url2: string
-      var qr_url = null;
-     QRcode.toDataURL(newdata.secret, function(err, data_url){
-        qr_url = data_url
-       console.log("qr code is ", qr_url)
+    //   // var data_url2: string
+    //   var qr_url = null;
+    var url = await QRcode.toDataURL(secret.otpauth_url, function(err, data_url){
+       console.log("qr code is |", data_url, "|")
        //return '<img src="' + qr_url + '">'
+        return data_url
       })
-      await this.authService.update_info({id: user.id, secret: qr_url})
-      return qr_url
+
+  
+      console.log("bruh url ==> ", url)
+      // return url
     }
+    
     // return data_url
   }
 

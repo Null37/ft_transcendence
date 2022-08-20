@@ -169,14 +169,7 @@ export default Vue.extend({
           headers: {
             Authorization: token
         }}).then(res => {
-          this.tmp;
-
-
-          this.tmp = res.data;
-          for (let i = 0; i < this.tmp.length; ++i)
-          {
-            this.friendlist.push(this.tmp[i].friend_id);
-          }
+          this.friendlist = res.data;
           if (this.friendlist.length > 0)
           {
             this.users = this.users.filter((el) => {

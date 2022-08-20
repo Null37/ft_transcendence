@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn,  OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn,  ManyToOne,  OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { Users } from "./users.entity";
 
 
@@ -12,7 +12,7 @@ export class friend
     @Column()
     user_id: number
 
-    @OneToOne(() => Users)
+    @ManyToOne(() => Users)
     @JoinColumn()
     friend_id: Users
 
