@@ -6,6 +6,7 @@ import FriendList from '../components/FriendList.vue';
 import FriendsStatus from '../components/FriendsStatus.vue';
 import Profile from '@/components/Profile.vue';
 import axios from 'axios';
+import io from 'socket.io-client';
 import { SocketInstance } from '@/main';
 
 // SocketInstance.on('msgToClient')
@@ -87,14 +88,15 @@ export default Vue.extend({
           })
           .catch(error => {
             console.log(error);
-          });
+          }); 
         }
       },
       submitMessage: function(e: any) {
         if (e.target.value !== '')
         {
           this.messages.push({id: this.messages.length, from: "Akira", message: e.target.value, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
-          this.$socket.emit('msgToServer', this.placeHolder)
+          console.log("id ===> ", this.me[0].id)
+          this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: 'id1-id2', userID: this.me[0].id})
           this.placeHolder = "";
         }
       },
@@ -196,6 +198,14 @@ export default Vue.extend({
       });
 
     }
+  },
+  setup()
+  {
+    const socket = io("http://127.0.0.1:3000");
+    socket.on("msgToClient",  function(res) {
+      console.log("received == > ");
+      console.log(res);
+    })
   },
   components: { TopBar, UserAvatar, FriendList, FriendsStatus, Profile }
 });

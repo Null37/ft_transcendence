@@ -124,7 +124,7 @@ import { UsersService } from './users/users.service';
 		// if (usr.)
 		this.logger.log(`received a message: ${message.text} will be sent to ${message.room}`)
 		// this.logger.log(`${JSON.stringify( await (await this.wss.in(message.room).fetchSockets()))}`)
-		this.wss.emit('msgToClient',
+		this.wss.to(message.room).emit('msgToClient',
 		{
 			roomName: message.room,
 			state: "DM",
