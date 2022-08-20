@@ -56,15 +56,7 @@ export class FriendService {
      findrow.forEach(( async function (element) {
         const removed = await this.friend_base.find({where:{id: element.id}})
         await this.friend_base.remove(removed)
-
         }).bind(this));
-    console.log("remove ==> ", remove)
-    // console.log("bruh", findrow.friend_id)
-    // console.log("bruh id row ==>", findrow.id)
-    // const userfound = await this.friend_base.findOneBy({id: findrow.id})
-    // if(userfound == null)
-    //   return userfound
-    // return this.friend_base.remove(userfound)
   }
   
   
