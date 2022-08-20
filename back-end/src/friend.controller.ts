@@ -32,8 +32,8 @@ export class FrinedCtroller {
     console.log("test ==> id", req.user.sub)
     // const target_user = await this.authService.get_user(req.user.name)
     // console.log("found user ==> ", target_user)
-
-    let test_user = await this.friend_base.remove_friend(par_id);
+    // req.user.sub id of user and req.user.name login of user all data from token
+    let test_user = await this.friend_base.remove_friend(par_id, req.user.sub);
     console.log(test_user);
    // let newdata = await this.friend_base.find_friends(req.user.sub)
     //console.log("databse",newdata)
