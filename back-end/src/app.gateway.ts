@@ -107,15 +107,42 @@ import { UsersService } from './users/users.service';
 		client.broadcast.to(message.room).emit('leaveRoom', message.userID);
 	}
 
+	@SubscribeMessage('joinDM')
+	handleJoinDM(client: Socket, roomName: string): void
+	{
+		this.logger.log(`${client.id} joined ${roomName}`)
+		client.join(roomName);
+	}
+
 	@SubscribeMessage('msgToClientDM')
 	async handleDmMessage(client: Socket, message: {text: string, room: string, username: string}): Promise<any> {
 		// Add logic before sending a message here
 		/* 
 			1- Check if the receiver is muted/blocked by the sender
 		*/
-		let usr = await this.usersService.find_username(message.username);
+		// let usr = await this.	usersService.find_username(message.username);
 		// if (usr.)
-		client.broadcast.to(message.room).emit(message.text);
+		this.logger.log(`received a message: ${message.text} will be sent to ${message.room}`)
+		// this.logger.log(`${JSON.stringify( await (await this.wss.in(message.room).fetchSockets()))}`)
+		this.wss.emit('msgToClient',
+		{
+			roomName: message.room,
+			state: "DM",
+			blockedUsers: null,
+			message: message.text,
+			sender: null
+		});
 	}
 
   }	
+
+  /* 
+  
+  {
+	roomName: string,
+	state: string, // DM or ROOM
+	blockedUsers: [] string, // null in the case of dm else array of blocked users in the roommsgToClient
+	message: string,
+	sender: {} // send user object (avtar, name)
+  }
+  */
