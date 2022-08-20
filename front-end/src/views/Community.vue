@@ -6,6 +6,7 @@ import FriendList from '../components/FriendList.vue';
 import FriendsStatus from '../components/FriendsStatus.vue';
 import Profile from '@/components/Profile.vue';
 import axios from 'axios';
+import { SocketInstance } from '@/main';
 
 // SocketInstance.on('msgToClient')
 // SocketInstance.on('msgToClient', (msg: any) => {
@@ -14,6 +15,30 @@ import axios from 'axios';
 // })
 export default Vue.extend({
     name: "App",
+    data: () => ({
+      setUsername: false,
+      Title: "Add new friends to chat with",
+      me: [],
+      avatar: "",
+      intra_login: "",
+      status: "",
+      username: "",
+      drawer: null,
+      placeHolder: "",
+      tmp: [],
+      messages: [
+        {
+          id: 0,
+          from: 'John Josh',
+          message: `Sure, I'll see yasdfou later.`,
+          time: '10:42am',
+          color: 'deep-purple lighten-1',
+        },
+      ],
+      users: [],
+      friendlist: [],
+
+    }),
     methods: {
       removefriend: function(username: string)
       {
@@ -73,7 +98,12 @@ export default Vue.extend({
           this.placeHolder = "";
         }
       },
-
+      ShowChatMessages: function(username: string){
+        this.Title = username;
+        this.messages = [];
+        // SocketInstance.join()
+        this.$socket.emit('joinDM', "id1-id2");
+      },
       updateMessage: function(e: any){
         this.placeHolder = e.target.value;
       },
@@ -101,35 +131,7 @@ export default Vue.extend({
         }
       }
     },
-    data: () => ({
-      setUsername: false,
-      me: [],
-      avatar: "",
-      intra_login: "",
-      status: "",
-      username: "",
-      drawer: null,
-      placeHolder: "",
-      tmp: [],
-      messages: [
-        {
-          id: 0,
-          from: 'John Josh',
-          message: `Sure, I'll see yasdfou later.`,
-          time: '10:42am',
-          color: 'deep-purple lighten-1',
-        },
-      ],
-      users: [],
-      friendlist: [],
-      // users: [
-      //   {
-      //     id: 0,
-      //     username: "Boodeer",
-      //     avatar: "https://cdn.intra.42.fr/users/hboudhir.jpg",
-      //   },
-      // ],
-    }),
+    
 	mounted () {
     const token = localStorage.getItem('token');
     
@@ -154,8 +156,13 @@ export default Vue.extend({
           Authorization: token
       }}).then(res => {
         this.users = res.data;
-
-
+        
+        this.users = this.users.filter((el) => {
+            return this.me.some((f) => {
+              return f.username !== el.username;
+            });
+          });
+        
         axios.get('/friend/find', {
           headers: {
             Authorization: token
@@ -164,28 +171,19 @@ export default Vue.extend({
 
 
           this.tmp = res.data;
-          console.log(this.tmp);
           for (let i = 0; i < this.tmp.length; ++i)
           {
             this.friendlist.push(this.tmp[i].friend_id);
           }
-          // this.users = this.users.filter((el) => {
-          //   return this.friendlist.some((f) => {
-          //     return f.username !== el.username;
-          //   });
-          // });
-
-          this.users = this.users.filter((el) => {
-            return this.me.some((f) => {
-              return f.username !== el.username;
+          if (this.friendlist.length > 0)
+          {
+            this.users = this.users.filter((el) => {
+              return this.friendlist.some((f) => {
+                return f.username !== el.username;
+              });
             });
-          });
-
-          // this.friendlist = this.friendlist.filter((el) => {
-          //   return this.me.some((f) => {
-          //     return f.username !== el.username;
-          //   });
-          // });
+          }
+  
 
         })
         .catch(error => {
@@ -198,10 +196,6 @@ export default Vue.extend({
       });
 
     }
-		// this.$socket.
-		this.sockets.subscribe("msgToClient", (msg: any) => {
-      this.messages.push({id: 0, from: "", message: msg, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
-    })
   },
   components: { TopBar, UserAvatar, FriendList, FriendsStatus, Profile }
 });
@@ -210,7 +204,7 @@ export default Vue.extend({
 
 <template>
    <v-app id="inspire">
-    <TopBar />
+    <TopBar :title="Title" />
 
     <v-navigation-drawer
       v-model="drawer"
@@ -261,7 +255,7 @@ export default Vue.extend({
         </v-list>
       
       </v-sheet>
-      <FriendList />
+      <FriendList :friends="friendlist" @ShowChatMessages="ShowChatMessages"/>
     </v-navigation-drawer>
 
     <FriendsStatus @Addfriend="Addfriend" @removefriend="removefriend" :users="users" :friends="friendlist" :username="me.username" />
@@ -275,7 +269,7 @@ export default Vue.extend({
                       class=""
                     >
                       <v-list-item-avatar class="align-self-start mr-2">
-                        <Profile :avatar="avatar" :username="me.username" />                   
+                        <Profile :avatar="avatar" :username="message.from" />                   
                                 
                       </v-list-item-avatar>
                       <v-list-item-content class="received-message">

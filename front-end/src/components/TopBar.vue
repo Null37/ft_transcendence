@@ -13,7 +13,7 @@
           color="grey"
           >mdi-pound</v-icon>
 
-          sadfadf asdf
+          {{title}}
         </div>
       </v-spacer>
 
@@ -25,6 +25,7 @@ import Vue from 'vue';
 
 export default Vue.extend({
     name: "App",
+    props: ['title'],
     data: () => ({
         drawer: null
     })
