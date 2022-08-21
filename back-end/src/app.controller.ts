@@ -1,4 +1,4 @@
-import { BadGatewayException, BadRequestException, Body, Controller, FileTypeValidator, Get, Header, HttpException, HttpStatus, Logger, NotFoundException, Param, ParseFilePipe, Patch, Post, Query, Redirect, Req, Request, Res, Response, UploadedFile, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, Body, Controller, FileTypeValidator, Get, Header, HttpException, HttpStatus, Logger, NotFoundException, Param, ParseFilePipe, Patch, Post, Put, Query, Redirect, Req, Request, Res, Response, UploadedFile, UseFilters, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { pass_42Guard } from './auth/guards/passport-42-auth.guard';
 import { jwtGuard } from './auth/guards/jwt-auth.guard';
@@ -8,6 +8,7 @@ import { diskStorage } from 'multer';
 import { get, request } from 'http';
 import { stringify } from 'querystring';
 import { write } from 'fs';
+import { body_dto } from './DTO/body.dto';
 
 
 @Controller()
@@ -69,9 +70,13 @@ export class AppController {
     {
         return new NotFoundException()
     }
-  
   }
 
+  @Put('2FA/verify')
+  verfiy_2fa(@Body(new ValidationPipe()) bd: body_dto)
+  {
+      console.log(bd);
+  }
 
   @UseGuards(jwtGuard)
   @Get('verify')
