@@ -8,7 +8,9 @@ export default Vue.extend({
 </script>
 
 <template>
-
+<v-app>
 <router-view></router-view>
+    
+</v-app>
 
 </template>

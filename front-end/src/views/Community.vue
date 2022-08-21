@@ -32,7 +32,7 @@ export default Vue.extend({
 	},
     data: () => ({
       setUsername: false,
-      Title: "Add new friends to chat with",
+      Title: "Add new friends or join rooms to start chatting",
       me: [],
       currentRoom: "",
       rooms: [
@@ -121,7 +121,7 @@ export default Vue.extend({
         }
       },
       submitMessage: function(e: any) {
-        if (e.target.value !== '')
+        if (e.target.value !== '' && this.currentRoom != '')
         {
           this.showmessages.push({id: this.messages.length, from: "Akira", message: e.target.value, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
           console.log("id ===> ", this.me[0].id)
@@ -214,13 +214,15 @@ export default Vue.extend({
           {
             this.users = this.users.filter((el) => {
               return this.friendlist.some((f) => {
+                if (f.username === el.username)
+                  console.log("match");
                 return f.username !== el.username;
               });
             });
+            console.log(this.users);
           }
           for (let i = 0; i < this.rooms.length; ++i)
             this.$socket.emit('joinDM', this.rooms.roomName);
-          console.log(this.friendlist.length)
           for (let i = 0; i < this.friendlist.length; i++)
           {
             if (this.me[0].id < this.friendlist[i].id)
@@ -245,11 +247,12 @@ export default Vue.extend({
         console.log(error);
       });
 
-      axios.get('/rooms/roomsList', {
+      axios.get('/rooms/findUserRooms', {
         headers: {
           Authorization: token
       }}).then(async (res) => {
         this.rooms = res.data;
+        console.log("data ===> ");
         console.log(res.data);
       })
       .catch(error => {
