@@ -61,14 +61,15 @@
                   v-model="usernameEdit"
                   required
                 ></v-text-field>
-                <v-file-input
+                <!-- <v-file-input
                     accept="image/png, image/jpeg, image/bmp"
                     placeholder="Pick an avatar"
                     prepend-icon="mdi-camera"
                     @change="loadImage($event)"
                     label="Avatar"
                     v-model="image"
-                ></v-file-input>
+                ></v-file-input> -->
+                <input ref="file" type="file" accept="image/*" @submit.prevent @change="loadImage($event)" />
               </v-col>
             </v-row>
           </v-container>
@@ -86,7 +87,7 @@
           <v-btn
             color="blue darken-1"
             text
-            @click="updateusername()"
+            @click="updateusername(); dialog = false"
           >
             Save
           </v-btn>
@@ -112,9 +113,24 @@ import axios from 'axios';
       dialog: false,
     }),
     methods: {
-      loadImage(event: any) {
+      loadImage(event) {
+        const token = localStorage.getItem('token');
+        const { files } = event.target;
+        if (token && files && files[0]) {
+          const data = new FormData();
+          data.append("file", files[0]);
 
-        console.log(event.target);
+
+          axios.post("/upload/image", data, {
+            headers: {
+                Authorization: token
+              }
+          }).then(res => {
+            console.log("image updated");
+          }).catch(error => {
+            console.log(error);
+          });
+        }
       },
       updateusername: function()
       {
@@ -132,43 +148,15 @@ import axios from 'axios';
               }
             }).then(res => {
               this.username = this.usernameEdit;
-              console.log("bla");
             })
             .catch(error => {
               console.log(error);
             });
           }
-          this.dialod = false;
+          
         }
-        if (this.image)
-        {
-          console.log(this.image);
-          let file = new FormData();
-          file.append('name', 'file')
-          file.append('file', this.image, this.image.name);
-          console.log(this.image);
-
-          const token = localStorage.getItem('token');
-
-          if (token)
-          {
-            axios.post('/upload/image', {
-              file
-            }, {
-              headers: {
-                Authorization: token,
-                'Content-Type': 'multipart/form-data'
-              }
-            }).then(res => {
-              console.log(res);
-              console.log("bla");
-            })
-            .catch(error => {
-              console.log(error);
-            });
-          }
-          this.dialod = false;
-        }
+        this.dialod = false;
+        console.log(this.dialod);
       }
     },
     mounted (){
