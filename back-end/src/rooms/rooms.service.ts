@@ -32,8 +32,8 @@ export class RoomsService {
 		}) 
 		
 		this.roomUser.save(usr);
-		await this.rooms.save(tmp);
-		return  usr;
+		// await this.rooms.save(tmp);
+		return  (await this.rooms.save(tmp));
 	}
 
 	async addUserToRoom(userID: string, room_name: string): Promise<any>
