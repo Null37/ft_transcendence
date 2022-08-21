@@ -41,8 +41,6 @@ export class AppController {
         console.log("false")
         return res.redirect("http://localhost:8080/Game?token="+accessToken);
       }
-      
-
     }
 
     // if()
@@ -98,6 +96,7 @@ export class AppController {
     console.log(bd);
     if(verified == true)
     {
+      // set token and redirct to game?token
       this.authService.update_info({id: bd.id, two_factor_authentication: true})
     }
     else
