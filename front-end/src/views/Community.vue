@@ -63,6 +63,7 @@ export default Vue.extend({
         {
           if (this.friendlist[i].username === username)
           {
+            console.log("found  ");
             const token = localStorage.getItem('token');
 
             if (token)
@@ -72,7 +73,7 @@ export default Vue.extend({
               headers: {
                 Authorization: token
               }}).then(res => {
-
+                console.log("removed");
                 this.users.push(this.friendlist.find(data => data.username === username));
                 this.friendlist = this.friendlist.filter(data => data.username !== username);
 

@@ -1,19 +1,17 @@
-import { Column, Entity, JoinColumn,  ManyToOne,  OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, Entity, JoinColumn,  ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Users } from "./users.entity";
 
 
 @Entity()
-export class friend
+export class block_list
 {
     @PrimaryGeneratedColumn()
-
     id: number
-
+    
     @Column()
     user_id: number
 
     @ManyToOne(() => Users)
     @JoinColumn()
-    friend_id: Users
-
+    block_list: Users
 }

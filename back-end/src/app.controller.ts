@@ -1,12 +1,14 @@
-import { BadGatewayException, BadRequestException, Body, Controller, FileTypeValidator, Get, Header, HttpException, HttpStatus, Logger, NotFoundException, Param, ParseFilePipe, Patch, Post, Query, Redirect, Req, Request, Res, Response, UploadedFile, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, Body, Controller, FileTypeValidator, Get, Header, HttpException, HttpStatus, Logger, NotFoundException, Param, ParseFilePipe, Patch, Post, Put, Query, Redirect, Req, Request, Res, Response, UploadedFile, UseFilters, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { pass_42Guard } from './auth/guards/passport-42-auth.guard';
 import { jwtGuard } from './auth/guards/jwt-auth.guard';
 import * as path from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { request } from 'http';
+import { get, request } from 'http';
 import { stringify } from 'querystring';
+import { write } from 'fs';
+import { body_dto } from './DTO/body.dto';
 
 
 @Controller()
@@ -15,12 +17,75 @@ export class AppController {
 
   @UseGuards(pass_42Guard)
   @Get('login')
-  login(@Request() req, @Response() res) 
+  async login(@Request() req, @Response() res) 
   {
+    console.log("==============================================")
+
     const accessToken = this.authService.login(req.user)
+    
     console.log(accessToken)
+    console.log("username ==> ", req.user.username);
+    
+    // if()
+   
+   
+    console.log("==============================================")
     return res.redirect("http://localhost:8080/Game?token="+accessToken);
   }
+  @UseGuards(jwtGuard)
+  @Get("QR")
+  async send_Qr_code(@Request() req)
+  {
+    let user = await this.authService.get_user(req.user.name)
+    console.log("user ====> ", user)
+    if(user == null)
+      throw new NotFoundException('user not found')
+    console.log("adctive 2FA ==> ", "<", user.two_factor_authentication, ">")
+    var speakeasy = require("speakeasy");
+    if(user.two_factor_authentication == false)
+    {
+      // start generate secret 
+      console.log("here")
+      var secret = speakeasy.generateSecret({name: "ft_transcendence (" + user.username +")"});
+      console.log("secret obj", secret)
+      await this.authService.update_info({id: user.id, secret: secret.base32})
+      var QRcode = require('qrcode')
+      const generateQR = async (text) => {
+        try {
+          return await QRcode.toDataURL(text)
+        } catch (err) {
+          console.error(err)
+        }
+      }
+      return await generateQR(secret.otpauth_url)
+    }
+    else
+    {
+        return new NotFoundException()
+    }
+  }
+
+  @Put('2FA/verify')
+  async verfiy_2fa(@Body(new ValidationPipe()) bd: body_dto)
+  {
+    let user = await this.authService.get_se(bd.id)
+    if(user == null)
+      throw  new NotFoundException("user not found");
+    var speakeasy = require("speakeasy");
+    var verified = speakeasy.totp.verify({ secret: user,
+       encoding: 'base32',
+       token: bd.number });
+    console.log(bd);
+    if(verified == true)
+    {
+      this.authService.update_info({id: bd.id, two_factor_authentication: true})
+    }
+    else
+    {
+      throw new BadRequestException("not valid")
+    }
+  }
+  
 
   @UseGuards(jwtGuard)
   @Get('verify')
@@ -32,10 +97,11 @@ export class AppController {
 
   @UseGuards(jwtGuard)
   @Get('users')
-  get_all_users() // get all users data
+  async get_all_users() // get all users data
   {
     console.log("start find users") // check with front-end if is work
-    return this.authService.get_all()
+    let users = await this.authService.get_all()
+    return users
   }
 
 
@@ -51,7 +117,7 @@ export class AppController {
     let user = await this.authService.get_user(par);
     console.log("valuse userv = ", user)
     if(user !=  null)
-      return user;
+      return user
     throw new NotFoundException('Not Found USER')
   }
 
@@ -74,7 +140,7 @@ export class AppController {
   @Post('upload/image')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      destination: 'images', // uoload location
+      destination: 'src/public', // uoload location
       filename: (req, file, cp) => {
         console.log("body ==> ", req.user)
         // file.filename = req.user['name']
@@ -84,21 +150,20 @@ export class AppController {
         const path_parse: path.ParsedPath = path.parse(fullpath)
         let file_name = req.user['name']
         const extension: string = path_parse.ext.toLowerCase();
-        if(extension == '.png' || extension == '.jpeg' ||  extension == '.jpg' || extension == '.bmp' || extension == '.ico')
+       if(extension == '.png' || extension == '.jpeg' ||  extension == '.jpg' || extension == '.bmp' || extension == '.ico')
           cp(null, `${file_name}${extension}`)
        else 
-          cp(null, 'not image')
+          cp(null, 'null')
       }
-
     })
   }))
   async update_avatar(@Request() req, @UploadedFile() file) 
   {
-    if(file.filename == 'not image')
+    if(file.filename == 'null')
       throw new BadGatewayException("not an image") // req 502
     console.log("start upload file") 
     console.log(file);
-    let path_file = "/images/" + file.filename
+    let path_file = "http://localhost:3000/public/" + file.filename
     this.authService.update_info({id: req.user.sub, avatar: path_file})
     return path_file;
   }

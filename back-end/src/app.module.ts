@@ -8,6 +8,9 @@ import { UsersModule } from './users/users.module';
 import { AppGateway } from './app.gateway';
 import { RoomsModule } from './rooms/rooms.module';
 import { FrinedCtroller } from './friend.controller';
+import { BlockCtroller } from './block.controller';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [AuthModule, 
@@ -22,9 +25,12 @@ import { FrinedCtroller } from './friend.controller';
         password: 'transcendence',
         autoLoadEntities: true,
         synchronize: true,
-    }
-  )],
-  controllers: [AppController, FrinedCtroller],
+    },
+    ),
+    //, {serveStaticOptions: {index: false , extensions: ['png', 'jpeg', 'jpg', 'bmp', 'ico']}}
+    ServeStaticModule.forRoot({rootPath: join('/back-end/src', 'public'), serveRoot: '/public/',serveStaticOptions: {index: false},})
+  ],
+  controllers: [AppController, FrinedCtroller, BlockCtroller],
   providers: [AppService, pass_42Guard, AppGateway],
 })
 export class AppModule {}

@@ -20,6 +20,14 @@ async findOne(intra_log: string): Promise<Users | null>
     return test;
 }
 
+async get_secret(id: number)
+{
+  let test = await this.usersdata.findOne({where :{id: id}, select: ['secret']})
+  if(test == null)
+    return null
+  return test.secret
+}
+
   create(users_id: user_dto) // dont forget to add real DTO
   {
       let newuser  = this.usersdata.create(users_id);

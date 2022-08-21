@@ -6,4 +6,6 @@ export class update_dto
     username?: string
     avatar? : string
     status? : string
+    secret?: string 
+    two_factor_authentication?: boolean = false
 }
