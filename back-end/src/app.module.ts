@@ -27,7 +27,8 @@ import { join } from 'path';
         synchronize: true,
     },
     ),
-    ServeStaticModule.forRoot({rootPath: join('/back-end/src', 'public'), serveRoot: '/public/',serveStaticOptions: {index: false,},})
+    //, {serveStaticOptions: {index: false , extensions: ['png', 'jpeg', 'jpg', 'bmp', 'ico']}}
+    ServeStaticModule.forRoot({rootPath: join('/back-end/src', 'public'), serveRoot: '/public/',serveStaticOptions: {index: false},})
   ],
   controllers: [AppController, FrinedCtroller, BlockCtroller],
   providers: [AppService, pass_42Guard, AppGateway],

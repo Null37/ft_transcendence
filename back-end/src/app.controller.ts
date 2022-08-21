@@ -136,17 +136,16 @@ export class AppController {
         const path_parse: path.ParsedPath = path.parse(fullpath)
         let file_name = req.user['name']
         const extension: string = path_parse.ext.toLowerCase();
-        if(extension == '.png' || extension == '.jpeg' ||  extension == '.jpg' || extension == '.bmp' || extension == '.ico')
+       if(extension == '.png' || extension == '.jpeg' ||  extension == '.jpg' || extension == '.bmp' || extension == '.ico')
           cp(null, `${file_name}${extension}`)
        else 
-          cp(null, 'not image')
+          cp(null, 'null')
       }
-
     })
   }))
   async update_avatar(@Request() req, @UploadedFile() file) 
   {
-    if(file.filename == 'not image')
+    if(file.filename == 'null')
       throw new BadGatewayException("not an image") // req 502
     console.log("start upload file") 
     console.log(file);
