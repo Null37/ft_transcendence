@@ -126,7 +126,7 @@ export class AppController {
   @Post('upload/image')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      destination: 'images', // uoload location
+      destination: 'src/public', // uoload location
       filename: (req, file, cp) => {
         console.log("body ==> ", req.user)
         // file.filename = req.user['name']
