@@ -49,33 +49,44 @@ export class AppController {
     console.log("adctive 2FA ==> ", "<", user.two_factor_authentication, ">")
     // var secret = speakeasy.generateSecret({name: "ft_transcendence"});
     var speakeasy = require("speakeasy");
-    var usera = null;
+    // var usera = null;
     if(user.two_factor_authentication == false)
     {
       // start generate secret 
-        console.log("here")
-        var secret = speakeasy.generateSecret({name: "ft_transcendence (" + user.username +")"});
-        console.log("secret obj", secret)
-        await this.authService.update_info({id: user.id, secret: secret.base32})
-        // console.log("base32==============> ", usera.secret)
+      console.log("here")
+      var secret = speakeasy.generateSecret({name: "ft_transcendence (" + user.username +")"});
+      console.log("secret obj", secret)
+      await this.authService.update_info({id: user.id, secret: secret.base32})
+      // console.log("base32==============> ", usera.secret)
       // const urtl_test = speakeasy.otpauthURL({secret: usera.secret, label: "ft_transcendence (" + usera.username + ")"});
       // console.log("userid ==>", user.id)
       // const use = await this.authService.get_se(user.id);
       // console.log(tes1t);
       var QRcode = require('qrcode')
-    //   // var data_url2: string
-    //   var qr_url = null;
-    var url = await QRcode.toDataURL(secret.otpauth_url, function(err, data_url){
-       console.log("qr code is |", data_url, "|")
-       //return '<img src="' + qr_url + '">'
-        return data_url
-      })
-
-  
-      console.log("bruh url ==> ", url)
+      //   // var data_url2: string
+      
+      // var bla
+      // QRcode.toDataURL(secret.otpauth_url, function(err, qr_url){
+      // // qr_url = data_url
+      // console.log(qr_url)
+      // // write()
+      // bla = qr_url
+      // //  console.log("qr code is |", data_url, "|", "and this  ==> ", qr_url)
+      //   // return qr_url
+      // })
+      // var test
+      const generateQR = async (text) => {
+        try {
+          // console.log(text)
+          return await QRcode.toDataURL(text)
+        } catch (err) {
+          console.error(err)
+        }
+      }
+      // return 
+      return await generateQR(secret.otpauth_url)
       // return url
     }
-    
     // return data_url
   }
 
