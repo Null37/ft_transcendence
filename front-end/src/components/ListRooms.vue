@@ -120,8 +120,23 @@ import axios from 'axios';
       }
     },
     mounted (){
- 
-
+      const token = localStorage.getItem('token');
+    
+      if (token)
+      {
+        axios.get('/rooms/roomsList', {
+          headers: {
+            Authorization: token
+        }}).then(async (res) => {
+          this.rooms = res.data;
+          // console.log("data ===> ");
+          console.log(res.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+          
+        }
     }
   }
 </script>

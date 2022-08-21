@@ -40,7 +40,7 @@ export default Vue.extend({
             :class="{ 'on-hover': hover }"
             size="28"
           >
-            <span class="text-h6" :title="r.roomName" >{{r.roomName.charAt(0)}}</span>
+            <span class="text-h6" :title="r.roomID" >{{r.roomID.charAt(0)}}</span>
           </v-avatar>
         </v-hover>
         <CreateRoom @Addroom="addroom" />
