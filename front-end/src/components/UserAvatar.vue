@@ -7,7 +7,11 @@ export default Vue.extend({
     props: ['avatar', 'rooms'],
     data: () => ({ drawer: null }),
     methods: {
-      
+      addroom: function(room)
+      {
+        this.$emit("Addroom", room);
+        
+      }
     },
     components: { EditProfile, CreateRoom }
 });
@@ -35,10 +39,10 @@ export default Vue.extend({
             :class="{ 'on-hover': hover }"
             size="28"
           >
-            <span class="text-h6" :title="r.roomname" >{{r.roomname.charAt(0)}}</span>
+            <span class="text-h6" :title="r.roomName" >{{r.roomName.charAt(0)}}</span>
           </v-avatar>
         </v-hover>
-        <CreateRoom />
+        <CreateRoom @Addroom="addroom" />
       </v-navigation-drawer>
 </template>
 

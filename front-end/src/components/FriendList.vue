@@ -20,7 +20,7 @@ import axios from 'axios';
           :key="f.id"
           link
         >
-          <v-list-item-content @click="$emit('ShowChatMessages', f.username)">
+          <v-list-item-content @click="$emit('ShowChatMessages', f)">
             <v-list-item-title>{{ f.username }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>

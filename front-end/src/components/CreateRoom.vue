@@ -1,8 +1,41 @@
 <script lang="ts">
+import axios from 'axios';
+
   export default {
     data: () => ({
       dialog: false,
+      roomname: "",
+      roompassword: "",
     }),
+    methods: {
+      creatroom: function (){
+
+        const token = localStorage.getItem('token');
+
+        if (token && this.roomname.length > 0)
+        {
+          const data = {
+            roomName: this.roomname,
+            password: this.roompassword,
+            state: 0
+          };
+          axios.post('/rooms/create', data , {
+              headers: {
+                Authorization: token
+              }
+            }).then((function (res){
+              this.$emit("Addroom", res.data);
+              this.roomname = "";
+              this.roompassword = "";
+            }).bind(this))
+            .catch(error => {
+              console.log(error);
+            });
+
+        }
+        
+      },
+    },
   }
 </script>
 
@@ -47,9 +80,11 @@
                 <v-text-field
                   label="Room name*"
                   required
+                  v-model="roomname"
                 ></v-text-field>
                 <v-text-field
                   label="Room Password"
+                  v-model="roompassword"
                 ></v-text-field>
               </v-col>
              
@@ -69,7 +104,7 @@
           <v-btn
             color="blue darken-1"
             text
-            @click="dialog = false"
+            @click="creatroom(); dialog = false"
           >
             Save
           </v-btn>

@@ -18,8 +18,12 @@ export default Vue.extend({
     name: "App",
 	sockets: {
 		msgToClient(data) {
-			console.log("reached the event")
-          this.messages.push({id: this.messages.length, from: "Akira", message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
+      console.log(data);
+      this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'});
+      this.showmessages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'});
+		},
+    msgToRoom(data) {
+      //this.messages.push({id: this.messages.length, from: "Akira", message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
 		}
 
 
@@ -30,14 +34,6 @@ export default Vue.extend({
       Title: "Add new friends to chat with",
       me: [],
       rooms: [
-        {
-          id: 0,
-          roomname: "blabla"
-        },
-        {
-          id: 1,
-          roomname: "test"
-        },
       ],
       avatar: "",
       intra_login: "",
@@ -46,20 +42,19 @@ export default Vue.extend({
       drawer: null,
       placeHolder: "",
       tmp: [],
+      showmessages: [],
       messages: [
-        {
-          id: 0,
-          from: 'John Josh',
-          message: `Sure, I'll see yasdfou later.`,
-          time: '10:42am',
-          color: 'deep-purple lighten-1',
-        },
+        {id: 0, from: "Akira", room: "bla", message: "bla", time: "10:43pm", color: 'deep-purple lighten-1'}
       ],
       users: [],
       friendlist: [],
 
     }),
     methods: {
+      addroom: function(room)
+      {
+        this.rooms.push(room);
+      },
       removefriend: function(username: string)
       {
         
@@ -113,17 +108,24 @@ export default Vue.extend({
       submitMessage: function(e: any) {
         if (e.target.value !== '')
         {
-          this.messages.push({id: this.messages.length, from: "Akira", message: e.target.value, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
+          this.showmessages.push({id: this.messages.length, from: "Akira", message: e.target.value, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
           console.log("id ===> ", this.me[0].id)
-          this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: 'id1-id2', userID: this.me[0].id})
+          this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: '1-2', userID: this.me[0].id})
           this.placeHolder = "";
         }
       },
-      ShowChatMessages: function(username: string){
-        this.Title = username;
-        this.messages = [];
+      ShowChatMessages: function(friend: string){
+        this.Title = friend.username;
+        var room;
+        if (friend.id < this.me[0].id)
+          room = friend.id+"-"+this.me[0].id;
+        else
+          room = this.me[0].id+"-"+friend.id;
+        this.showmessages = this.messages.filter(el => {
+          return el.room === room;
+        });
         // SocketInstance.join()
-        this.$socket.emit('joinDM', "id1-id2");
+        
       },
       updateMessage: function(e: any){
         this.placeHolder = e.target.value;
@@ -137,7 +139,7 @@ export default Vue.extend({
           if (token)
           {
             axios.patch('/update', {
-              userame: this.me.username 
+              userame: this.me.username
             }, {
               headers: {
                 Authorization: token
@@ -187,7 +189,7 @@ export default Vue.extend({
         axios.get('/friend/find', {
           headers: {
             Authorization: token
-        }}).then(res => {
+        }}).then((function (res) {
           this.tmp;
 
 
@@ -204,9 +206,24 @@ export default Vue.extend({
               });
             });
           }
-  
+          // for (let i = 0; i < this.rooms.length; ++i)
+          //   this.$socket.emit('joinDM', this.rooms.roomName);
+          console.log(this.friendlist.length)
+          for (let i = 0; i < this.friendlist.length; i++)
+          {
+            if (this.me[0].id < this.friendlist[i].id)
+            {
+              console.log(this.me[0].id+"-"+this.friendlist[i].id);
+              this.$socket.emit('joinDM', this.me[0].id+"-"+this.friendlist[i].id);
+            }
+            else
+            {
+              this.$socket.emit('joinDM', this.friendlist[i].id+"-"+this.me[0].id);
+              console.log(this.friendlist[i].id+"-"+this.me[0].id);
+            }
+          }
 
-        })
+        }).bind(this))
         .catch(error => {
           console.log(error);
         });
@@ -216,18 +233,20 @@ export default Vue.extend({
         console.log(error);
       });
 
+      axios.get('/rooms/roomsList', {
+        headers: {
+          Authorization: token
+      }}).then(async (res) => {
+        this.rooms = res.data;
+        console.log(res.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
 
+      
     }
   },
-setup() {
-	// let  socket = io("http://127.0.0.1:3000");
-
-	// // socket.emit('joinDM', {roomName: 'foo'});
-	// socket.on('msgToClient',  (res) => {
-	// console.log("received == > ");
-	// console.log(res);
-	// })
-},
   components: { TopBar, UserAvatar, FriendList, FriendsStatus, Profile }
 
   },
@@ -244,7 +263,7 @@ setup() {
       app
       width="300"
     >
-      <UserAvatar :rooms="rooms" :avatar="avatar" />
+      <UserAvatar @Addroom="addroom" :rooms="rooms" :avatar="avatar" />
 
       <v-sheet
         height="164"
@@ -296,7 +315,7 @@ setup() {
 
       <v-container fluid style="height:100%;">
         <v-row class="space-around flex-column">
-          <v-card v-for="message in messages" :key="message.id" flat>              
+          <v-card v-for="message in showmessages" :key="message.id" flat>              
                   <v-list-item
                       :key="message.id"
                       class=""
