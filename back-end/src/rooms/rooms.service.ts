@@ -44,6 +44,7 @@ export class RoomsService {
 			3- Check the state of the user (if he's banned from joining the room)
 			4- If the room is protected by password, then check if the given password if correct
 		*/
+
 		let tmp = await this.rooms.findOne({where: {roomName: room_name}})
 		if (tmp == null)
 		{
@@ -53,7 +54,7 @@ export class RoomsService {
 		else
 		{
 			console.log("Room already exists")
-			let usrexist = this.roomUser.find({where: {userID: +userID}})
+			let usrexist = this.roomUser.find({where: {userID: +userID, roomID: room_name}})
 			if ((await usrexist).length == 0)
 			{
 				console.log("user not found")
@@ -84,10 +85,11 @@ export class RoomsService {
 		}
 	}
 
+	//* Set/modify/delete room's password
 	async changeRoompw(user: number, roomID: string, password: string): Promise<any>
 	{
 		let usr = await this.roomUser.findOne({where: {userID: user, roomID: roomID}})
-		if (usr.role == "admin" || usr.role == "moderator")
+		if (usr.role == "moderator")
 		{
 			let room = await this.rooms.findOne({where: {roomName: roomID}})
 			room.password = password;
@@ -96,14 +98,17 @@ export class RoomsService {
 	}
 	
 	//*  
-	async changeUserState(user: number, roomID, target: number, state: number): Promise<any> //! Sus function (double check)
+	async changeUserRole(user: number, roomID: string, target: number, role: string): Promise<any> //! Sus function (double check)
 	{
 		let usr = await this.roomUser.findOne({where: {userID: user, roomID: roomID}})
 		if (usr.role == "admin" || usr.role == "moderator")
 		{
-			let usr = await this.roomUser.findOne({where: {roomID: roomID, userID: target}})
-			usr.status = state;
-			this.roomUser.save(usr)
+			let usr2 = await this.roomUser.findOne({where: {roomID: roomID, userID: target}})
+			if (role == "admin")
+			{
+				usr2.role = role;
+			}
+			this.roomUser.save(usr2)
 		}
 	}
 
@@ -118,7 +123,14 @@ export class RoomsService {
 		// let rooms = await ;
 		return this.roomUser.find({where: {roomID: roomID}});
 	}
+	async getUserRoomsList(userID: number): Promise<any>
+	{
+		// let rooms = await ;
+		return this.roomUser.find({where: {userID: userID}});
+	}
 	
+
+	//* Replaced with changeroomPW (if pw == undefined or empty string then it's public)
 	async changeRoomState(user: number, roomID: string, state: number): Promise<any>
 	{
 		let usr = await this.roomUser.findOne({where: {userID: user, roomID: roomID}})

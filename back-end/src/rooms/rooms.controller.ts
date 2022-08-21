@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Header, HttpException, HttpStatus, Logger, Patch, Post, Req, Request, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Header, HttpException, HttpStatus, Logger, Param, Patch, Post, Req, Request, UseFilters, UseGuards } from '@nestjs/common';
 import { jwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RoomsDTO } from 'src/Entity/rooms.entity';
 import { RoomUserDTO } from 'src/Entity/roomsUser.entity';
@@ -27,10 +27,10 @@ export class RoomController {
   	}
 
 
-	@Get('joinRoom')
-	async joinRoom(@Body() body, @Request() req): Promise<any>
+	@Get('joinRoom/:id')
+	async joinRoom(@Param() param, @Request() req): Promise<any>
 	{
-		let res = await this.roomService.addUserToRoom(req.user.sub, body.room_name);
+		let res = await this.roomService.addUserToRoom(req.user.sub, param.id);
 
 		if (res == "Room not found")
 			throw new HttpException(res, HttpStatus.NOT_FOUND)
@@ -62,10 +62,10 @@ export class RoomController {
 		return (await this.roomService.getUsersList(body.roomName))
 	}
 
-	@Get('findRoom')
-	async findroom(@Body() body, @Request() req): Promise<void>
+	@Get('findUserRooms')
+	async findroom(@Request() req): Promise<void>
 	{
-		let res = await this.roomService.addUserToRoom(req.user.sub, body.room_name);
+		let res = await this.roomService.getUserRoomsList(req.user.sub);
 		return res;
 	}
 }
