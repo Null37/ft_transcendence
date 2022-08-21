@@ -150,7 +150,7 @@ export class AppController {
       throw new BadGatewayException("not an image") // req 502
     console.log("start upload file") 
     console.log(file);
-    let path_file = "/images/" + file.filename
+    let path_file = "http://localhost:3000/public/" + file.filename
     this.authService.update_info({id: req.user.sub, avatar: path_file})
     return path_file;
   }
