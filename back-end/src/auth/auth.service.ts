@@ -18,7 +18,7 @@ export class AuthService {
   }
   async get_se(id: number)
   {
-     await this.userdata.get_secret(id)
+     return await this.userdata.get_secret(id)
   }
    get_all()
   {

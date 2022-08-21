@@ -20,20 +20,13 @@ export class AppController {
   async login(@Request() req, @Response() res) 
   {
     console.log("==============================================")
-   
-  
-    //  else
-    //  {
-      
-      // rediret to otp
-  //  }
-   
+
     const accessToken = this.authService.login(req.user)
     
     console.log(accessToken)
     console.log("username ==> ", req.user.username);
     
-    
+    // if()
    
    
     console.log("==============================================")
@@ -73,10 +66,26 @@ export class AppController {
   }
 
   @Put('2FA/verify')
-  verfiy_2fa(@Body(new ValidationPipe()) bd: body_dto)
+  async verfiy_2fa(@Body(new ValidationPipe()) bd: body_dto)
   {
-      console.log(bd);
+    let user = await this.authService.get_se(bd.id)
+    if(user == null)
+      throw  new NotFoundException("user not found");
+    var speakeasy = require("speakeasy");
+    var verified = speakeasy.totp.verify({ secret: user,
+       encoding: 'base32',
+       token: bd.number });
+    console.log(bd);
+    if(verified == true)
+    {
+      this.authService.update_info({id: bd.id, two_factor_authentication: true})
+    }
+    else
+    {
+      throw new BadRequestException("not valid")
+    }
   }
+  
 
   @UseGuards(jwtGuard)
   @Get('verify')
