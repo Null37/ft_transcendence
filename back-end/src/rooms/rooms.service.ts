@@ -25,7 +25,7 @@ export class RoomsService {
 		let tmp = this.rooms.create(roomElem);
 
 		let usr = this.roomUser.create({
-			userID: Math.floor(Math.random() * 100), //! should insert userID here
+			userID: +userID, //! should insert userID here
 			role: "mod",
 			status: 0,
 			roomID: tmp.roomName

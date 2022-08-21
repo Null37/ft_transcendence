@@ -15,16 +15,12 @@ export class RoomController {
 	{
 		return this.roomService.debuggingLog();
 	}
-	//   async createDM(@Body() body): Promise<void> {
-		// 	await this.roomService.create(body);
-// 	this.roomService.debuggingLog()
-//   }
 
 	@Post('create')
 	async createRoom(@Body() body, @Request() req): Promise<RoomsDTO> {
+
 		// check if room already exists with that name
-		req.user.sub;
-		let res = await this.roomService.create(body, body.userID);
+		let res = await this.roomService.create(body, req.user.sub);
 		if (res == "Chat room already exists")
 			throw new HttpException(res, HttpStatus.FORBIDDEN);
 		return res;
@@ -32,9 +28,9 @@ export class RoomController {
 
 
 	@Get('joinRoom')
-	async joinRoom(@Body() body): Promise<any>
+	async joinRoom(@Body() body, @Request() req): Promise<any>
 	{
-		let res = await this.roomService.addUserToRoom(body.userID, body.room_name);
+		let res = await this.roomService.addUserToRoom(req.user.sub, body.room_name);
 
 		if (res == "Room not found")
 			throw new HttpException(res, HttpStatus.NOT_FOUND)
@@ -43,15 +39,15 @@ export class RoomController {
 	}
 
 	@Post('leaveRoom')
-	async leaveRoom(@Body() body): Promise<any>
+	async leaveRoom(@Body() body, @Request() req): Promise<any>
 	{
-		this.roomService.leaveUserRoom(body.userID, body.room_name);
+		this.roomService.leaveUserRoom(req.user.sub, body.room_name);
 	}
 	
 	@Patch('changeRoompw')
-	async changeRoompw(@Body() body): Promise<any>
+	async changeRoompw(@Body() body, @Request() req): Promise<any>
 	{
-		this.roomService.changeRoompw(body.userID, body.roomID, body.password);
+		this.roomService.changeRoompw(req.user.sub, body.roomID, body.password);
 	}
 
 	@Get('roomsList')
@@ -67,9 +63,9 @@ export class RoomController {
 	}
 
 	@Get('findRoom')
-	async findroom(@Body() body): Promise<void>
+	async findroom(@Body() body, @Request() req): Promise<void>
 	{
-		let res = await this.roomService.addUserToRoom(body.user_id, body.room_name);
+		let res = await this.roomService.addUserToRoom(req.user.sub, body.room_name);
 		return res;
 	}
 }
