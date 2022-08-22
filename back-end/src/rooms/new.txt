@@ -1,7 +1,7 @@
 * list of  room [✔] http --> :3000/rooms/roomslist [no args]
 * users in room [✔] http --> :3000/rooms/usersList [args] {"roomName": string}
 * create room [✔] http --> :3000/rooms/create [args] {"roomName": string, "state": number, "password": string}
-* edit password [✔] http --> :3000/rooms/changeRoompw [args] {"userID": number, "roomID": string, "password": string}
+* edit password [✔] http --> :3000/rooms/changeRoompw [args] {"userID": number, "roomName": string, "password": string}
 * ban/mute(change user state) [✔] socket --> event: InteractUsers [args] {user1: number, user2: number, interaction: string, roomName: string}
 * (edit all room variables)
 * leave room [✔] 

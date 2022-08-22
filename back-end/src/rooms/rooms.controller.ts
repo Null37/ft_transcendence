@@ -48,7 +48,7 @@ export class RoomController {
 	@Patch('changeRoompw')
 	async changeRoompw(@Body() body, @Request() req): Promise<any>
 	{
-		this.roomService.changeRoompw(req.user.sub, body.roomID, body.password);
+		this.roomService.changeRoompw(req.user.sub, body.roomName, body.password);
 	}
 
 	@Get('roomsList')

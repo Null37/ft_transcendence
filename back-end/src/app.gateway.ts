@@ -9,6 +9,7 @@ import {
   import { Socket, Server } from 'socket.io';
 import { RoomsService } from './rooms/rooms.service';
 import { UsersService } from './users/users.service';
+import { blockService } from './users/block.service';
   
   @WebSocketGateway({
 	  cors: {
@@ -21,7 +22,8 @@ import { UsersService } from './users/users.service';
 	
 	constructor(
 		private readonly roomsService: RoomsService,
-		private readonly usersService: UsersService
+		private readonly usersService: UsersService,
+		private readonly blockService: blockService
 	){}
 	private logger: Logger = new Logger('AppGateway');
   
@@ -75,14 +77,16 @@ import { UsersService } from './users/users.service';
 
 		this.logger.log(`User ${message.user1} ${message.interaction}ed ${message.user2}`);
 		
-		let usr1 = await this.roomsService.roomUser.findOne({where: {userID: message.user1, roomID: message.roomName}})
-		let usr2 = await this.roomsService.roomUser.findOne({where: {userID: message.user2, roomID: message.roomName}})
+		let usr1 = await this.roomsService.roomUser.findOne({where: {userID: message.user1, roomName: message.roomName}})
+		let usr2 = await this.roomsService.roomUser.findOne({where: {userID: message.user2, roomName: message.roomName}})
 		
 		
 		if (usr2.role == "moderator" || usr1.role == "user" || (usr1.role == "admin" && usr2.role != "user"))
 			return ;
+
 		usr2.role = message.interaction;
-		usr2.duration = message.duration;
+		usr2.duration = Date.now() +  message.duration;
+		await this.roomsService.roomUser.save(usr2);
 		if (message.interaction == "ban")
 			client.broadcast.to(message.roomName).emit('leaveRoom', message.user2) // must be checked in the front end to kick the banned user.
 	}
@@ -92,7 +96,7 @@ import { UsersService } from './users/users.service';
 	handleJoinRoom(client: Socket, message: {userID: number, room: string}): void {
 		//TODO: check if room is protected and if user is not banned etc...
 		client.join(message.room);
-		client.emit('joinedRoom', message.room);
+		// client.emit('joinedRoom', message.room);
 	}
 
 	/* 
@@ -104,6 +108,8 @@ import { UsersService } from './users/users.service';
 		//TODO: check if room is protected and if user is not banned etc...
 		// this.roomsService.
 		client.leave(message.room);
+		//TODO Delete the user from UsersRoom table.
+
 		client.broadcast.to(message.room).emit('leaveRoom', message.userID);
 	}
 
@@ -115,7 +121,7 @@ import { UsersService } from './users/users.service';
 	}
 
 	@SubscribeMessage('msgToClientDM')
-	async handleDmMessage(client: Socket, message: {text: string, room: string, username: string}): Promise<any> {
+	async handleDmMessage(client: Socket, message: {text: string, room: string, userID: number}): Promise<any> {
 		// Add logic before sending a message here
 		/* 
 			1- Check if the receiver is muted/blocked by the sender
@@ -124,6 +130,14 @@ import { UsersService } from './users/users.service';
 		// if (usr.)
 		
 		this.logger.log(`received a message: ${message.text} from ${client.id} will be sent to ${message.room}`)
+		
+		console.log(message)
+
+		let tmp = await this.blockService.get_blocked(message.userID)
+		// tmp.id 
+
+
+		console.log("blocked list ", tmp, " userID: ", message.userID);
 		
 		client.broadcast.to(message.room).emit('msgToClient',
 		{

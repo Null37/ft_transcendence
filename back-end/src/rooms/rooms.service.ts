@@ -28,7 +28,7 @@ export class RoomsService {
 			userID: +userID, //! should insert userID here
 			role: "mod",
 			status: 0,
-			roomID: tmp.roomName
+			roomName: tmp.roomName
 		}) 
 		
 		this.roomUser.save(usr);
@@ -54,20 +54,20 @@ export class RoomsService {
 		else
 		{
 			console.log("Room already exists")
-			let usrexist = this.roomUser.find({where: {userID: +userID, roomID: room_name}})
+			let usrexist = this.roomUser.find({where: {userID: +userID, roomName: room_name}})
 			if ((await usrexist).length == 0)
 			{
 				console.log("user not found")
-				let user = this.roomUser.create({userID: +userID, role:"user", status:0, roomID: room_name})
+				let user = this.roomUser.create({userID: +userID, role:"user", status:0, roomName: room_name})
 				console.log("RoomUser ===> ", user)
 				await this.roomUser.save(user)
-				let res = await this.roomUser.find({where: {roomID: room_name}})
+				let res = await this.roomUser.find({where: {roomName: room_name}})
 				console.log(res)
 				return res;
 			}
 			else
 			{
-				let res = await this.roomUser.find({where: {roomID: room_name}})
+				let res = await this.roomUser.find({where: {roomName: room_name}})
 				return res;
 			}
 		}
@@ -75,35 +75,35 @@ export class RoomsService {
 
 	async leaveUserRoom(userID: string, room_name: string): Promise<any>
 	{
-		let usr = await this.roomUser.findOne({where: {roomID: room_name, userID: +userID}})
+		let usr = await this.roomUser.findOne({where: {roomName: room_name, userID: +userID}})
 		if (usr)
 		{
 			await this.roomUser.remove(usr);
-			let isempty = await this.roomUser.find({where: {roomID: room_name}})
+			let isempty = await this.roomUser.find({where: {roomName: room_name}})
 			if (isempty.length == 0)
 				await this.rooms.remove(await this.rooms.findOne({where: {roomName: room_name}}))
 		}
 	}
 
 	//* Set/modify/delete room's password
-	async changeRoompw(user: number, roomID: string, password: string): Promise<any>
+	async changeRoompw(user: number, roomName: string, password: string): Promise<any>
 	{
-		let usr = await this.roomUser.findOne({where: {userID: user, roomID: roomID}})
+		let usr = await this.roomUser.findOne({where: {userID: user, roomName: roomName}})
 		if (usr.role == "moderator")
 		{
-			let room = await this.rooms.findOne({where: {roomName: roomID}})
+			let room = await this.rooms.findOne({where: {roomName: roomName}})
 			room.password = password;
 			this.rooms.save(room)
 		}
 	}
 	
 	//*  
-	async changeUserRole(user: number, roomID: string, target: number, role: string): Promise<any> //! Sus function (double check)
+	async changeUserRole(user: number, roomName: string, target: number, role: string): Promise<any> //! Sus function (double check)
 	{
-		let usr = await this.roomUser.findOne({where: {userID: user, roomID: roomID}})
+		let usr = await this.roomUser.findOne({where: {userID: user, roomName: roomName}})
 		if (usr.role == "admin" || usr.role == "moderator")
 		{
-			let usr2 = await this.roomUser.findOne({where: {roomID: roomID, userID: target}})
+			let usr2 = await this.roomUser.findOne({where: {roomName: roomName, userID: target}})
 			if (role == "admin")
 			{
 				usr2.role = role;
@@ -118,10 +118,10 @@ export class RoomsService {
 		// let rooms = await ;
 		return this.rooms.find();
 	}
-	async getUsersList(roomID: string): Promise<any>
+	async getUsersList(roomName: string): Promise<any>
 	{
 		// let rooms = await ;
-		return this.roomUser.find({where: {roomID: roomID}});
+		return this.roomUser.find({where: {roomName: roomName}});
 	}
 	async getUserRoomsList(userID: number): Promise<any>
 	{
@@ -130,12 +130,12 @@ export class RoomsService {
 	
 
 	//* Replaced with changeroomPW (if pw == undefined or empty string then it's public)
-	async changeRoomState(user: number, roomID: string, state: number): Promise<any>
+	async changeRoomState(user: number, roomName: string, state: number): Promise<any>
 	{
-		let usr = await this.roomUser.findOne({where: {userID: user, roomID: roomID}})
+		let usr = await this.roomUser.findOne({where: {userID: user, roomName: roomName}})
 		if (usr.role == "moderator")
 		{
-			let room = await this.rooms.findOne({where: {roomName: roomID}})
+			let room = await this.rooms.findOne({where: {roomName: roomName}})
 			room.state = state;
 			this.rooms.save(room)
 		}

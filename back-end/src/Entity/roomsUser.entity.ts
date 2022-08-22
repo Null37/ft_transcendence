@@ -3,7 +3,7 @@ import { Rooms } from "./rooms.entity"
 
 export class RoomUserDTO
 {
-    roomID: string
+    roomName: string
 	role: string
 	userID: number
 	status: number
@@ -19,7 +19,7 @@ export class RoomUsers
 	id: number
 
 	@Column()
-    roomID: string
+    roomName: string
 
 	@Column()
 	userID: number;
