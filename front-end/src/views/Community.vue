@@ -82,7 +82,7 @@ export default Vue.extend({
                 Authorization: token
               }}).then(res => {
                 console.log("removed");
-                his.$emit("Addroom", res.data);
+                this.$emit("Addroom", res.data);
                 this.users.push(this.friendlist.find(data => data.username === username));
                 this.friendlist = this.friendlist.filter(data => data.username !== username);
 

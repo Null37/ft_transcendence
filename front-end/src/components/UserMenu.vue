@@ -18,8 +18,8 @@
               size="24"
             >
                <img
-                        :src="user.avatar"
-                        alt="John"
+                :src="user.avatar"
+                alt="John"
                     >
             </v-avatar>
             <v-badge
@@ -62,11 +62,7 @@
         </v-list-item>
          <v-list-item
           link
-        >
-          <v-list-item-title >Mute</v-list-item-title>
-        </v-list-item>
-         <v-list-item
-          link
+          @click="blockuser(user)"
         >
           <v-list-item-title >Block</v-list-item-title>
         </v-list-item>
@@ -82,6 +78,36 @@ import axios from 'axios';
     data: () => ({
     }),
     methods: {
+      blockuser: function (user)
+      {
+        const token = localStorage.getItem('token');
+    
+        if (token)
+        {
+
+          axios.get('/block/'+user.id, {
+            headers: {
+              Authorization: token
+          }}).then((function (res) {
+            console.log("user blocked");
+            console.log(res.data);
+          }).bind(this))
+          .catch(error => {
+            console.log(error);
+          });
+
+          axios.get('/block/find', {
+            headers: {
+              Authorization: token
+          }}).then((function (res) {
+            console.log("blocked === >");
+            console.log(res.data);
+          }).bind(this))
+          .catch(error => {
+            console.log(error);
+          });
+        }
+      }
     }
   }
 </script>
