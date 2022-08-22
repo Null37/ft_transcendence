@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { block_list } from "src/Entity/block.entity";
+import { BlockLIST } from "src/Entity/block.entity";
 import { Repository } from "typeorm";
 import { block_dto } from "src/DTO/block.dto";
 import { FriendService } from "./friend.service";
@@ -8,8 +8,8 @@ import { FriendService } from "./friend.service";
 @Injectable()
 export class blockService {
   constructor(
-    @InjectRepository(block_list)
-    private readonly  block_base: Repository<block_list>,
+    @InjectRepository(BlockLIST)
+    private readonly  block_base: Repository<BlockLIST>,
     private readonly friend_base: FriendService
   ){}
 
@@ -27,9 +27,9 @@ export class blockService {
   async find_blocked(me: number, friend_id: number)
   {
    const findrow  = await this.block_base.createQueryBuilder('block')
-      .leftJoinAndSelect("block_list.block_list", "blocklist")
+      .leftJoinAndSelect("block.block_list", "blocklist")
       .where("block.user_id = :userid", {userid: me})
-      .andWhere("block_list.id = :id", { id: friend_id })
+      .andWhere("blocklist.id = :id", { id: friend_id })
       .getOne()
     return findrow;
   }
@@ -39,9 +39,9 @@ export class blockService {
     if(user == null)
       console.log("not frined")
       const findrow  = await this.block_base.createQueryBuilder('block')
-      .leftJoinAndSelect("block_list.block_list", "blocklist")
+      .leftJoinAndSelect("block.block_list", "blocklist")
       .where("block.user_id = :userid", {userid: me})
-      .andWhere("block_list.id = :id", { id: friend_id })
+      .andWhere("blocklist.id = :id", { id: friend_id })
       .getOne()
     if(findrow ==  null)
     {
