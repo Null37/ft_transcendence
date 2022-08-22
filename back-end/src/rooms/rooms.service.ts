@@ -54,8 +54,9 @@ export class RoomsService {
 		else
 		{
 			console.log("Room already exists")
-			let usrexist = this.roomUser.find({where: {userID: +userID, roomName: room_name}})
-			if ((await usrexist).length == 0)
+			let usrexist = await this.roomUser.findOne({where: {userID: +userID, roomName: room_name}})
+			console.log(usrexist)
+			if (usrexist == null)
 			{
 				console.log("user not found")
 				let user = this.roomUser.create({userID: +userID, role:"user", status:0, roomName: room_name})
@@ -66,10 +67,7 @@ export class RoomsService {
 				return res;
 			}
 			else
-			{
-				let res = await this.roomUser.find({where: {userID: +userID, roomName: room_name}})
-				return res;
-			}
+				return "User already joined";
 		}
 	}
 
