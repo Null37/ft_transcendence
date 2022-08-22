@@ -125,7 +125,6 @@ export class RoomsService {
 	}
 	async getUserRoomsList(userID: number): Promise<any>
 	{
-		// let rooms = await ;
 		return this.roomUser.find({where: {userID: userID}});
 	}
 	
