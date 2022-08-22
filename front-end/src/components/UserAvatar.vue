@@ -44,7 +44,7 @@ export default Vue.extend({
           </v-avatar>
         </v-hover>
         <CreateRoom @Addroom="addroom" />
-        <ListRooms :joinedRooms="rooms" />
+        <ListRooms @Addroom="addroom"/>
       </v-navigation-drawer>
 </template>
 

@@ -74,28 +74,10 @@
 import axios from 'axios';
 
   export default {
-    props: ['joinedRooms'],
+    props: ['avatar'],
     data: () => ({
       dialog: false,
       rooms: [
-        {
-          id: 1,
-          password: "dddd",
-          roomName: "dddd",
-          state: 0
-        },
-        {
-          id: 2,
-          password: "ssss",
-          roomName: "ssss",
-          state: 0
-        },
-        {
-          id: 3,
-          password: "vvvv",
-          roomName: "vvvv",
-          state: 0
-        },
         ]
     }),
     methods: {
@@ -110,7 +92,7 @@ import axios from 'axios';
               Authorization: token
           }}).then(async (res) => {
             this.rooms = this.rooms.filter(data => data.roomName !== roomName);
-            console.log("res == ");
+            console.log("res");
             console.log(res);
           })
           .catch(error => {
@@ -130,10 +112,8 @@ import axios from 'axios';
             Authorization: token
         }}).then(async (res) => {
           this.rooms = res.data;
-          console.log("rooms ->");
-          console.log(this.rooms);
-
-          console.log(this.rooms);
+          // console.log("data ===> ");
+          console.log(res.data);
         })
         .catch(error => {
           console.log(error);

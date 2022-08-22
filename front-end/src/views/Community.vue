@@ -82,6 +82,7 @@ export default Vue.extend({
                 Authorization: token
               }}).then(res => {
                 console.log("removed");
+                his.$emit("Addroom", res.data);
                 this.users.push(this.friendlist.find(data => data.username === username));
                 this.friendlist = this.friendlist.filter(data => data.username !== username);
 
@@ -286,11 +287,11 @@ export default Vue.extend({
       axios.get('/rooms/findUserRooms', {
         headers: {
           Authorization: token
-      }}).then(async (res) => {
+      }}).then((function (res) {
         this.rooms = res.data;
         console.log("data ===> ");
         console.log(res.data);
-      })
+      }).bind(this))
       .catch(error => {
         console.log(error);
       });
