@@ -46,16 +46,4 @@ services:
         default:
           aliases:
             - front-end
-  ############################################### start UI ###############################
-  pgadmin: # UI for database
-    container_name: pgadmin
-    image: dpage/pgadmin4
-    depends_on:
-        - postgres
-    environment:
-        - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-        - PGADMIN_DEFAULT_PASSWORD=admin
-    ports:
-      - 8888:80
-
   

@@ -20,7 +20,8 @@ export default Vue.extend({
 		msgToClient(data) {
       console.log(data);
       this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'});
-      this.showmessages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'});
+      if (this.currentRoom == data.roomName)
+        this.showmessages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'});
 		},
     msgToRoom(data) {
       //this.messages.push({id: this.messages.length, from: "Akira", message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
@@ -33,6 +34,7 @@ export default Vue.extend({
       setUsername: false,
       Title: "Add new friends to chat with",
       me: [],
+      currentRoom: "",
       rooms: [
       ],
       avatar: "",
@@ -95,12 +97,24 @@ export default Vue.extend({
           axios.get('/friend/add/'+this.users.find(data => data.username === username).id, {
           headers: {
             Authorization: token
-          }}).then(res => {
+          }}).then((function (res) {
 
+            var tmp = this.users.find(data => data.username === username);
             this.friendlist.push(this.users.find(data => data.username === username));
             this.users = this.users.filter(data => data.username !== username);
 
-          })
+            if (this.me[0].id < tmp.id)
+            {
+              console.log(this.me[0].id+"-"+tmp.id);
+              this.$socket.emit('joinDM', this.me[0].id+"-"+tmp.id);
+            }
+            else
+            {
+              this.$socket.emit('joinDM', tmp.id+"-"+this.me[0].id);
+              console.log(tmp.id+"-"+this.me[0].id);
+            }
+
+          }).bind(this))
           .catch(error => {
             console.log(error);
           }); 
@@ -111,20 +125,24 @@ export default Vue.extend({
         {
           this.showmessages.push({id: this.messages.length, from: "Akira", message: e.target.value, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
           console.log("id ===> ", this.me[0].id)
-          this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: '1-2', userID: this.me[0].id})
+          this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, userID: this.me[0].id})
           this.placeHolder = "";
         }
       },
       ShowChatMessages: function(friend: string){
-        this.Title = friend.username;
-        var room;
-        if (friend.id < this.me[0].id)
-          room = friend.id+"-"+this.me[0].id;
-        else
-          room = this.me[0].id+"-"+friend.id;
-        this.showmessages = this.messages.filter(el => {
-          return el.room === room;
-        });
+        if (this.currentRoom != friend.id+"-"+this.me[0].id && this.currentRoom != this.me[0].id+"-"+friend.id)
+        {
+          this.Title = friend.username;
+          if (friend.id < this.me[0].id)
+            this.currentRoom = friend.id+"-"+this.me[0].id;
+          else
+            this.currentRoom = this.me[0].id+"-"+friend.id;
+          var r = this.currentRoom;
+          this.showmessages = this.messages.filter(el => {
+            return el.room === r;
+          });
+        }
+        
         // SocketInstance.join()
         
       },
@@ -191,14 +209,7 @@ export default Vue.extend({
           headers: {
             Authorization: token
         }}).then((function (res) {
-          this.tmp;
-
-
-          this.tmp = res.data;
-          for (let i = 0; i < this.tmp.length; ++i)
-          {
-            this.friendlist.push(this.tmp[i].friend_id);
-          }
+          this.friendlist = res.data;
           if (this.friendlist.length > 0)
           {
             this.users = this.users.filter((el) => {
@@ -207,8 +218,8 @@ export default Vue.extend({
               });
             });
           }
-          // for (let i = 0; i < this.rooms.length; ++i)
-          //   this.$socket.emit('joinDM', this.rooms.roomName);
+          for (let i = 0; i < this.rooms.length; ++i)
+            this.$socket.emit('joinDM', this.rooms.roomName);
           console.log(this.friendlist.length)
           for (let i = 0; i < this.friendlist.length; i++)
           {

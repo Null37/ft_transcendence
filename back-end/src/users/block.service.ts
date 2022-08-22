@@ -24,6 +24,15 @@ export class blockService {
     return stat;
   }
 
+  async find_blocked(me: number, friend_id: number)
+  {
+   const findrow  = await this.block_base.createQueryBuilder('block')
+      .leftJoinAndSelect("block_list.block_list", "blocklist")
+      .where("block.user_id = :userid", {userid: me})
+      .andWhere("block_list.id = :id", { id: friend_id })
+      .getOne()
+    return findrow;
+  }
   async block(block_dto: block_dto, me: number, friend_id: number)
   {
     const user = await this.friend_base.remove_friend(friend_id, me)
