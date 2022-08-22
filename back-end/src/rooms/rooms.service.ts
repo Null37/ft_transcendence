@@ -61,13 +61,13 @@ export class RoomsService {
 				let user = this.roomUser.create({userID: +userID, role:"user", status:0, roomName: room_name})
 				console.log("RoomUser ===> ", user)
 				await this.roomUser.save(user)
-				let res = await this.rooms.find({where: {roomName: room_name}})
+				let res = await this.roomUser.find({where: {userID: +userID, roomName: room_name}})
 				console.log(res)
 				return res;
 			}
 			else
 			{
-				let res = await this.rooms.find({where: {roomName: room_name}})
+				let res = await this.roomUser.find({where: {userID: +userID, roomName: room_name}})
 				return res;
 			}
 		}
@@ -118,11 +118,13 @@ export class RoomsService {
 		// let rooms = await ;
 		return this.rooms.find();
 	}
+
 	async getUsersList(roomName: string): Promise<any>
 	{
 		// let rooms = await ;
 		return this.roomUser.find({where: {roomName: roomName}});
 	}
+
 	async getUserRoomsList(userID: number): Promise<any>
 	{
 		return this.roomUser.find({where: {userID: userID}});
