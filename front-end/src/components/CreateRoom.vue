@@ -24,7 +24,7 @@ import axios from 'axios';
                 Authorization: token
               }
             }).then((function (res){
-              this.$emit("Addroom", res.data);
+              this.$emit("Addroom", res.data[0]);
               this.roomname = "";
               this.roompassword = "";
             }).bind(this))

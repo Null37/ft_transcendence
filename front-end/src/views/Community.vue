@@ -18,10 +18,10 @@ export default Vue.extend({
     name: "App",
 	sockets: {
 		msgToClient(data) {
-
-      this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'});
+      console.log(data);
+      this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message});
       if (this.currentRoom == data.roomName)
-        this.showmessages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'});
+        this.showmessages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message});
 		},
     msgToRoom(data) {
       //this.messages.push({id: this.messages.length, from: "Akira", message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic

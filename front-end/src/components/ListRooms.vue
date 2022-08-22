@@ -92,6 +92,7 @@ import axios from 'axios';
               Authorization: token
           }}).then(async (res) => {
             this.rooms = this.rooms.filter(data => data.roomName !== roomName);
+            this.$emit("Addroom", res.data[0]);
             console.log("res");
             console.log(res);
           })
