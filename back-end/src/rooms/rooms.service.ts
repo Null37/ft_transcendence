@@ -25,7 +25,7 @@ export class RoomsService {
 		let tmp = this.rooms.create(roomElem);
 
 		let usr = this.roomUser.create({
-			userID: +userID, //! should insert userID here
+			userID: +userID,
 			role: "mod",
 			status: 0,
 			roomName: tmp.roomName
@@ -61,13 +61,13 @@ export class RoomsService {
 				let user = this.roomUser.create({userID: +userID, role:"user", status:0, roomName: room_name})
 				console.log("RoomUser ===> ", user)
 				await this.roomUser.save(user)
-				let res = await this.roomUser.find({where: {roomName: room_name}})
+				let res = await this.rooms.find({where: {roomName: room_name}})
 				console.log(res)
 				return res;
 			}
 			else
 			{
-				let res = await this.roomUser.find({where: {roomName: room_name}})
+				let res = await this.rooms.find({where: {roomName: room_name}})
 				return res;
 			}
 		}
