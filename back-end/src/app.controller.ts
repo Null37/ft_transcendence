@@ -20,7 +20,7 @@ export class AppController {
   async login(@Request() req, @Response() res) 
   {
     console.log("==============================================")
-
+    
     let user   =  await this.authService.get_user(req.user.intra_login);
     const accessToken = this.authService.login(req.user)
     if(user == null)
