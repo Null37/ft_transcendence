@@ -85,7 +85,7 @@ import axios from 'axios';
         if (token)
         {
 
-          axios.get('/block/'+user.username, {
+          axios.get('/block/'+user.id, {
             headers: {
               Authorization: token
           }}).then((function (res) {
