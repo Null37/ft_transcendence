@@ -74,7 +74,7 @@
 import axios from 'axios';
 
   export default {
-    props: ['avatar'],
+    props: ['joinedRooms'],
     data: () => ({
       dialog: false,
       rooms: [
@@ -129,7 +129,11 @@ import axios from 'axios';
             Authorization: token
         }}).then(async (res) => {
           this.rooms = res.data;
-          // console.log("data ===> ");
+          this.rooms = this.rooms.filter((el) => {
+              return this.joinedRooms.some((f) => {
+                return f.roomName !== el.roomName;
+              });
+            });
           console.log(res.data);
         })
         .catch(error => {

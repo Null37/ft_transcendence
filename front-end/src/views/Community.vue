@@ -18,7 +18,7 @@ export default Vue.extend({
     name: "App",
 	sockets: {
 		msgToClient(data) {
-      console.log(data);
+
       this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'});
       if (this.currentRoom == data.roomName)
         this.showmessages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'});
@@ -44,7 +44,13 @@ export default Vue.extend({
       drawer: null,
       placeHolder: "",
       tmp: [],
-      showmessages: [],
+      showmessages: [{
+        blockedUsers: null,
+        message: "Use /help command to see available options",
+        roomName: "",
+        sender: null,
+        state: "DM",
+      }],
       messages: [
         {id: 0, from: "Akira", room: "bla", message: "bla", time: "10:43pm", color: 'deep-purple lighten-1'}
       ],
@@ -121,7 +127,39 @@ export default Vue.extend({
         }
       },
       submitMessage: function(e: any) {
-        if (e.target.value !== '' && this.currentRoom != '')
+        if (e.target.value === '/help')
+        {
+          this.showmessages.push({
+            blockedUsers: null,
+            message: "Use /ban [duration] [username] to ban a user for a limited time",
+            roomName: "",
+            sender: null,
+            state: "DM",
+          });
+          this.showmessages.push({
+            blockedUsers: null,
+            message: "Use /mute [duration] [username] to mute a user for a limited time",
+            roomName: "",
+            sender: null,
+            state: "DM",
+          });
+          this.showmessages.push({
+            blockedUsers: null,
+            message: "Use /changepassword [password] to change/set room password(room will be protected)",
+            roomName: "",
+            sender: null,
+            state: "DM",
+          });
+          this.showmessages.push({
+            blockedUsers: null,
+            message: "Use /admin [username] to set a user as administrator",
+            roomName: "",
+            sender: null,
+            state: "DM",
+          });
+          this.placeHolder = "";
+        }
+        else if (e.target.value !== '' && this.currentRoom != '')
         {
           this.showmessages.push({id: this.messages.length, from: "Akira", message: e.target.value, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
           console.log("id ===> ", this.me[0].id)
@@ -214,8 +252,6 @@ export default Vue.extend({
           {
             this.users = this.users.filter((el) => {
               return this.friendlist.some((f) => {
-                if (f.username === el.username)
-                  console.log("match");
                 return f.username !== el.username;
               });
             });
