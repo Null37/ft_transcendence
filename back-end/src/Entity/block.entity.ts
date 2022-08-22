@@ -3,7 +3,7 @@ import { Users } from "./users.entity";
 
 
 @Entity()
-export class block_list
+export class BlockLIST
 {
     @PrimaryGeneratedColumn()
     id: number
