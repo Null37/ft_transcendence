@@ -30,6 +30,7 @@ export class RoomController {
 	@Get('joinRoom/:id')
 	async joinRoom(@Param() param, @Request() req): Promise<any>
 	{
+		console.log("room's id's: ",param.id)
 		let res = await this.roomService.addUserToRoom(req.user.sub, param.id);
 
 		if (res == "Room not found")
@@ -47,13 +48,16 @@ export class RoomController {
 	@Patch('changeRoompw')
 	async changeRoompw(@Body() body, @Request() req): Promise<any>
 	{
-		this.roomService.changeRoompw(req.user.sub, body.roomID, body.password);
+		this.roomService.changeRoompw(req.user.sub, body.roomName, body.password);
 	}
 
 	@Get('roomsList')
 	async getRoomsList(): Promise<any>
 	{
-		return (await this.roomService.getRoomsList())
+		return (await this.roomService.getRoomsList()).map(element => {
+			element.password = undefined
+			return element
+		})
 	}
 
 	@Get('usersList')
