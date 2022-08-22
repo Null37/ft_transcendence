@@ -110,6 +110,7 @@ import axios from 'axios';
               Authorization: token
           }}).then(async (res) => {
             this.rooms = this.rooms.filter(data => data.roomName !== roomName);
+            console.log("res == ");
             console.log(res);
           })
           .catch(error => {
@@ -129,12 +130,10 @@ import axios from 'axios';
             Authorization: token
         }}).then(async (res) => {
           this.rooms = res.data;
-          this.rooms = this.rooms.filter((el) => {
-              return this.joinedRooms.some((f) => {
-                return f.roomName !== el.roomName;
-              });
-            });
-          console.log(res.data);
+          console.log("rooms ->");
+          console.log(this.rooms);
+
+          console.log(this.rooms);
         })
         .catch(error => {
           console.log(error);
