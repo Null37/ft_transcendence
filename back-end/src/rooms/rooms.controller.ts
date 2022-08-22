@@ -32,8 +32,8 @@ export class RoomController {
 	{
 		console.log("room's id's: ",param.id)
 		let res = await this.roomService.addUserToRoom(req.user.sub, param.id);
-
-		if (res == "Room not found")
+		console.log("res ===> ", res)
+		if (typeof res == "string")
 			throw new HttpException(res, HttpStatus.NOT_FOUND)
 		else
 			throw new HttpException(res, HttpStatus.OK)
