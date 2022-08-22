@@ -21,7 +21,7 @@ export class blockService {
     stat.forEach(element => {
             res.push(element.block_list);
         });
-    return stat;
+    return res;
   }
 
   async find_blocked(me: number, friend_id: number)
