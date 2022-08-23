@@ -36,6 +36,7 @@ export default Vue.extend({
       me: [],
       blocked: [],
       currentRoom: "",
+      receiverID: Number,
       rooms: [
       ],
       avatar: "",
@@ -175,8 +176,9 @@ export default Vue.extend({
         else if (e.target.value !== '' && this.currentRoom != '')
         {
           this.showmessages.push({id: this.messages.length, from: "Akira", message: e.target.value, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
-          console.log("id ===> ", this.me[0].id)
-          this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, userID: this.me[0].id})
+          console.log("me id = "+this.me[0].id);
+          console.log("me receiverID = "+this.receiverID);
+          this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, sender: this.me[0].id, receiver: this.receiverID})
           this.placeHolder = "";
         }
       },
@@ -188,6 +190,7 @@ export default Vue.extend({
             this.currentRoom = friend.id+"-"+this.me[0].id;
           else
             this.currentRoom = this.me[0].id+"-"+friend.id;
+          this.receiverID = friend.id;
           var r = this.currentRoom;
           this.showmessages = this.messages.filter(el => {
             return el.room === r;
