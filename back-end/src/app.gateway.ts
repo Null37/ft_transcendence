@@ -133,7 +133,7 @@ import { blockService } from './users/block.service';
 		
 		console.log(message)
 		let tmp = await this.blockService.find_blocked(message.receiver, message.sender)
-		// console.log("blocked list ", tmp, " userID: ", message.userID);
+		console.log("blocked list ", tmp, " userID: ", message.receiver, "===>", message.sender);
 
 		// tmp.id 
 
