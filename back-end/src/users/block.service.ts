@@ -4,13 +4,15 @@ import { BlockLIST } from "src/Entity/block.entity";
 import { Repository } from "typeorm";
 import { block_dto } from "src/DTO/block.dto";
 import { FriendService } from "./friend.service";
+import { UsersService } from "./users.service";
 
 @Injectable()
 export class blockService {
   constructor(
     @InjectRepository(BlockLIST)
     private readonly  block_base: Repository<BlockLIST>,
-    private readonly friend_base: FriendService
+    private readonly friend_base: FriendService,
+    private readonly userdata: UsersService
   ){}
 
     
@@ -53,7 +55,7 @@ export class blockService {
  async  unblock(block_id: number, me: number)
   {
     const findrow  = await this.block_base.createQueryBuilder('block')
-    .leftJoinAndSelect("blcok.block_list", "list")
+    .leftJoinAndSelect("block.block_list", "list")
     .where("block.user_id = :userid", {userid: me})
     .andWhere("list.id = :id", { id: block_id })
     .getOne()
@@ -61,7 +63,9 @@ export class blockService {
     const userfound = await this.block_base.findOneBy({id: findrow.id})
     if(userfound == null)
       return userfound
-    return this.block_base.remove(userfound)
+    let user_id = await this.block_base.remove(userfound);
+    console.log("user_id ==> ", user_id);
+    return await this.userdata.findbyId(block_id);
   }
   
 

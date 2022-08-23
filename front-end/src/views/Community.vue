@@ -34,6 +34,7 @@ export default Vue.extend({
       setUsername: false,
       Title: "Add new friends or join rooms to start chatting",
       me: [],
+      blocked: [],
       currentRoom: "",
       rooms: [
       ],
@@ -59,6 +60,17 @@ export default Vue.extend({
 
     }),
     methods: {
+      blockuser: function(user)
+      {
+        this.blocked.push(user);
+        this.users = this.users.filter(data => data.username !== user.username);
+        this.friendlist = this.friendlist.filter(data => data.username !== user.username);
+      },
+      unblockuser: function(user)
+      {
+        this.users.push(user);
+        this.blocked = this.blocked.filter(data => data.username !== user.username);
+      },
       addroom: function(room)
       {
         this.rooms.push(room);
@@ -238,6 +250,8 @@ export default Vue.extend({
       }}).then(res => {
         this.users = res.data;
         
+        console.log("users == >");
+        console.log(this.users);
         this.users = this.users.filter((el) => {
             return this.me.some((f) => {
               return f.username !== el.username;
@@ -249,15 +263,51 @@ export default Vue.extend({
             Authorization: token
         }}).then((function (res) {
           this.friendlist = res.data;
+
+          console.log("friendlist==>");
+          console.log(this.friendlist);
           if (this.friendlist.length > 0)
           {
-            this.users = this.users.filter((el) => {
-              return this.friendlist.some((f) => {
-                return f.username !== el.username;
+
+            
+            this.users = this.users.filter((function ( el )
+            {
+              let ret = true;
+              this.friendlist.forEach(element => {
+                if (element.username == el.username)
+                {
+                  ret = false;
+                }
               });
-            });
-            console.log(this.users);
+              return ret;
+            }).bind(this));
+
+
+
           }
+          axios.get('/block/find', {
+            headers: {
+              Authorization: token
+          }}).then((function (res) {
+            this.blocked = res.data;
+            
+            this.users = this.users.filter((function ( el )
+            {
+              let ret = true;
+              this.blocked.forEach(element => {
+                if (element.username == el.username)
+                {
+                  ret = false;
+                }
+              });
+              return ret;
+            }).bind(this));
+
+          }).bind(this))
+          .catch(error => {
+            console.log(error);
+          });
+
           for (let i = 0; i < this.rooms.length; ++i)
             this.$socket.emit('joinDM', this.rooms.roomName);
           for (let i = 0; i < this.friendlist.length; i++)
@@ -362,7 +412,7 @@ export default Vue.extend({
       <FriendList :friends="friendlist" @ShowChatMessages="ShowChatMessages"/>
     </v-navigation-drawer>
 
-    <FriendsStatus @Addfriend="Addfriend" @removefriend="removefriend" :users="users" :friends="friendlist" :username="me.username" />
+    <FriendsStatus @blockuser="blockuser" @unblockuser="unblockuser" :blocked="blocked" @Addfriend="Addfriend" @removefriend="removefriend" :users="users" :friends="friendlist" :username="me.username" />
     <v-main>
 
       <v-container fluid style="height:100%;">
