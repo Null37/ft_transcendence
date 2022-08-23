@@ -2,6 +2,7 @@
 import Vue from 'vue';
 import EditProfile from './EditProfile.vue';
 import CreateRoom from './CreateRoom.vue';
+import ListRooms from './ListRooms.vue';
 
 export default Vue.extend({
     props: ['avatar', 'rooms'],
@@ -13,7 +14,7 @@ export default Vue.extend({
         
       }
     },
-    components: { EditProfile, CreateRoom }
+    components: { EditProfile, CreateRoom, ListRooms }
 });
 </script>
 
@@ -43,6 +44,7 @@ export default Vue.extend({
           </v-avatar>
         </v-hover>
         <CreateRoom @Addroom="addroom" />
+        <ListRooms @Addroom="addroom"/>
       </v-navigation-drawer>
 </template>
 

@@ -19,9 +19,9 @@ export default Vue.extend({
 	sockets: {
 		msgToClient(data) {
       console.log(data);
-      this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'});
+      this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message});
       if (this.currentRoom == data.roomName)
-        this.showmessages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'});
+        this.showmessages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message});
 		},
     msgToRoom(data) {
       //this.messages.push({id: this.messages.length, from: "Akira", message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
@@ -32,8 +32,9 @@ export default Vue.extend({
 	},
     data: () => ({
       setUsername: false,
-      Title: "Add new friends to chat with",
+      Title: "Add new friends or join rooms to start chatting",
       me: [],
+      blocked: [],
       currentRoom: "",
       rooms: [
       ],
@@ -44,7 +45,13 @@ export default Vue.extend({
       drawer: null,
       placeHolder: "",
       tmp: [],
-      showmessages: [],
+      showmessages: [{
+        blockedUsers: null,
+        message: "Use /help command to see available options",
+        roomName: "",
+        sender: null,
+        state: "DM",
+      }],
       messages: [
         {id: 0, from: "Akira", room: "bla", message: "bla", time: "10:43pm", color: 'deep-purple lighten-1'}
       ],
@@ -53,6 +60,17 @@ export default Vue.extend({
 
     }),
     methods: {
+      blockuser: function(user)
+      {
+        this.blocked.push(user);
+        this.users = this.users.filter(data => data.username !== user.username);
+        this.friendlist = this.friendlist.filter(data => data.username !== user.username);
+      },
+      unblockuser: function(user)
+      {
+        this.users.push(user);
+        this.blocked = this.blocked.filter(data => data.username !== user.username);
+      },
       addroom: function(room)
       {
         this.rooms.push(room);
@@ -76,6 +94,7 @@ export default Vue.extend({
                 Authorization: token
               }}).then(res => {
                 console.log("removed");
+                this.$emit("Addroom", res.data);
                 this.users.push(this.friendlist.find(data => data.username === username));
                 this.friendlist = this.friendlist.filter(data => data.username !== username);
 
@@ -121,7 +140,39 @@ export default Vue.extend({
         }
       },
       submitMessage: function(e: any) {
-        if (e.target.value !== '')
+        if (e.target.value === '/help')
+        {
+          this.showmessages.push({
+            blockedUsers: null,
+            message: "Use /ban [duration] [username] to ban a user for a limited time",
+            roomName: "",
+            sender: null,
+            state: "DM",
+          });
+          this.showmessages.push({
+            blockedUsers: null,
+            message: "Use /mute [duration] [username] to mute a user for a limited time",
+            roomName: "",
+            sender: null,
+            state: "DM",
+          });
+          this.showmessages.push({
+            blockedUsers: null,
+            message: "Use /changepassword [password] to change/set room password(room will be protected)",
+            roomName: "",
+            sender: null,
+            state: "DM",
+          });
+          this.showmessages.push({
+            blockedUsers: null,
+            message: "Use /admin [username] to set a user as administrator",
+            roomName: "",
+            sender: null,
+            state: "DM",
+          });
+          this.placeHolder = "";
+        }
+        else if (e.target.value !== '' && this.currentRoom != '')
         {
           this.showmessages.push({id: this.messages.length, from: "Akira", message: e.target.value, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
           console.log("id ===> ", this.me[0].id)
@@ -199,6 +250,8 @@ export default Vue.extend({
       }}).then(res => {
         this.users = res.data;
         
+        console.log("users == >");
+        console.log(this.users);
         this.users = this.users.filter((el) => {
             return this.me.some((f) => {
               return f.username !== el.username;
@@ -210,17 +263,53 @@ export default Vue.extend({
             Authorization: token
         }}).then((function (res) {
           this.friendlist = res.data;
+
+          console.log("friendlist==>");
+          console.log(this.friendlist);
           if (this.friendlist.length > 0)
           {
-            this.users = this.users.filter((el) => {
-              return this.friendlist.some((f) => {
-                return f.username !== el.username;
+
+            
+            this.users = this.users.filter((function ( el )
+            {
+              let ret = true;
+              this.friendlist.forEach(element => {
+                if (element.username == el.username)
+                {
+                  ret = false;
+                }
               });
-            });
+              return ret;
+            }).bind(this));
+
+
+
           }
+          axios.get('/block/find', {
+            headers: {
+              Authorization: token
+          }}).then((function (res) {
+            this.blocked = res.data;
+            
+            this.users = this.users.filter((function ( el )
+            {
+              let ret = true;
+              this.blocked.forEach(element => {
+                if (element.username == el.username)
+                {
+                  ret = false;
+                }
+              });
+              return ret;
+            }).bind(this));
+
+          }).bind(this))
+          .catch(error => {
+            console.log(error);
+          });
+
           for (let i = 0; i < this.rooms.length; ++i)
             this.$socket.emit('joinDM', this.rooms.roomName);
-          console.log(this.friendlist.length)
           for (let i = 0; i < this.friendlist.length; i++)
           {
             if (this.me[0].id < this.friendlist[i].id)
@@ -245,13 +334,14 @@ export default Vue.extend({
         console.log(error);
       });
 
-      axios.get('/rooms/roomsList', {
+      axios.get('/rooms/findUserRooms', {
         headers: {
           Authorization: token
-      }}).then(async (res) => {
+      }}).then((function (res) {
         this.rooms = res.data;
+        console.log("data ===> ");
         console.log(res.data);
-      })
+      }).bind(this))
       .catch(error => {
         console.log(error);
       });
@@ -322,7 +412,7 @@ export default Vue.extend({
       <FriendList :friends="friendlist" @ShowChatMessages="ShowChatMessages"/>
     </v-navigation-drawer>
 
-    <FriendsStatus @Addfriend="Addfriend" @removefriend="removefriend" :users="users" :friends="friendlist" :username="me.username" />
+    <FriendsStatus @blockuser="blockuser" @unblockuser="unblockuser" :blocked="blocked" @Addfriend="Addfriend" @removefriend="removefriend" :users="users" :friends="friendlist" :username="me.username" />
     <v-main>
 
       <v-container fluid style="height:100%;">

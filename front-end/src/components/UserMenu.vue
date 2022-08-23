@@ -18,8 +18,8 @@
               size="24"
             >
                <img
-                        :src="user.avatar"
-                        alt="John"
+                :src="user.avatar"
+                alt="John"
                     >
             </v-avatar>
             <v-badge
@@ -56,19 +56,23 @@
         </v-list-item>
         <v-list-item
           link
-          v-else @click="$emit('Addfriend', user.username)"
+          v-else-if="status === 'user'" @click="$emit('Addfriend', user.username)"
         >
           <v-list-item-title >Add friend</v-list-item-title>
         </v-list-item>
          <v-list-item
           link
+          v-if="status === 'blocked'"
+          @click="unblockuser(user)"
         >
-          <v-list-item-title >Mute</v-list-item-title>
+          <v-list-item-title >Unblock</v-list-item-title>
         </v-list-item>
-         <v-list-item
+        <v-list-item
           link
+          v-else-if="status === 'friend' || status === 'user'"
+          @click="blockuser(user)"
         >
-          <v-list-item-title >Block</v-list-item-title>
+          <v-list-item-title >block</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>
@@ -82,6 +86,44 @@ import axios from 'axios';
     data: () => ({
     }),
     methods: {
+      unblockuser: function (user)
+      {
+        const token = localStorage.getItem('token');
+    
+        if (token)
+        {
+
+          axios.get('/block/unblock/'+user.id, {
+            headers: {
+              Authorization: token
+          }}).then((function (res) {
+            this.$emit("unblockuser", res.data);
+          }).bind(this))
+          .catch(error => {
+            console.log(error);
+          });
+
+        }
+      },
+      blockuser: function (user)
+      {
+        const token = localStorage.getItem('token');
+    
+        if (token)
+        {
+
+          axios.get('/block/'+user.id, {
+            headers: {
+              Authorization: token
+          }}).then((function (res) {
+            this.$emit("blockuser", user);
+          }).bind(this))
+          .catch(error => {
+            console.log(error);
+          });
+
+        }
+      }
     }
   }
 </script>

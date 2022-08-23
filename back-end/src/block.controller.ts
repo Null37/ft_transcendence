@@ -26,7 +26,8 @@ export class BlockCtroller {
   @Get('unblock/:id')
   async unblock_user(@Request() req, @Param('id') par_id)
   {
-     await this.block_base.unblock(par_id, req.user.sub)
+    return await this.block_base.unblock(par_id, req.user.sub);
+
   }
 
   
