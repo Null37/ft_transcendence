@@ -57,8 +57,8 @@ export class RoomsService {
 			console.log("Room already exists")
 			let usrexist = await this.roomUser.findOne({where: {userID: +userID, roomName: room_name}})
 			
-			if (usrexist.duration && usrexist.duration > Date.now())
-			return "User is banned from this chat";
+			if (usrexist && usrexist.duration && usrexist.duration > Date.now())
+				return "User is banned from this chat";
 			
 			console.log(usrexist)
 			if (usrexist == null)
@@ -71,7 +71,7 @@ export class RoomsService {
 						return "Wrong password";
 				}
 				console.log("user not found")
-				let user = this.roomUser.create({userID: +userID, role:"user", status:0, roomName: room_name})
+				let user = this.roomUser.create({userID: +userID, role:"user", status:0, roomName: room_name, duration: 0})
 				console.log("RoomUser ===> ", user)
 				await this.roomUser.save(user)
 				let res = await this.roomUser.find({where: {userID: +userID, roomName: room_name}})

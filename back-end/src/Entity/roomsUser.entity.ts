@@ -34,7 +34,9 @@ export class RoomUsers
 	// @JoinColumn()
 	// rooms: Rooms
 
-	@Column({nullable: true})
+	@Column({
+		default: 0
+	})
 	duration: number
 
 	@Column()
