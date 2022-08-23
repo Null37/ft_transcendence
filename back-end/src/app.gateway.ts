@@ -129,24 +129,37 @@ import { blockService } from './users/block.service';
 		// let usr = await this.	usersService.find_username(message.username);
 		// if (usr.)
 		
-		this.logger.log(`received a message: ${message.text} from ${client.id} will be sent to ${message.room}`)
+		// this.logger.log(`received a message: ${message.text} from ${client.id} will be sent to ${message.room}`)
 		
-		console.log(message)
+		// console.log(message)
 		let tmp = await this.blockService.find_blocked(message.receiver, message.sender)
-		console.log("blocked list ", tmp, " userID: ", message.receiver, "===>", message.sender);
+		// console.log("blocked list ", tmp, " userID: ", message.receiver, "===>", message.sender);
 
 		// tmp.id 
 
 
-		
-		client.broadcast.to(message.room).emit('msgToClient',
+		if (tmp == null)
 		{
-			roomName: message.room,
-			state: "DM",
-			blockedUsers: null,
-			message: message.text,
-			sender: message.sender
-		});
+			client.broadcast.to(message.room).emit('msgToClient',
+			{
+				roomName: message.room,
+				state: "DM",
+				blockedUsers: null,
+				message: message.text,
+				sender: message.sender
+			});
+		}
+		else
+		{
+			this.wss.to(client.id).emit('msgToClient',
+			{
+				roomName: message.room,
+				state: "DM",
+				blockedUsers: null,
+				message: `This user blocked you`,
+				sender: message.sender
+			});			
+		}
 	}
 
 	@SubscribeMessage('msgToRoom')
