@@ -12,6 +12,11 @@ export default Vue.extend({
       {
         this.$emit("Addroom", room);
         
+      },
+      changeAvatarC: function(avatar)
+      {
+        this.avatar = avatar;
+        this.$emit('changeAvatar', avatar);
       }
     },
     components: { EditProfile, CreateRoom, ListRooms }
@@ -26,7 +31,7 @@ export default Vue.extend({
 
         mini-variant
       >
-        <EditProfile :avatar="avatar" />
+        <EditProfile @changeAvatar="changeAvatarC" :avatar="avatar" />
         <v-divider class="mx-3 my-5"></v-divider>
         <v-hover
         v-slot="{ hover }"

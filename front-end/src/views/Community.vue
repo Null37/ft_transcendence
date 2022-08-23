@@ -61,6 +61,10 @@ export default Vue.extend({
 
     }),
     methods: {
+      changeAvatar: function(newavatar)
+      {
+        this.avatar = newavatar;
+      },
       blockuser: function(user)
       {
         this.blocked.push(user);
@@ -74,7 +78,7 @@ export default Vue.extend({
       },
       addroom: function(room)
       {
-        this.rooms.push(room);
+        // this.rooms.push(room);
       },
       removefriend: function(username: string)
       {
@@ -368,7 +372,7 @@ export default Vue.extend({
       app
       width="300"
     >
-      <UserAvatar @Addroom="addroom" :rooms="rooms" :avatar="avatar" />
+      <UserAvatar @changeAvatar="changeAvatar" @Addroom="addroom" :rooms="rooms" :avatar="avatar" />
 
       <v-sheet
         height="164"

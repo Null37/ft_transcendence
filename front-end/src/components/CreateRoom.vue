@@ -14,10 +14,13 @@ import axios from 'axios';
 
         if (token && this.roomname.length > 0)
         {
+          let st = 0;
+          if (this.roompassword != '')
+            st = 1;
           const data = {
             roomName: this.roomname,
             password: this.roompassword,
-            state: 0
+            state: st
           };
           axios.post('/rooms/create', data , {
               headers: {
@@ -80,10 +83,12 @@ import axios from 'axios';
                 <v-text-field
                   label="Room name*"
                   required
+                  v-on:keyup.enter="creatroom(); dialog = false"
                   v-model="roomname"
                 ></v-text-field>
                 <v-text-field
                   label="Room Password"
+                  v-on:keyup.enter="creatroom(); dialog = false"
                   v-model="roompassword"
                 ></v-text-field>
               </v-col>
@@ -104,6 +109,7 @@ import axios from 'axios';
           <v-btn
             color="blue darken-1"
             text
+            
             @click="creatroom(); dialog = false"
           >
             Save

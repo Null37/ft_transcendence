@@ -25,4 +25,9 @@ export class Users
 
     @Column()
     two_factor_authentication: boolean = false
+
+// test: array[]
+    // [{}, {
+
+   // }
 }

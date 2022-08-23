@@ -1,3 +1,80 @@
+<script lang="ts">
+import axios from 'axios';
+
+  export default {
+    props: ['avatar'],
+    data: () => ({
+      dialog: false,
+      roompassword: "",
+      rooms: [
+        ]
+    }),
+    methods: {
+      trypassword: function(roomName)
+      {
+        const token = localStorage.getItem('token');
+    
+        if (token)
+        {
+          const data = {
+            password: this.roompassword,
+          };
+          axios.get('/rooms/joinRoom/'+roomName, {
+            headers: {
+              Authorization: token
+          }}).then(async (res) => {
+            this.rooms = this.rooms.filter(data => data.roomName !== roomName);
+            this.$emit("Addroom", res.data[0]);
+            console.log("res");
+            console.log(res);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        }
+      },
+      joinRoom: function (roomName)
+      {
+        const token = localStorage.getItem('token');
+    
+        if (token)
+        {
+          axios.get('/rooms/joinRoom/'+roomName, {
+            headers: {
+              Authorization: token
+          }}).then(async (res) => {
+            this.rooms = this.rooms.filter(data => data.roomName !== roomName);
+            this.$emit("Addroom", res.data[0]);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+          
+        }
+      }
+    },
+    mounted (){
+      const token = localStorage.getItem('token');
+    
+      if (token)
+      {
+        axios.get('/rooms/roomsList', {
+          headers: {
+            Authorization: token
+        }}).then(async (res) => {
+          this.rooms = res.data;
+          console.log("rooms");
+          console.log(this.rooms);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+          
+        }
+    }
+  }
+</script>
+
 <template>
   <v-row justify="center">
     <v-dialog
@@ -31,11 +108,35 @@
           <span class="text-h5">List of rooms</span>
         </v-card-title>
         <v-card-text>
+          <div v-for="r in rooms"
+                v-if="r.state == 1"
+                :key="r.id">
+              <v-list-group
+                no-action
+                sub-group
+                
+              >
 
+                  <template v-slot:activator>
+                    <v-list-item-content>
+                      <v-list-item-title>{{r.roomName}}</v-list-item-title>
+                    </v-list-item-content>
+                  </template>
+
+                  <v-list-item
+                    link
+                  >
+                    <v-list-item-title >
+                      <v-text-field @keyup.enter="trypassword(r.roomName)" v-model="roompassword" label="Room password"></v-text-field>
+                    </v-list-item-title>
+
+                    
+                  </v-list-item>
+              </v-list-group>
+            </div>
               <v-list
                 class="pl-14"
               >
-                
                 <v-list-item-group
 
                   
@@ -46,7 +147,7 @@
                     link
                   >
 
-                    <v-list-item-content @click="joinRoom(r.roomName)">
+                    <v-list-item-content v-if="r.state == 0" @click="joinRoom(r.roomName)">
                       <v-list-item-title v-text="r.roomName"></v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
@@ -70,60 +171,7 @@
   </v-row>
 </template>
 
-<script lang="ts">
-import axios from 'axios';
 
-  export default {
-    props: ['avatar'],
-    data: () => ({
-      dialog: false,
-      rooms: [
-        ]
-    }),
-    methods: {
-      joinRoom: function (roomName)
-      {
-        const token = localStorage.getItem('token');
-    
-        if (token)
-        {
-          axios.get('/rooms/joinRoom/'+roomName, {
-            headers: {
-              Authorization: token
-          }}).then(async (res) => {
-            this.rooms = this.rooms.filter(data => data.roomName !== roomName);
-            this.$emit("Addroom", res.data[0]);
-            console.log("res");
-            console.log(res);
-          })
-          .catch(error => {
-            console.log(error);
-          });
-          
-        }
-      }
-    },
-    mounted (){
-      const token = localStorage.getItem('token');
-    
-      if (token)
-      {
-        axios.get('/rooms/roomsList', {
-          headers: {
-            Authorization: token
-        }}).then(async (res) => {
-          this.rooms = res.data;
-          // console.log("data ===> ");
-          console.log(res.data);
-        })
-        .catch(error => {
-          console.log(error);
-        });
-          
-        }
-    }
-  }
-</script>
 
 <style lang="scss" scoped>
 

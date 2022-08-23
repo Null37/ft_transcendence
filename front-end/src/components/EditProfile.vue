@@ -119,15 +119,16 @@ import axios from 'axios';
         if (token && files && files[0]) {
           const data = new FormData();
           data.append("file", files[0]);
-
-
+          
           axios.post("/upload/image", data, {
             headers: {
                 Authorization: token
               }
-          }).then(res => {
-            console.log("image updated");
-          }).catch(error => {
+          }).then((function (res) {
+            console.log(files);
+            // this.avatar = files[0];
+            this.$emit('changeAvatar', res.data);
+          }).bind(this)).catch(error => {
             console.log(error);
           });
         }
