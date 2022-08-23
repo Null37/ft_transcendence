@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Rooms, RoomsDTO } from 'src/Entity/rooms.entity';
 import { RoomUsers } from 'src/Entity/roomsUser.entity';
+import * as bcrypt from 'bcrypt';
 
 
 
@@ -21,7 +22,7 @@ export class RoomsService {
 		let exist = await this.rooms.findBy({roomName: roomElem.roomName});
 		if (exist.length)
 			return "Chat room already exists";
-
+		roomElem.password = await bcrypt.hash(roomElem.password, 10);
 		let tmp = this.rooms.create(roomElem);
 
 		let usr = this.roomUser.create({
@@ -36,7 +37,7 @@ export class RoomsService {
 		return  (await this.rooms.save(tmp));
 	}
 
-	async addUserToRoom(userID: string, room_name: string): Promise<any>
+	async addUserToRoom(userID: string, room_name: string, password: string): Promise<any>
 	{
 		/* 
 			1- Check if the room exists.
@@ -55,9 +56,20 @@ export class RoomsService {
 		{
 			console.log("Room already exists")
 			let usrexist = await this.roomUser.findOne({where: {userID: +userID, roomName: room_name}})
+			
+			if (usrexist.duration && usrexist.duration > Date.now())
+			return "User is banned from this chat";
+			
 			console.log(usrexist)
 			if (usrexist == null)
 			{
+				//TODO: check if the password is correct here
+				if (password)
+				{
+					const test = await bcrypt.compare(password, tmp.password)
+					if (test == false)
+						return "Wrong password";
+				}
 				console.log("user not found")
 				let user = this.roomUser.create({userID: +userID, role:"user", status:0, roomName: room_name})
 				console.log("RoomUser ===> ", user)
@@ -86,11 +98,13 @@ export class RoomsService {
 	//* Set/modify/delete room's password
 	async changeRoompw(user: number, roomName: string, password: string): Promise<any>
 	{
+		// const salt = 10;
+
 		let usr = await this.roomUser.findOne({where: {userID: user, roomName: roomName}})
 		if (usr.role == "moderator")
 		{
 			let room = await this.rooms.findOne({where: {roomName: roomName}})
-			room.password = password;
+			room.password = await bcrypt.hash(password, 10);
 			this.rooms.save(room)
 		}
 	}
