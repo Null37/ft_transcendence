@@ -121,7 +121,7 @@ import { blockService } from './users/block.service';
 	}
 
 	@SubscribeMessage('msgToClientDM')
-	async handleDmMessage(client: Socket, message: {text: string, room: string, userID: number}): Promise<any> {
+	async handleDmMessage(client: Socket, message: {text: string, room: string, sender: number, receiver: number}): Promise<any> {
 		// Add logic before sending a message here
 		/* 
 			1- Check if the receiver is muted/blocked by the sender
@@ -132,12 +132,12 @@ import { blockService } from './users/block.service';
 		this.logger.log(`received a message: ${message.text} from ${client.id} will be sent to ${message.room}`)
 		
 		console.log(message)
+		let tmp = await this.blockService.find_blocked(message.receiver, message.sender)
+		// console.log("blocked list ", tmp, " userID: ", message.userID);
 
-		let tmp = await this.blockService.get_blocked(message.userID)
 		// tmp.id 
 
 
-		console.log("blocked list ", tmp, " userID: ", message.userID);
 		
 		client.broadcast.to(message.room).emit('msgToClient',
 		{
@@ -145,7 +145,34 @@ import { blockService } from './users/block.service';
 			state: "DM",
 			blockedUsers: null,
 			message: message.text,
-			sender: null
+			sender: message.sender
+		});
+	}
+
+	@SubscribeMessage('msgToRoom')
+	async handleRoomMessage(client: Socket, message: {text: string, room: string, userID: number}): Promise<any> {
+		// Add logic before sending a message here
+		/* 
+			1- Check if the receiver is muted/banned in the room
+		*/
+		
+		this.logger.log(`received a message: ${message.text} from ${client.id} will be sent to ${message.room}`)
+		
+		console.log(message)
+		// let tmp = await this.blockService.find_blocked(2, 11)
+		// console.log("blocked list ", tmp, " userID: ", message.userID);
+
+		// tmp.id 
+
+
+		
+		client.broadcast.to(message.room).emit('msgToRoom',
+		{
+			roomName: message.room,
+			state: "ROOM",
+			blockedUsers: null,
+			message: message.text,
+			sender: message.userID
 		});
 	}
 
