@@ -20,6 +20,14 @@ async findOne(intra_log: string): Promise<Users | null>
     return test;
 }
 
+async findbyID(id: number): Promise<Users | null> 
+{
+    const test = await this.usersdata.findOneBy( { id: id });
+    console.log("value ===> ", test)
+    return test;
+}
+
+
 
 
 
