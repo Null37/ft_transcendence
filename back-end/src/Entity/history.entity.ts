@@ -16,6 +16,9 @@ export class history
     vs: Users
 
     @Column()
+    score: number
+    
+    @Column()
     status: string
 
     @Column()
