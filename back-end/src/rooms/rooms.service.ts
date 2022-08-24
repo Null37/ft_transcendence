@@ -161,8 +161,13 @@ export class RoomsService {
 			room.state = state;
 			this.rooms.save(room)
 		}
-		}
+	}
 
+	async getuserOfRoom(userID: number, roomName: string): Promise<any>
+	{
+		return this.roomUser.find({where: {userID: userID, roomName: roomName}})
+	}
+	
 	async debuggingLog()
 	{
 		let res = await this.rooms.find();

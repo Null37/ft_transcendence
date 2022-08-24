@@ -89,4 +89,10 @@ export class RoomController {
 		let res = await this.roomService.getUserRoomsList(req.user.sub);
 		return res;
 	}
+
+	@Get('userOfRoom/:roomName')
+	async userOfRoom(@Param() param, @Request() req): Promise<void>
+	{
+		return (await this.roomService.getuserOfRoom(req.user.sub, param.roomName))
+	}
 }

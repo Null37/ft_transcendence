@@ -156,7 +156,6 @@ import { blockService } from './users/block.service';
 			{
 				roomName: message.room,
 				state: "DM",
-				blockedUsers: null,
 				message: `This user blocked you`,
 				sender: userProfile
 			});			
@@ -185,7 +184,6 @@ import { blockService } from './users/block.service';
 		{
 			roomName: message.room,
 			state: "ROOM",
-			blockedUsers: null,
 			message: message.text,
 			sender: userProfile
 		});
