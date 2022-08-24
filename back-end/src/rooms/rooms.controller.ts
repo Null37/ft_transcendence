@@ -41,7 +41,7 @@ export class RoomController {
   	}
 
 
-	@Get('joinRoom/:id')
+	@Post('joinRoom/:id')
 	async joinRoom(@Body() body, @Param() param, @Request() req): Promise<any>
 	{
 		console.log("room's id's: ",param.id)

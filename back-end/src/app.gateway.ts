@@ -36,7 +36,8 @@ import { blockService } from './users/block.service';
 	}
   
 	handleConnection(client: Socket, ...args: any[]) {
-	  this.logger.log(`Client connected:    ${client.id}`);
+	//   this.logger.log(`Client connected:    ${client}`);
+	//   console.log(`Client connected:    ${client.}`);
 	}
 
 

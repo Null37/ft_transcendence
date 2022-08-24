@@ -64,6 +64,8 @@ export class RoomsService {
 			if (usrexist == null)
 			{
 				//TODO: check if the password is correct here
+				if (tmp.password && !password)
+					return "this room is protected";
 				if (password)
 				{
 					const test = await bcrypt.compare(password, tmp.password)

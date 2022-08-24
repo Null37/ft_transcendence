@@ -130,11 +130,8 @@ export class AppController {
   {
     if (par === 'me')
       par = Req.user.name;
-    console.log("start get info about user")
     // find usr and get data
-    console.log("user = ", par)
     let user = await this.authService.get_user(par);
-    console.log("valuse userv = ", user)
     if(user !=  null)
       return user
     throw new NotFoundException('Not Found USER')
