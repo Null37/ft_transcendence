@@ -39,7 +39,7 @@ export default Vue.extend({
         :key="r.id"
         >
           <v-avatar
-            
+            @click="$emit('showChatroom', r.roomName)"
             class="d-block mx-auto mb-9"
             color="grey darken-4"
             :class="{ 'on-hover': hover }"

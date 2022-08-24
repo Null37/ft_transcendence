@@ -18,12 +18,14 @@ export default Vue.extend({
     name: "App",
 	sockets: {
 		msgToClient(data) {
-      console.log(data);
       this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message});
       if (this.currentRoom == data.roomName)
-        this.showmessages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message});
+        this.showmessages.push({id: this.showmessages.length, from: "Akira", room: data.roomName, message: data.message});
 		},
     msgToRoom(data) {
+      this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message});
+      if (this.currentRoom == data.roomName)
+        this.showmessages.push({id: this.showmessages.length, from: "Akira", room: data.roomName, message: data.message});
       //this.messages.push({id: this.messages.length, from: "Akira", message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
 		}
 
@@ -41,6 +43,7 @@ export default Vue.extend({
       ],
       avatar: "",
       intra_login: "",
+      roomorfriend: false,
       status: "",
       username: "",
       drawer: null,
@@ -54,7 +57,6 @@ export default Vue.extend({
         state: "DM",
       }],
       messages: [
-        {id: 0, from: "Akira", room: "bla", message: "bla", time: "10:43pm", color: 'deep-purple lighten-1'}
       ],
       users: [],
       friendlist: [],
@@ -183,10 +185,11 @@ export default Vue.extend({
         }
         else if (e.target.value !== '' && this.currentRoom != '')
         {
-          this.showmessages.push({id: this.messages.length, from: "Akira", message: e.target.value, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
-          console.log("me id = "+this.me[0].id);
-          console.log("me receiverID = "+this.receiverID);
-          this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, sender: this.me[0].id, receiver: this.receiverID})
+          this.showmessages.push({id: this.showmessages.length, from: "Akira", message: e.target.value});
+          if (this.roomorfriend == true)
+            this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, sender: this.me[0].id, receiver: this.receiverID})
+          else
+            this.$socket.emit('msgToRoom', {text: this.placeHolder, room: this.currentRoom, userID: this.me[0].id})
           this.placeHolder = "";
         }
       },
@@ -198,6 +201,7 @@ export default Vue.extend({
             this.currentRoom = friend.id+"-"+this.me[0].id;
           else
             this.currentRoom = this.me[0].id+"-"+friend.id;
+          this.roomorfriend = true;
           this.receiverID = friend.id;
           var r = this.currentRoom;
           this.showmessages = this.messages.filter(el => {
@@ -208,9 +212,23 @@ export default Vue.extend({
         // SocketInstance.join()
         
       },
+      showChatroom: function(roomname)
+      {
+        if (this.currentRoom != roomname)
+        {
+          this.Title = roomname;
+          this.currentRoom = roomname;
+          this.roomorfriend = false;
+
+          this.showmessages = this.messages.filter(el => {
+            return el.room === roomname;
+          });
+        }
+      },
       updateMessage: function(e: any){
         this.placeHolder = e.target.value;
       },
+      
       setUsernameMethod: function()
       {
         if (this.me.username.length > 5 && this.me.username.length < 10)
@@ -350,8 +368,12 @@ export default Vue.extend({
           Authorization: token
       }}).then((function (res) {
         this.rooms = res.data;
-        console.log("data ===> ");
-        console.log(res.data);
+        console.log("rooooooms");
+        console.log(this.rooms);
+        for(let i = 0; i < this.rooms.length; i++)
+          this.$socket.emit('joinRoom', this.rooms[i].roomName);
+
+
       }).bind(this))
       .catch(error => {
         console.log(error);
@@ -376,7 +398,7 @@ export default Vue.extend({
       app
       width="300"
     >
-      <UserAvatar @changeAvatar="changeAvatar" @Addroom="addroom" :rooms="rooms" :avatar="avatar" />
+      <UserAvatar @showChatroom="showChatroom" @changeAvatar="changeAvatar" @Addroom="addroom" :rooms="rooms" :avatar="avatar" />
 
       <v-sheet
         height="164"
