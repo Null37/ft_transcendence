@@ -6,10 +6,11 @@ import { friend } from 'src/Entity/friend.entity';
 import { FriendService } from './friend.service';
 import { blockService } from './block.service';
 import { BlockLIST } from 'src/Entity/block.entity';
+import { historyervice } from './history.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Users, friend ,BlockLIST])] ,
-  providers: [UsersService, FriendService, blockService],
-  exports: [UsersService, FriendService, blockService],
+  providers: [UsersService, FriendService, blockService, historyervice],
+  exports: [UsersService, FriendService, blockService, historyervice],
 })
 export class UsersModule {}
