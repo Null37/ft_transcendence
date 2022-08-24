@@ -19,7 +19,7 @@ export class history
     status: string
 
     @Column()
-    achievements: string
+    achievements: Array<string>
 
     @Column()
     level: number = 0;

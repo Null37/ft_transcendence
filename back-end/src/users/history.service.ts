@@ -16,9 +16,9 @@ export class historyervice {
     {
         his.level = +1;
         if(his.status == "win")
-            his.achievements = "http://localhost:3000/public/success.png" // first win
+            his.achievements[0] = "http://localhost:3000/public/achievements/success.png" // first win
         else
-            his.achievements = "http://localhost:3000/public/conquer.png" // first game
+            his.achievements[1] = "http://localhost:3000/public/achievements/conquer.png" // first game
         console.log("level ==> ", his.level)
         const newfriend = this.histdata.create(his)
         return this.histdata.save(newfriend)

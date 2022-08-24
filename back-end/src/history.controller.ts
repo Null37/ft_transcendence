@@ -8,8 +8,6 @@ export class historyCtroller {
   constructor(private readonly hisdata: historyervice) {}
 
 
-
-
     @Get(":id")
     async find_history(@Param('id') par_id)
     {
