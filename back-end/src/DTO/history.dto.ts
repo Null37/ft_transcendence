@@ -7,6 +7,6 @@ export class history_dto
    user_id: number
    vs: Users
    status?: string
-   achievements?:Array<string>
+   achievements?
    level?:number
 }

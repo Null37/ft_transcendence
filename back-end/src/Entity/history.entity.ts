@@ -21,8 +21,8 @@ export class history
     @Column()
     status: string
 
-    @Column()
-    achievements: Array<string>
+    @Column({array: true})
+    achievements: string
 
     @Column()
     level: number = 0;
