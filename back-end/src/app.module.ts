@@ -11,6 +11,7 @@ import { FrinedCtroller } from './friend.controller';
 import { BlockCtroller } from './block.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { historyCtroller } from './history.controller';
 
 @Module({
   imports: [AuthModule, 
@@ -30,7 +31,7 @@ import { join } from 'path';
     //, {serveStaticOptions: {index: false , extensions: ['png', 'jpeg', 'jpg', 'bmp', 'ico']}}
     ServeStaticModule.forRoot({rootPath: join('/back-end/src', 'public'), serveRoot: '/public/',serveStaticOptions: {index: false},})
   ],
-  controllers: [AppController, FrinedCtroller, BlockCtroller],
+  controllers: [AppController, FrinedCtroller, BlockCtroller, historyCtroller],
   providers: [AppService, pass_42Guard, AppGateway],
 })
 export class AppModule {}

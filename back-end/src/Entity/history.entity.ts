@@ -22,5 +22,5 @@ export class history
     achievements: string
 
     @Column()
-    level: string 
+    level: number = 0;
 }
