@@ -78,6 +78,7 @@ export default Vue.extend({
       },
       addroom: function(room)
       {
+        console.log("room Add");
         // this.rooms.push(room);
       },
       removefriend: function(username: string)
@@ -99,7 +100,12 @@ export default Vue.extend({
                 Authorization: token
               }}).then(res => {
                 console.log("removed");
-                this.$emit("Addroom", res.data);
+                // this.$emit("Addroom", res.data);
+                if (this.me[0].id < this.friendlist[i].id)
+                  this.$socket.emit('leaveRoom', this.me[0].id+"-"+this.friendlist[i].id);
+                else
+                  this.$socket.emit('leaveRoom', this.friendlist[i].id+"-"+this.me[0].id);
+
                 this.users.push(this.friendlist.find(data => data.username === username));
                 this.friendlist = this.friendlist.filter(data => data.username !== username);
 
@@ -129,13 +135,11 @@ export default Vue.extend({
 
             if (this.me[0].id < tmp.id)
             {
-              console.log(this.me[0].id+"-"+tmp.id);
               this.$socket.emit('joinDM', this.me[0].id+"-"+tmp.id);
             }
             else
             {
               this.$socket.emit('joinDM', tmp.id+"-"+this.me[0].id);
-              console.log(tmp.id+"-"+this.me[0].id);
             }
 
           }).bind(this))

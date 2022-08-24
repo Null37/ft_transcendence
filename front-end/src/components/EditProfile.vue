@@ -125,7 +125,7 @@ import axios from 'axios';
                 Authorization: token
               }
           }).then((function (res) {
-            console.log(files);
+            console.log(filesb);
             // this.avatar = files[0];
             this.$emit('changeAvatar', res.data);
           }).bind(this)).catch(error => {

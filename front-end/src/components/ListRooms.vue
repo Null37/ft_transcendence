@@ -19,7 +19,7 @@ import axios from 'axios';
           const data = {
             password: this.roompassword,
           };
-          axios.get('/rooms/joinRoom/'+roomName, {
+          axios.post('/rooms/joinRoom/'+roomName, data, {
             headers: {
               Authorization: token
           }}).then(async (res) => {
@@ -39,7 +39,7 @@ import axios from 'axios';
     
         if (token)
         {
-          axios.get('/rooms/joinRoom/'+roomName, {
+          axios.post('/rooms/joinRoom/'+roomName, {}, {
             headers: {
               Authorization: token
           }}).then(async (res) => {
