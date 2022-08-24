@@ -64,13 +64,17 @@ export class RoomsService {
 			if (usrexist == null)
 			{
 				//TODO: check if the password is correct here
-				if (tmp.password && !password)
-					return "this room is protected";
-				if (password)
+				if (tmp.password)
 				{
-					const test = await bcrypt.compare(password, tmp.password)
-					if (test == false)
-						return "Wrong password";
+					if (!password)
+						return "this room is protected";
+					else if (password)
+					{
+						const test = await bcrypt.compare(password, tmp.password)
+						if (test == false)
+							return "Wrong password";
+					}
+
 				}
 				console.log("user not found")
 				let user = this.roomUser.create({userID: +userID, role:"user", status:0, roomName: room_name})
