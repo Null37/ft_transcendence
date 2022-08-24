@@ -22,12 +22,10 @@ import axios from 'axios';
           axios.post('/rooms/joinRoom/'+roomName, data, {
             headers: {
               Authorization: token
-          }}).then(async (res) => {
+          }}).then((function(res) {
             this.rooms = this.rooms.filter(data => data.roomName !== roomName);
-            this.$emit("Addroom", res.data[0]);
-            console.log("res");
-            console.log(res);
-          })
+            this.$emit("Addroom", roomName);
+          }).bind(this))
           .catch(error => {
             console.log(error);
           });
@@ -42,10 +40,10 @@ import axios from 'axios';
           axios.post('/rooms/joinRoom/'+roomName, {}, {
             headers: {
               Authorization: token
-          }}).then(async (res) => {
+          }}).then((function (res) {
             this.rooms = this.rooms.filter(data => data.roomName !== roomName);
-            this.$emit("Addroom", res.data[0]);
-          })
+            this.$emit("Addroom", roomName);
+          }).bind(this))
           .catch(error => {
             console.log(error);
           });
@@ -61,16 +59,40 @@ import axios from 'axios';
         axios.get('/rooms/roomsList', {
           headers: {
             Authorization: token
-        }}).then(async (res) => {
+        }}).then((function(res) {
           this.rooms = res.data;
-          console.log("rooms");
-          console.log(this.rooms);
-        })
+          axios.get('/rooms/roomsList', {
+            headers: {
+              Authorization: token
+          }}).then((function(res) {
+            var tmprooms = res.data;
+            console.log("this.rooms before");
+            console.log(this.rooms);
+            this.rooms = this.rooms.filter((function ( el )
+            {
+              let ret = true;
+              tmprooms.forEach(element => {
+                if (element.roomName === el.roomName)
+                {
+                  ret = false;
+                }
+              });
+              console.log("ret", ret);
+              return ret;
+            }));
+            console.log("this.rooms");
+            console.log(this.rooms);
+            
+          }).bind(this))
+          .catch(error => {
+            console.log(error);
+          });
+        }).bind(this))
         .catch(error => {
           console.log(error);
         });
           
-        }
+      }
     }
   }
 </script>

@@ -80,9 +80,23 @@ export default Vue.extend({
       },
       addroom: function(roomname)
       {
-        console.log("room Add");
-        console.log(roomname);
-        // this.rooms.push(room);
+        const token = localStorage.getItem('token');
+
+        if (token)
+        {
+          axios.get('/rooms/userOfRoom/'+roomname, {
+            headers: {
+              Authorization: token
+          }}).then((function (res) {
+            this.rooms.push(res.data[0]);
+            this.$socket.emit('joinRoom', res.data[0].roomName);
+
+
+          }).bind(this))
+          .catch(error => {
+            console.log(error);
+          });
+        }
       },
       removefriend: function(username: string)
       {
@@ -293,13 +307,8 @@ export default Vue.extend({
             Authorization: token
         }}).then((function (res) {
           this.friendlist = res.data;
-
-          console.log("friendlist==>");
-          console.log(this.friendlist);
           if (this.friendlist.length > 0)
           {
-
-            
             this.users = this.users.filter((function ( el )
             {
               let ret = true;
