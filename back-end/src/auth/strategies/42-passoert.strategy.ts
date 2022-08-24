@@ -25,6 +25,7 @@ export class passport_42 extends PassportStrategy(Strategy) {
 				intra_login: profile.username,
 				avatar: profile._json.image_url,
 				status: "Offline",
+				two_factor_authentication: false
 			})
 			console.log(vr)
 		}
