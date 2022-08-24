@@ -94,9 +94,9 @@ import { blockService } from './users/block.service';
 
 
 	@SubscribeMessage('joinRoom')
-	handleJoinRoom(client: Socket, room: string): void {
+	handleJoinRoom(client: Socket, message: {userID: number, room: string}): void {
 		//TODO: check if room is protected and if user is not banned etc...
-		client.join(room);
+		client.join(message.room);
 		// client.emit('joinedRoom', message.room);
 	}
 
@@ -138,7 +138,7 @@ import { blockService } from './users/block.service';
 
 		// tmp.id 
 
-
+		let userProfile = await this.usersService.findbyId(message.receiver)
 		if (tmp == null)
 		{
 			client.broadcast.to(message.room).emit('msgToClient',
@@ -147,7 +147,7 @@ import { blockService } from './users/block.service';
 				state: "DM",
 				blockedUsers: null,
 				message: message.text,
-				sender: message.sender
+				sender: userProfile
 			});
 		}
 		else
@@ -158,7 +158,7 @@ import { blockService } from './users/block.service';
 				state: "DM",
 				blockedUsers: null,
 				message: `This user blocked you`,
-				sender: message.sender
+				sender: userProfile
 			});			
 		}
 	}
@@ -178,6 +178,7 @@ import { blockService } from './users/block.service';
 
 		// tmp.id 
 
+		let userProfile = await this.usersService.findbyId(message.userID)
 
 		
 		client.broadcast.to(message.room).emit('msgToRoom',
@@ -186,7 +187,7 @@ import { blockService } from './users/block.service';
 			state: "ROOM",
 			blockedUsers: null,
 			message: message.text,
-			sender: message.userID
+			sender: userProfile
 		});
 	}
 
