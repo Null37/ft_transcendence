@@ -16,14 +16,12 @@ export class UsersService {
 async findOne(intra_log: string): Promise<Users | null> 
 {
     const test = await this.usersdata.findOneBy( { intra_login: intra_log });
-    console.log("value ===> ", test)
     return test;
 }
 
 async findbyId(id: number): Promise<Users | null> 
 {
     const test = await this.usersdata.findOneBy( { id: id });
-    console.log("value ===> ", test)
     return test;
 }
 
@@ -49,7 +47,6 @@ async get_secret(id: number)
   async find_username(username: string)
   {
     const test = await this.usersdata.findOneBy( { username: username });
-    console.log("value ===> ", test)
     return test;
   }
   async update(dto_update: update_dto)
