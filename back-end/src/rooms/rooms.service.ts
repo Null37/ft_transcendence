@@ -22,7 +22,8 @@ export class RoomsService {
 		let exist = await this.rooms.findBy({roomName: roomElem.roomName});
 		if (exist.length)
 			return "Chat room already exists";
-		roomElem.password = await bcrypt.hash(roomElem.password, 10);
+		if (roomElem.password)
+			roomElem.password = await bcrypt.hash(roomElem.password, 10);
 		let tmp = this.rooms.create(roomElem);
 
 		let usr = this.roomUser.create({
@@ -63,6 +64,7 @@ export class RoomsService {
 			console.log(usrexist)
 			if (usrexist == null)
 			{
+				console.log("room's password ===> ", tmp.password, " user's password ===> ", password)
 				//TODO: check if the password is correct here
 				if (tmp.password)
 				{
