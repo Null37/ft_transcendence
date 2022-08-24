@@ -17,4 +17,10 @@ export class history
 
     @Column()
     status: string
+
+    @Column()
+    achievements: string
+
+    @Column()
+    level: string 
 }
