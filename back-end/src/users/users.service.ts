@@ -20,6 +20,9 @@ async findOne(intra_log: string): Promise<Users | null>
     return test;
 }
 
+
+
+
 async get_secret(id: number)
 {
   let test = await this.usersdata.findOne({where :{id: id}, select: ['secret']})
@@ -28,11 +31,13 @@ async get_secret(id: number)
   return test.secret
 }
 
-  create(users_id: user_dto) // dont forget to add real DTO
-  {
-      let newuser  = this.usersdata.create(users_id);
-      return this.usersdata.save(newuser);
-  }
+create(users_id: user_dto) // dont forget to add real DTO
+{
+    let newuser  = this.usersdata.create(users_id);
+    return this.usersdata.save(newuser);
+}
+
+
 
   findAll()
   {
@@ -44,8 +49,13 @@ async get_secret(id: number)
     console.log("value ===> ", test)
     return test;
   }
+
+
+  
+
   async update(dto_update: update_dto)
   {
+    
     try
     {
       let newuser = await this.usersdata.preload(dto_update);

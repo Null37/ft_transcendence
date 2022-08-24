@@ -14,4 +14,5 @@ export class user_dto
     secret?: string 
 
     two_factor_authentication?: boolean = false
+    socket_savier?: Array<JSON>
 } 

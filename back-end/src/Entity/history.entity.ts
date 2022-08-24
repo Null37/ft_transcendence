@@ -10,14 +10,14 @@ export class history
     
     @Column()
     user_id: number
+    
+    @Column()
+    score: number
 
     @ManyToOne(() => Users)
     @JoinColumn()
     vs: Users
 
-    @Column()
-    score: number
-    
     @Column()
     status: string
 

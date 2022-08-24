@@ -25,4 +25,8 @@ export class Users
 
     @Column()
     two_factor_authentication: boolean = false
+
+
+    @Column({select: false})
+    socket_savier: Array<JSON>
 }
