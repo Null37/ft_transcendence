@@ -78,9 +78,10 @@ export default Vue.extend({
         this.users.push(user);
         this.blocked = this.blocked.filter(data => data.username !== user.username);
       },
-      addroom: function(room)
+      addroom: function(roomname)
       {
         console.log("room Add");
+        console.log(roomname);
         // this.rooms.push(room);
       },
       removefriend: function(username: string)
