@@ -18,16 +18,17 @@ export default Vue.extend({
     name: "App",
 	sockets: {
 		msgToClient(data) {
-      this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message});
-      if (this.currentRoom == data.roomName)
-        this.showmessages.push({id: this.showmessages.length, from: "Akira", room: data.roomName, message: data.message});
-		},
-    msgToRoom(data) {
       console.log("dataaaa >> ");
       console.log(data);
-      this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message});
+      this.messages.push({id: this.messages.length, from: data.sender, room: data.roomName, message: data.message});
       if (this.currentRoom == data.roomName)
-        this.showmessages.push({id: this.showmessages.length, from: "Akira", room: data.roomName, message: data.message});
+        this.showmessages.push({id: this.showmessages.length, from: data.sender, room: data.roomName, message: data.message});
+		},
+    msgToRoom(data) {
+      
+      this.messages.push({id: this.messages.length, from: data.sender, room: data.roomName, message: data.message});
+      if (this.currentRoom == data.roomName)
+        this.showmessages.push({id: this.showmessages.length, from: data.sender, room: data.roomName, message: data.message});
 		}
 
 
@@ -51,11 +52,17 @@ export default Vue.extend({
       placeHolder: "",
       tmp: [],
       showmessages: [{
-        blockedUsers: null,
+        id: 0,
         message: "Use /help command to see available options",
-        roomName: "",
-        sender: null,
-        state: "DM",
+        room: "",
+        from: {
+          two_factor_authentication: false,
+          id: 2,
+          username: 'asdfasfd',
+          intra_login: 'hboudhir',
+          avatar: 'https://cdn.intra.42.fr/users/hboudhir.jpg',
+          status: 'Offline'
+          },
       }],
       messages: [
       ],
@@ -210,12 +217,11 @@ export default Vue.extend({
         }
         else if (e.target.value !== '' && this.currentRoom != '')
         {
-          this.showmessages.push({id: this.showmessages.length, from: "Akira", message: e.target.value});
+          this.showmessages.push({id: this.showmessages.length, room: this.currentroom, from: this.me[0], message: e.target.value});
           if (this.roomorfriend == true)
             this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, sender: this.me[0].id, receiver: this.receiverID})
           else
           {
-            console.log("sending msg", this.currentRoom);
             this.$socket.emit('msgToRoom', {text: this.placeHolder, room: this.currentRoom, userID: this.me[0].id})
           }
           this.placeHolder = "";
@@ -478,13 +484,13 @@ export default Vue.extend({
                       class=""
                     >
                       <v-list-item-avatar class="align-self-start mr-2">
-                        <Profile :avatar="avatar" :username="message.from" />                   
+                        <Profile :avatar="avatar" :username="message.from.username" />                   
                                 
                       </v-list-item-avatar>
                       <v-list-item-content class="received-message">
                         <v-card color="grey darken-3" class="flex-none">                        
                           <v-card-text class="white--text pa-2 d-flex flex-column">
-                            <span   class="text-body-2 font-weight-bold">{{message.from}} <span class="text-caption">{{message.time}}</span> </span>                                             
+                            <span   class="text-body-2 font-weight-bold">{{message.from.username}} </span>                                             
                             <span class="align-self-start text-subtitle-1">{{ message.message }}</span>
                             
                           </v-card-text>
