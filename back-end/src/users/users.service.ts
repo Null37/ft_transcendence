@@ -22,6 +22,7 @@ async findOne(intra_log: string): Promise<Users | null>
 async findbyId(id: number): Promise<Users | null> 
 {
     const test = await this.usersdata.findOneBy( { id: id });
+
     return test;
 }
 
@@ -34,11 +35,13 @@ async get_secret(id: number)
   return test.secret
 }
 
-  create(users_id: user_dto) // dont forget to add real DTO
-  {
-      let newuser  = this.usersdata.create(users_id);
-      return this.usersdata.save(newuser);
-  }
+create(users_id: user_dto) // dont forget to add real DTO
+{
+    let newuser  = this.usersdata.create(users_id);
+    return this.usersdata.save(newuser);
+}
+
+
 
   findAll()
   {
@@ -49,8 +52,13 @@ async get_secret(id: number)
     const test = await this.usersdata.findOneBy( { username: username });
     return test;
   }
+
+
+  
+
   async update(dto_update: update_dto)
   {
+    
     try
     {
       let newuser = await this.usersdata.preload(dto_update);

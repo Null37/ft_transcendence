@@ -65,9 +65,8 @@ export class blockService {
       return userfound
     let user_id = await this.block_base.remove(userfound);
     console.log("user_id ==> ", user_id);
+
     return await this.userdata.findbyId(block_id);
   }
   
-
-
 }

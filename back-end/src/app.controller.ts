@@ -20,35 +20,22 @@ export class AppController {
   async login(@Request() req, @Response() res) 
   {
     console.log("==============================================")
-    
-    let user   =  await this.authService.get_user(req.user.intra_login);
-    const accessToken = this.authService.login(req.user)
-    if(user == null)
+    console.log("two ==> ", req.user.two_factor_authenticatio)
+    if(req.user.two_factor_authentication == true)
     {
-      console.log(accessToken)
-      console.log("username ==> ", req.user.username);
-      return res.redirect("http://localhost:8080/Game?token="+accessToken);
+      // redirect to new 2fa without set token
+      // return res.redirect(http://localhost:8080/2FA)
     }
     else
     {
-      if(user.two_factor_authentication == true)
-      {
-        // redirect to new 2fa without set token
-        // return res.redirect(http://localhost:8080/2FA)
-      }
-      else
-      {
+        const accessToken = this.authService.login(req.user)
+        console.log(accessToken)
+        console.log("username ==> ", req.user.username);
         console.log("false")
         return res.redirect("http://localhost:8080/Game?token="+accessToken);
       }
-    }
-
-    // if()
-    
-    // if()
-   
-   
     console.log("==============================================")
+
   }
   @UseGuards(jwtGuard)
   @Get("QR")

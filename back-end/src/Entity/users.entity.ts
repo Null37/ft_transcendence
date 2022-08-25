@@ -1,3 +1,4 @@
+
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm"
 
 
@@ -26,8 +27,7 @@ export class Users
     @Column()
     two_factor_authentication: boolean = false
 
-// test: array[]
-    // [{}, {
 
-   // }
+    @Column({select: false, array: true, type: 'json', nullable: true})
+    socket_savier
 }
