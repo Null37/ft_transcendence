@@ -90,8 +90,7 @@ export default Vue.extend({
               Authorization: token
           }}).then((function (res) {
             this.rooms.push(res.data[0]);
-            this.$socket.emit('joinRoom', res.data[0].roomName);
-            console.log("joinRoom Emited???" + res.data[0].roomName);
+            this.$socket.emit('joinRoom', roomname);
 
 
           }).bind(this))
@@ -121,9 +120,15 @@ export default Vue.extend({
                 console.log("removed");
                 // this.$emit("Addroom", res.data);
                 if (this.me[0].id < this.friendlist[i].id)
+                {
+                  console.log("left room -->"+this.me[0].id+"-"+this.friendlist[i].id);
                   this.$socket.emit('leaveRoom', this.me[0].id+"-"+this.friendlist[i].id);
+                }
                 else
+                {
+                  console.log("left room -->"+this.friendlist[i].id+"-"+this.me[0].id);
                   this.$socket.emit('leaveRoom', this.friendlist[i].id+"-"+this.me[0].id);
+                }
 
                 this.users.push(this.friendlist.find(data => data.username === username));
                 this.friendlist = this.friendlist.filter(data => data.username !== username);
@@ -151,14 +156,17 @@ export default Vue.extend({
             var tmp = this.users.find(data => data.username === username);
             this.friendlist.push(this.users.find(data => data.username === username));
             this.users = this.users.filter(data => data.username !== username);
-
-            if (this.me[0].id < tmp.id)
+            
+            if (tmp.length > 0)
             {
-              this.$socket.emit('joinDM', this.me[0].id+"-"+tmp.id);
-            }
-            else
-            {
-              this.$socket.emit('joinDM', tmp.id+"-"+this.me[0].id);
+              if (this.me[0].id < tmp.id)
+              {
+                this.$socket.emit('joinDM', this.me[0].id+"-"+tmp.id);
+              }
+              else
+              {
+                this.$socket.emit('joinDM', tmp.id+"-"+this.me[0].id);
+              }
             }
 
           }).bind(this))
@@ -206,7 +214,10 @@ export default Vue.extend({
           if (this.roomorfriend == true)
             this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, sender: this.me[0].id, receiver: this.receiverID})
           else
+          {
+            console.log("sending msg", this.currentRoom);
             this.$socket.emit('msgToRoom', {text: this.placeHolder, room: this.currentRoom, userID: this.me[0].id})
+          }
           this.placeHolder = "";
         }
       },
@@ -349,8 +360,6 @@ export default Vue.extend({
             console.log(error);
           });
 
-          for (let i = 0; i < this.rooms.length; ++i)
-            this.$socket.emit('joinDM', this.rooms.roomName);
           for (let i = 0; i < this.friendlist.length; i++)
           {
             if (this.me[0].id < this.friendlist[i].id)
@@ -381,10 +390,11 @@ export default Vue.extend({
       }}).then((function (res) {
         this.rooms = res.data;
         console.log("rooooooms");
-        console.log(this.rooms);
+        console.log(res.data);
         for(let i = 0; i < this.rooms.length; i++)
+        {
           this.$socket.emit('joinRoom', this.rooms[i].roomName);
-
+        }
 
       }).bind(this))
       .catch(error => {
