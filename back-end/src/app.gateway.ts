@@ -138,14 +138,14 @@ import { blockService } from './users/block.service';
 
 		// tmp.id 
 
-		let userProfile = await this.usersService.findbyId(message.receiver)
+		let userProfile = await this.usersService.findbyId(message.sender)
+		console.log(userProfile)
 		if (tmp == null)
 		{
 			client.broadcast.to(message.room).emit('msgToClient',
 			{
 				roomName: message.room,
 				state: "DM",
-				blockedUsers: null,
 				message: message.text,
 				sender: userProfile
 			});
