@@ -105,13 +105,13 @@ import { blockService } from './users/block.service';
 		broadcast the userID to update other users front-end
 	*/
 	@SubscribeMessage('leaveRoom')
-	handleLeaveRoom(client: Socket, message: {userID: number, room: string}): void {
+	handleLeaveRoom(client: Socket, room: string): void {
 		//TODO: check if room is protected and if user is not banned etc...
 		// this.roomsService.
-		client.leave(message.room);
+		client.leave(room);
 		//TODO Delete the user from UsersRoom table.
 
-		client.broadcast.to(message.room).emit('leaveRoom', message.userID);
+		// client.broadcast.to(room).emit('leaveRoom', userID);
 	}
 
 	@SubscribeMessage('joinDM')
