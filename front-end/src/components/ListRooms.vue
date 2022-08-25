@@ -5,6 +5,7 @@ import axios from 'axios';
     props: ['avatar'],
     data: () => ({
       dialog: false,
+      error: false,
       roompassword: "",
       rooms: [
         ]
@@ -25,9 +26,11 @@ import axios from 'axios';
           }}).then((function(res) {
             this.rooms = this.rooms.filter(data => data.roomName !== roomName);
             this.$emit("Addroom", roomName);
+            this.error = false;
+            this.roompassword = '';
           }).bind(this))
           .catch(error => {
-            console.log(error);
+            this.error = true;
           });
         }
       },
@@ -43,9 +46,10 @@ import axios from 'axios';
           }}).then((function (res) {
             this.rooms = this.rooms.filter(data => data.roomName !== roomName);
             this.$emit("Addroom", roomName);
+            this.error = false;
           }).bind(this))
           .catch(error => {
-            console.log(error);
+            this.error = true;
           });
           
         }
@@ -61,35 +65,33 @@ import axios from 'axios';
             Authorization: token
         }}).then((function(res) {
           this.rooms = res.data;
-          axios.get('/rooms/roomsList', {
+          axios.get('/rooms/findUserRooms', {
             headers: {
               Authorization: token
           }}).then((function(res) {
-            var tmprooms = res.data;
-            console.log("this.rooms before");
-            console.log(this.rooms);
+            let tmprooms = res.data;
+            
+            
+            
             this.rooms = this.rooms.filter((function ( el )
             {
-              let ret = true;
-              tmprooms.forEach(element => {
-                if (element.roomName === el.roomName)
+              for(let i = 0; i < tmprooms.length; i++)
+              {
+                if (tmprooms[i].roomName == el.roomName)
                 {
-                  ret = false;
+                  return false;
                 }
-              });
-              console.log("ret", ret);
-              return ret;
+              }
+              return true;
             }));
-            console.log("this.rooms");
-            console.log(this.rooms);
-            
+
           }).bind(this))
           .catch(error => {
-            console.log(error);
+
           });
         }).bind(this))
         .catch(error => {
-          console.log(error);
+
         });
           
       }
@@ -126,6 +128,9 @@ import axios from 'axios';
         
       </template>
       <v-card>
+        <v-card-title v-if="error == true"  class="justify-center">
+          <span class="red--text text-h5">Please try again!</span>
+        </v-card-title>
         <v-card-title class="justify-center">
           <span class="text-h5">List of rooms</span>
         </v-card-title>
@@ -151,25 +156,20 @@ import axios from 'axios';
                     <v-list-item-title >
                       <v-text-field @keyup.enter="trypassword(r.roomName)" v-model="roompassword" label="Room password"></v-text-field>
                     </v-list-item-title>
-
-                    
                   </v-list-item>
               </v-list-group>
             </div>
               <v-list
                 class="pl-14"
               >
-                <v-list-item-group
-
-                  
-                >
+                <v-list-item-group>
                   <v-list-item
                     v-for="r in rooms"
                     :key="r.id"
+                    v-if="r.state == 0"
                     link
                   >
-
-                    <v-list-item-content v-if="r.state == 0" @click="joinRoom(r.roomName)">
+                    <v-list-item-content  @click="joinRoom(r.roomName)">
                       <v-list-item-title v-text="r.roomName"></v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>

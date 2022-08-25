@@ -23,10 +23,11 @@ export default Vue.extend({
         this.showmessages.push({id: this.showmessages.length, from: "Akira", room: data.roomName, message: data.message});
 		},
     msgToRoom(data) {
+      console.log("dataaaa >> ");
+      console.log(data);
       this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message});
       if (this.currentRoom == data.roomName)
         this.showmessages.push({id: this.showmessages.length, from: "Akira", room: data.roomName, message: data.message});
-      //this.messages.push({id: this.messages.length, from: "Akira", message: data.message, time: "10:43pm", color: 'deep-purple lighten-1'}); // id should be dynamic
 		}
 
 
@@ -90,6 +91,7 @@ export default Vue.extend({
           }}).then((function (res) {
             this.rooms.push(res.data[0]);
             this.$socket.emit('joinRoom', res.data[0].roomName);
+            console.log("joinRoom Emited???" + res.data[0].roomName);
 
 
           }).bind(this))

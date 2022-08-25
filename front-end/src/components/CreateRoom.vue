@@ -4,6 +4,7 @@ import axios from 'axios';
   export default {
     data: () => ({
       dialog: false,
+      error: false,
       roomname: "",
       roompassword: "",
     }),
@@ -29,10 +30,12 @@ import axios from 'axios';
             }).then((function (res){
               this.$emit("Addroom", res.data.roomName);
               this.roomname = "";
+              this.error = false;
+              this.dialog = false;
               this.roompassword = "";
             }).bind(this))
             .catch(error => {
-              console.log(error);
+              this.error = true;
             });
 
         }
@@ -72,6 +75,9 @@ import axios from 'axios';
           </v-hover>
       </template>
       <v-card>
+        <v-card-title v-if="error == true"  class="justify-center">
+          <span class="red--text text-h5">Please try again!</span>
+        </v-card-title>
         <v-card-title class="justify-center">
           <span class="text-h5">Create new chat room</span>
         </v-card-title>
@@ -83,12 +89,12 @@ import axios from 'axios';
                 <v-text-field
                   label="Room name*"
                   required
-                  v-on:keyup.enter="creatroom(); dialog = false"
+                  v-on:keyup.enter="creatroom();"
                   v-model="roomname"
                 ></v-text-field>
                 <v-text-field
                   label="Room Password"
-                  v-on:keyup.enter="creatroom(); dialog = false"
+                  v-on:keyup.enter="creatroom();"
                   v-model="roompassword"
                 ></v-text-field>
               </v-col>
@@ -110,7 +116,7 @@ import axios from 'axios';
             color="blue darken-1"
             text
             
-            @click="creatroom(); dialog = false"
+            @click="creatroom();"
           >
             Save
           </v-btn>

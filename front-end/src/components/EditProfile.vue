@@ -37,6 +37,9 @@
         
       </template>
       <v-card>
+        <v-card-title v-if="error == true"  class="justify-center">
+          <span class="red--text text-h5">Please try again!</span>
+        </v-card-title>
         <v-card-title class="justify-center">
           <span class="text-h5">Edit your profile</span>
         </v-card-title>
@@ -61,20 +64,45 @@
                   v-model="usernameEdit"
                   required
                 ></v-text-field>
-                <!-- <v-file-input
-                    accept="image/png, image/jpeg, image/bmp"
-                    placeholder="Pick an avatar"
-                    prepend-icon="mdi-camera"
-                    @change="loadImage($event)"
-                    label="Avatar"
-                    v-model="image"
-                ></v-file-input> -->
                 <input ref="file" type="file" accept="image/*" @submit.prevent @change="loadImage($event)" />
               </v-col>
             </v-row>
           </v-container>
           <small>*indicates required field</small>
         </v-card-text>
+        <v-list-group
+                no-action
+                sub-group
+                
+              >
+
+                  <template v-slot:activator>
+                    <v-list-item-content>
+                      <v-list-item-title>Enable 2FA</v-list-item-title>
+                    </v-list-item-content>
+                  </template>
+
+                  <v-avatar
+                    class="d-block text-center mx-auto mt-4"
+                    color="primary"
+                    size="400"
+                    tile
+                  >
+                    
+                    <img
+                      :elevation="4"
+                      alt="Qr"
+                      :src="QRcode"
+                    >
+                  </v-avatar>
+                  <v-list-item
+                    link
+                  >
+                    <v-list-item-title >
+                      <v-text-field v-model="verification" label="Verification code"></v-text-field>
+                    </v-list-item-title>
+                  </v-list-item>
+              </v-list-group>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
@@ -105,12 +133,15 @@ import axios from 'axios';
     props: ['avatar'],
     data: () => ({
       usernameEdit: "",
+      error: false,
       linkavatar: "",
       intra_login: "",
       status: "",
       username: "",
       image: null,
       dialog: false,
+      QRcode: "",
+      verification: "",
     }),
     methods: {
       loadImage(event) {
@@ -125,11 +156,10 @@ import axios from 'axios';
                 Authorization: token
               }
           }).then((function (res) {
-            console.log(filesb);
-            // this.avatar = files[0];
+            this.error = false;
             this.$emit('changeAvatar', res.data);
           }).bind(this)).catch(error => {
-            console.log(error);
+            this.error = true;
           });
         }
       },
@@ -148,16 +178,31 @@ import axios from 'axios';
                 Authorization: token
               }
             }).then(res => {
+              this.dialod = false;
+              this.error = false;
               this.username = this.usernameEdit;
             })
             .catch(error => {
-              console.log(error);
+              this.error = true;
             });
           }
-          
         }
-        this.dialod = false;
-        console.log(this.dialod);
+        if (this.verification.length == 6)
+        {
+          // axios.get('/user/me', {
+          //   headers: {
+          //     Authorization: token
+          // }}).then(res => {
+          //   this.linkavatar = res.data.avatar;
+          //   this.username = res.data.username;
+          //   this.usernameEdit = this.username;
+          //   this.intra_login = res.data.intra_login;
+          //   this.status = res.data.status;
+          // })
+          // .catch(error => {
+          //   console.log(error);
+          // });
+        }
       }
     },
     mounted (){
@@ -176,7 +221,15 @@ import axios from 'axios';
           this.status = res.data.status;
         })
         .catch(error => {
-          console.log(error);
+        });
+
+        axios.get('/QR', {
+          headers: {
+            Authorization: token
+        }}).then(res => {
+          this.QRcode = res.data;
+        })
+        .catch(error => {
         });
       }
 

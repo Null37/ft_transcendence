@@ -137,7 +137,6 @@ export default Vue.extend({
 
     </v-navigation-drawer>
 
-    <FriendsStatus />
     <v-main>
 
       <v-container
