@@ -28,9 +28,6 @@ async findbyID(id: number): Promise<Users | null>
 }
 
 
-
-
-
 async get_secret(id: number)
 {
   let test = await this.usersdata.findOne({where :{id: id}, select: ['secret']})
