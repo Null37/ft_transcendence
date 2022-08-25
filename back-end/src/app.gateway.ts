@@ -94,9 +94,9 @@ import { blockService } from './users/block.service';
 
 
 	@SubscribeMessage('joinRoom')
-	handleJoinRoom(client: Socket, message: {userID: number, room: string}): void {
+	handleJoinRoom(client: Socket, room: string): void {
 		//TODO: check if room is protected and if user is not banned etc...
-		client.join(message.room);
+		client.join(room);
 		// client.emit('joinedRoom', message.room);
 	}
 
