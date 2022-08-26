@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import Community from '../views/Community.vue';
 import Login from '../views/Login.vue';
 import Game from '../views/Game.vue';
+import TWOFA from '../views/2FA.vue';
 import axios from 'axios';
 
 Vue.use(VueRouter)
@@ -12,6 +13,11 @@ const routes: Array<RouteConfig> = [
     name: 'Login',
     path: '/Login',
     component: Login
+  },
+  {
+    name: '2FA',
+    path: '/2FA',
+    component: TWOFA
   },
   {
     name: 'Community',
@@ -61,6 +67,15 @@ router.beforeEach(async (to, from, next) => {
   {
     localStorage.removeItem("token");
     return next({ name: 'Login' });
+  }
+  else if (to.path === "/2FA" && to.query.id !== undefined)
+  {
+    localStorage.setItem("id", "?" + to.query.id);
+    return next({ name: '2FA' });
+  }
+  else if (to.path === "/2FA")
+  {
+    return next();
   }
   verify().then(loggedIn => {
     if (to.path === "/Login" && !loggedIn)

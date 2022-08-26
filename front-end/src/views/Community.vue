@@ -18,16 +18,17 @@ export default Vue.extend({
     name: "App",
 	sockets: {
 		msgToClient(data) {
-      this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message});
-      if (this.currentRoom == data.roomName)
-        this.showmessages.push({id: this.showmessages.length, from: "Akira", room: data.roomName, message: data.message});
-		},
-    msgToRoom(data) {
       console.log("dataaaa >> ");
       console.log(data);
-      this.messages.push({id: this.messages.length, from: "Akira", room: data.roomName, message: data.message});
+      this.messages.push({id: this.messages.length, from: data.sender, room: data.roomName, message: data.message});
       if (this.currentRoom == data.roomName)
-        this.showmessages.push({id: this.showmessages.length, from: "Akira", room: data.roomName, message: data.message});
+        this.showmessages.push({id: this.showmessages.length, from: data.sender, room: data.roomName, message: data.message});
+		},
+    msgToRoom(data) {
+      
+      this.messages.push({id: this.messages.length, from: data.sender, room: data.roomName, message: data.message});
+      if (this.currentRoom == data.roomName)
+        this.showmessages.push({id: this.showmessages.length, from: data.sender, room: data.roomName, message: data.message});
 		}
 
 
@@ -51,11 +52,17 @@ export default Vue.extend({
       placeHolder: "",
       tmp: [],
       showmessages: [{
-        blockedUsers: null,
+        id: 0,
         message: "Use /help command to see available options",
-        roomName: "",
-        sender: null,
-        state: "DM",
+        room: "",
+        from: {
+          two_factor_authentication: false,
+          id: 2,
+          username: 'asdfasfd',
+          intra_login: 'hboudhir',
+          avatar: 'https://cdn.intra.42.fr/users/hboudhir.jpg',
+          status: 'Offline'
+          },
       }],
       messages: [
       ],
@@ -90,8 +97,7 @@ export default Vue.extend({
               Authorization: token
           }}).then((function (res) {
             this.rooms.push(res.data[0]);
-            this.$socket.emit('joinRoom', res.data[0].roomName);
-            console.log("joinRoom Emited???" + res.data[0].roomName);
+            this.$socket.emit('joinRoom', roomname);
 
 
           }).bind(this))
@@ -121,9 +127,15 @@ export default Vue.extend({
                 console.log("removed");
                 // this.$emit("Addroom", res.data);
                 if (this.me[0].id < this.friendlist[i].id)
+                {
+                  console.log("left room -->"+this.me[0].id+"-"+this.friendlist[i].id);
                   this.$socket.emit('leaveRoom', this.me[0].id+"-"+this.friendlist[i].id);
+                }
                 else
+                {
+                  console.log("left room -->"+this.friendlist[i].id+"-"+this.me[0].id);
                   this.$socket.emit('leaveRoom', this.friendlist[i].id+"-"+this.me[0].id);
+                }
 
                 this.users.push(this.friendlist.find(data => data.username === username));
                 this.friendlist = this.friendlist.filter(data => data.username !== username);
@@ -151,7 +163,7 @@ export default Vue.extend({
             var tmp = this.users.find(data => data.username === username);
             this.friendlist.push(this.users.find(data => data.username === username));
             this.users = this.users.filter(data => data.username !== username);
-
+            
             if (this.me[0].id < tmp.id)
             {
               this.$socket.emit('joinDM', this.me[0].id+"-"+tmp.id);
@@ -160,6 +172,7 @@ export default Vue.extend({
             {
               this.$socket.emit('joinDM', tmp.id+"-"+this.me[0].id);
             }
+
 
           }).bind(this))
           .catch(error => {
@@ -171,42 +184,49 @@ export default Vue.extend({
         if (e.target.value === '/help')
         {
           this.showmessages.push({
-            blockedUsers: null,
             message: "Use /ban [duration] [username] to ban a user for a limited time",
-            roomName: "",
-            sender: null,
-            state: "DM",
+            roomName: this.currentRoom,
+            from: this.me[0],
           });
           this.showmessages.push({
-            blockedUsers: null,
             message: "Use /mute [duration] [username] to mute a user for a limited time",
-            roomName: "",
-            sender: null,
-            state: "DM",
+            roomName: this.currentRoom,
+            from: this.me[0],
           });
           this.showmessages.push({
-            blockedUsers: null,
             message: "Use /changepassword [password] to change/set room password(room will be protected)",
-            roomName: "",
-            sender: null,
-            state: "DM",
+            roomName: this.currentRoom,
+            from: this.me[0],
           });
           this.showmessages.push({
-            blockedUsers: null,
             message: "Use /admin [username] to set a user as administrator",
-            roomName: "",
-            sender: null,
-            state: "DM",
+            roomName: this.currentRoom,
+            from: this.me[0],
           });
+          this.placeHolder = "";
+        }
+        else if (e.target.value !== '' && e.target.value.startsWith("/"))
+        {
+          if (!this.placeHolder.startsWith("/leave") && !this.placeHolder.startsWith("/ban") && !this.placeHolder.startsWith("/mute"))
+          {
+
+            this.showmessages.push({
+              message: "Unknown command. Please use /help.",
+              roomName: this.currentRoom,
+              from: this.me[0],
+            });
+          }
           this.placeHolder = "";
         }
         else if (e.target.value !== '' && this.currentRoom != '')
         {
-          this.showmessages.push({id: this.showmessages.length, from: "Akira", message: e.target.value});
+          this.showmessages.push({id: this.showmessages.length, room: this.currentroom, from: this.me[0], message: e.target.value});
           if (this.roomorfriend == true)
             this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, sender: this.me[0].id, receiver: this.receiverID})
           else
+          {
             this.$socket.emit('msgToRoom', {text: this.placeHolder, room: this.currentRoom, userID: this.me[0].id})
+          }
           this.placeHolder = "";
         }
       },
@@ -349,8 +369,6 @@ export default Vue.extend({
             console.log(error);
           });
 
-          for (let i = 0; i < this.rooms.length; ++i)
-            this.$socket.emit('joinDM', this.rooms.roomName);
           for (let i = 0; i < this.friendlist.length; i++)
           {
             if (this.me[0].id < this.friendlist[i].id)
@@ -381,10 +399,11 @@ export default Vue.extend({
       }}).then((function (res) {
         this.rooms = res.data;
         console.log("rooooooms");
-        console.log(this.rooms);
+        console.log(res.data);
         for(let i = 0; i < this.rooms.length; i++)
+        {
           this.$socket.emit('joinRoom', this.rooms[i].roomName);
-
+        }
 
       }).bind(this))
       .catch(error => {
@@ -468,13 +487,13 @@ export default Vue.extend({
                       class=""
                     >
                       <v-list-item-avatar class="align-self-start mr-2">
-                        <Profile :avatar="avatar" :username="message.from" />                   
+                        <Profile :avatar="message.from.avatar" :username="message.from.username" />                   
                                 
                       </v-list-item-avatar>
                       <v-list-item-content class="received-message">
                         <v-card color="grey darken-3" class="flex-none">                        
                           <v-card-text class="white--text pa-2 d-flex flex-column">
-                            <span   class="text-body-2 font-weight-bold">{{message.from}} <span class="text-caption">{{message.time}}</span> </span>                                             
+                            <span   class="text-body-2 font-weight-bold">{{message.from.username}} </span>                                             
                             <span class="align-self-start text-subtitle-1">{{ message.message }}</span>
                             
                           </v-card-text>
@@ -534,6 +553,7 @@ export default Vue.extend({
           <v-btn
             color="blue darken-1"
             text
+            @keyup.enter="setUsernameMethod"
             @click="setUsernameMethod"
           >
             Save
