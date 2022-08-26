@@ -309,6 +309,7 @@ export default Vue.extend({
         console.log(error);
       });
 
+      this.$socket.emit('connectUser', this.me[0].username, "blabla");
 
       axios.get('/users', {
         headers: {
