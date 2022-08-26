@@ -7,6 +7,14 @@ export default Vue.extend({
     data: () => ({
         drawer: null,
         }),
+    sockets: {
+		receiveFromServer(data) {
+            console.log("receive data from server == > ");
+            console.log(data);
+		},
+
+
+	},
     mounted()
     {
         const HEIGHT = 600;
