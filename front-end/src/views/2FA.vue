@@ -5,7 +5,8 @@ import axios from 'axios';
 export default Vue.extend({
     data: () => ({
       drawer: null,
-      verification: ""
+      verification: "",
+      error: false
     }),
     methods: {
       verify: function()
@@ -23,15 +24,20 @@ export default Vue.extend({
             axios.put('/2FA/verify', data,{}
             ).then((function (res) {
               localStorage.setItem("token", "Bearer " + res.data.token);
+              this.error = false;
               this.$router.push({ path: '/Game' })
               this.$router.go(1);
             }).bind(this))
-            .catch(error => {
-              console.log(error);
-            });
+            .catch((function (err)  {
+              this.error = true;
+
+            }).bind(this));
           }
+          else
+            this.error = true;
 
         }
+        
       }
     }
 });
@@ -53,6 +59,7 @@ export default Vue.extend({
             md="4"
           >
             <div class="text-center">
+              <span v-if="error == true" class="red--text text-h5">Error: Wrong number</span>
               <v-text-field v-model="verification" v-on:keyup.enter="verify();" label="Verification code"></v-text-field>
             </div>
           </v-col>
