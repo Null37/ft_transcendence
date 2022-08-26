@@ -164,17 +164,15 @@ export default Vue.extend({
             this.friendlist.push(this.users.find(data => data.username === username));
             this.users = this.users.filter(data => data.username !== username);
             
-            if (tmp.length > 0)
+            if (this.me[0].id < tmp.id)
             {
-              if (this.me[0].id < tmp.id)
-              {
-                this.$socket.emit('joinDM', this.me[0].id+"-"+tmp.id);
-              }
-              else
-              {
-                this.$socket.emit('joinDM', tmp.id+"-"+this.me[0].id);
-              }
+              this.$socket.emit('joinDM', this.me[0].id+"-"+tmp.id);
             }
+            else
+            {
+              this.$socket.emit('joinDM', tmp.id+"-"+this.me[0].id);
+            }
+
 
           }).bind(this))
           .catch(error => {
@@ -186,32 +184,24 @@ export default Vue.extend({
         if (e.target.value === '/help')
         {
           this.showmessages.push({
-            blockedUsers: null,
             message: "Use /ban [duration] [username] to ban a user for a limited time",
             roomName: "",
-            sender: null,
-            state: "DM",
+            sender: this.me[0],
           });
           this.showmessages.push({
-            blockedUsers: null,
             message: "Use /mute [duration] [username] to mute a user for a limited time",
             roomName: "",
-            sender: null,
-            state: "DM",
+            sender: this.me[0],
           });
           this.showmessages.push({
-            blockedUsers: null,
             message: "Use /changepassword [password] to change/set room password(room will be protected)",
             roomName: "",
-            sender: null,
-            state: "DM",
+            sender: this.me[0],
           });
           this.showmessages.push({
-            blockedUsers: null,
             message: "Use /admin [username] to set a user as administrator",
             roomName: "",
-            sender: null,
-            state: "DM",
+            sender: this.me[0],
           });
           this.placeHolder = "";
         }
@@ -484,7 +474,7 @@ export default Vue.extend({
                       class=""
                     >
                       <v-list-item-avatar class="align-self-start mr-2">
-                        <Profile :avatar="avatar" :username="message.from.username" />                   
+                        <Profile :avatar="message.from.avatar" :username="message.from.username" />                   
                                 
                       </v-list-item-avatar>
                       <v-list-item-content class="received-message">
@@ -550,6 +540,7 @@ export default Vue.extend({
           <v-btn
             color="blue darken-1"
             text
+            @keyup.enter="setUsernameMethod"
             @click="setUsernameMethod"
           >
             Save

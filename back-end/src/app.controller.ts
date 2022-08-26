@@ -9,11 +9,13 @@ import { get, request } from 'http';
 import { stringify } from 'querystring';
 import { write } from 'fs';
 import { body_dto } from './DTO/body.dto';
+import { UsersService } from './users/users.service';
 
 
 @Controller()
 export class AppController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService,
+    private readonly userdata: UsersService) {}
 
   @UseGuards(pass_42Guard)
   @Get('login')
@@ -23,11 +25,13 @@ export class AppController {
     console.log("two ==> ", req.user.two_factor_authenticatio)
     if(req.user.two_factor_authentication == true)
     {
+      console.log("id ===> " , req.user.id)
       // redirect to new 2fa without set token
-      // return res.redirect(http://localhost:8080/2FA)
+       return res.redirect("http://localhost:8080/2FA?id=" + req.user.id)
     }
     else
     {
+      
         const accessToken = this.authService.login(req.user)
         console.log(accessToken)
         console.log("username ==> ", req.user.username);
@@ -71,9 +75,11 @@ export class AppController {
   }
 
   @Put('2FA/verify')
-  async verfiy_2fa(@Body(new ValidationPipe()) bd: body_dto)
+  async verfiy_2fa(@Body(new ValidationPipe()) bd: body_dto, @Response() res)
   {
+    console.log("id , number", bd.id, bd.number)
     let user = await this.authService.get_se(bd.id)
+    let findit = await this.userdata.findbyId(bd.id)
     if(user == null)
       throw  new NotFoundException("user not found");
     var speakeasy = require("speakeasy");
@@ -81,10 +87,20 @@ export class AppController {
        encoding: 'base32',
        token: bd.number });
     console.log(bd);
-    if(verified == true)
+    console.log("findit ===> ", findit)
+    console.log("findit two ===> ", findit.two_factor_authentication)
+
+    if(verified == true && findit.two_factor_authentication == false)
     {
       // set token and redirct to game?token
       this.authService.update_info({id: bd.id, two_factor_authentication: true})
+      return res.status(HttpStatus.OK).send()
+    }
+    if (verified == true && findit.two_factor_authentication == true)
+    {
+      console.log("ana hna ")
+      const accessToken = this.authService.login(findit)
+      return res.json({token: accessToken});
     }
     else
     {
@@ -92,6 +108,15 @@ export class AppController {
     }
   }
   
+  @UseGuards(jwtGuard)
+  @Get('2FA/disable')
+  async disable_2FA(@Request() req)
+  {
+    let user = await this.authService.get_user(req.user.name)
+    if(user == null)
+      throw new NotFoundException()
+    this.authService.update_info({id: req.user.sub, two_factor_authentication: false})
+  }
 
   @UseGuards(jwtGuard)
   @Get('verify')

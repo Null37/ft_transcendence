@@ -75,14 +75,14 @@
                 sub-group
                 
               >
-
                   <template v-slot:activator>
-                    <v-list-item-content>
-                      <v-list-item-title>Enable 2FA</v-list-item-title>
+                    <v-list-item-content >
+                      <v-list-item-title>Two Factor Authentication</v-list-item-title>
                     </v-list-item-content>
                   </template>
 
                   <v-avatar
+                    v-if="twofactor == false"
                     class="d-block text-center mx-auto mt-4"
                     color="primary"
                     size="400"
@@ -96,12 +96,24 @@
                     >
                   </v-avatar>
                   <v-list-item
+                    v-if="twofactor == false"
                     link
                   >
-                    <v-list-item-title >
-                      <v-text-field v-model="verification" label="Verification code"></v-text-field>
+                    <v-list-item-title  >
+                      <v-text-field v-on:keyup.enter="updateusername()" v-model="verification" label="Verification code"></v-text-field>
                     </v-list-item-title>
                   </v-list-item>
+                  <v-list-item
+                    v-else
+                    link
+                  >
+                    <v-list-item-title  >
+                      <v-btn @click="disbale2fa()" block>
+                        Disable 2FA
+                      </v-btn>
+                    </v-list-item-title>
+                  </v-list-item>
+
               </v-list-group>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -115,7 +127,7 @@
           <v-btn
             color="blue darken-1"
             text
-            @click="updateusername(); dialog = false"
+            @click="updateusername();"
           >
             Save
           </v-btn>
@@ -142,8 +154,33 @@ import axios from 'axios';
       dialog: false,
       QRcode: "",
       verification: "",
+      id: -1,
+      twofactor: false
     }),
     methods: {
+      disbale2fa(){
+        const token = localStorage.getItem('token');
+        if (token) {
+          axios.get("/2FA/disable", {
+            headers: {
+                Authorization: token
+              }
+          }).then((function (res) {
+            this.twofactor = false;
+            axios.get('/QR', {
+                headers: {
+                  Authorization: token
+              }}).then(res => {
+                this.QRcode = res.data;
+              })
+              .catch((function (err) {
+                this.error = true;
+              }).bind(this));
+          }).bind(this)).catch((function (err) {
+            this.error = true;
+          }).bind(this));
+        }
+      },
       loadImage(event) {
         const token = localStorage.getItem('token');
         const { files } = event.target;
@@ -158,9 +195,9 @@ import axios from 'axios';
           }).then((function (res) {
             this.error = false;
             this.$emit('changeAvatar', res.data);
-          }).bind(this)).catch(error => {
+          }).bind(this)).catch((function (err) {
             this.error = true;
-          });
+          }).bind(this));
         }
       },
       updateusername: function()
@@ -182,27 +219,36 @@ import axios from 'axios';
               this.error = false;
               this.username = this.usernameEdit;
             })
-            .catch(error => {
+            .catch((function (err) {
               this.error = true;
-            });
+            }).bind(this));
           }
         }
+        else
+          this.error = true;
         if (this.verification.length == 6)
         {
-          // axios.get('/user/me', {
-          //   headers: {
-          //     Authorization: token
-          // }}).then(res => {
-          //   this.linkavatar = res.data.avatar;
-          //   this.username = res.data.username;
-          //   this.usernameEdit = this.username;
-          //   this.intra_login = res.data.intra_login;
-          //   this.status = res.data.status;
-          // })
-          // .catch(error => {
-          //   console.log(error);
-          // });
+          if (/^[0-9]+$/.test(this.verification))
+          {
+            const data = {
+              id: this.id,
+              number: +this.verification
+            };
+  
+            console.log(data);
+            axios.put('/2FA/verify', data, {}).then((function (res) {
+              this.dialod = false;
+              this.error = false;
+              this.twofactor = true;
+            }).bind(this))
+            .catch((function (err) {
+              this.error = true;
+            }).bind(this));
+          }
+
         }
+        else
+          this.error = true;
       }
     },
     mounted (){
@@ -219,6 +265,8 @@ import axios from 'axios';
           this.usernameEdit = this.username;
           this.intra_login = res.data.intra_login;
           this.status = res.data.status;
+          this.id = res.data.id;
+          this.twofactor = res.data.two_factor_authentication;
         })
         .catch(error => {
         });
