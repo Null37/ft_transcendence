@@ -12,6 +12,7 @@ import { BlockCtroller } from './block.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { historyCtroller } from './history.controller';
+import { GameGateway } from './game.gateway';
 
 @Module({
   imports: [AuthModule, 
@@ -32,6 +33,6 @@ import { historyCtroller } from './history.controller';
     ServeStaticModule.forRoot({rootPath: join('/back-end/src', 'public'), serveRoot: '/public/',serveStaticOptions: {index: false},})
   ],
   controllers: [AppController, FrinedCtroller, BlockCtroller, historyCtroller],
-  providers: [AppService, pass_42Guard, AppGateway],
+  providers: [AppService, pass_42Guard, AppGateway, GameGateway],
 })
 export class AppModule {}
