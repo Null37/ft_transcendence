@@ -185,24 +185,37 @@ export default Vue.extend({
         {
           this.showmessages.push({
             message: "Use /ban [duration] [username] to ban a user for a limited time",
-            roomName: "",
-            sender: this.me[0],
+            roomName: this.currentRoom,
+            from: this.me[0],
           });
           this.showmessages.push({
             message: "Use /mute [duration] [username] to mute a user for a limited time",
-            roomName: "",
-            sender: this.me[0],
+            roomName: this.currentRoom,
+            from: this.me[0],
           });
           this.showmessages.push({
             message: "Use /changepassword [password] to change/set room password(room will be protected)",
-            roomName: "",
-            sender: this.me[0],
+            roomName: this.currentRoom,
+            from: this.me[0],
           });
           this.showmessages.push({
             message: "Use /admin [username] to set a user as administrator",
-            roomName: "",
-            sender: this.me[0],
+            roomName: this.currentRoom,
+            from: this.me[0],
           });
+          this.placeHolder = "";
+        }
+        else if (e.target.value !== '' && e.target.value.startsWith("/"))
+        {
+          if (!this.placeHolder.startsWith("/leave") && !this.placeHolder.startsWith("/ban") && !this.placeHolder.startsWith("/mute"))
+          {
+
+            this.showmessages.push({
+              message: "Unknown command. Please use /help.",
+              roomName: this.currentRoom,
+              from: this.me[0],
+            });
+          }
           this.placeHolder = "";
         }
         else if (e.target.value !== '' && this.currentRoom != '')
