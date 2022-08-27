@@ -308,8 +308,10 @@ export default Vue.extend({
       .catch(error => {
         console.log(error);
       });
-
-      this.$socket.emit('connectUser', this.me[0].username, "blabla");
+	setTimeout((() => {
+		this.$socket.emit('connectUser', this.me[0].username, "blabla");
+		
+	}).bind(this), 1000);
 
       axios.get('/users', {
         headers: {

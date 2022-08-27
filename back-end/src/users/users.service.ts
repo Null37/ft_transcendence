@@ -62,8 +62,6 @@ create(users_id: user_dto) // dont forget to add real DTO
     try
     {
       let newuser = await this.usersdata.preload(dto_update);
-      console.log("no error")
-      console.log(newuser)
       if(newuser == undefined)
           return null;
       else

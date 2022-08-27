@@ -58,7 +58,8 @@ export class RoomsService {
 			console.log("Room already exists")
 			let usrexist = await this.roomUser.findOne({where: {userID: +userID, roomName: room_name}})
 			
-			if (usrexist && usrexist.duration && usrexist.duration > Date.now())
+			// if (usrexist && usrexist.status == 1 && usrexist.duration && +usrexist.duration > Date.now())
+			if (usrexist && usrexist.status == 2 && usrexist.duration && +usrexist.duration > Date.now())
 				return "User is banned from this chat";
 			
 			console.log(usrexist)
@@ -79,7 +80,7 @@ export class RoomsService {
 
 				}
 				console.log("user not found")
-				let user = this.roomUser.create({userID: +userID, role:"user", status:0, roomName: room_name, duration: 0})
+				let user = this.roomUser.create({userID: +userID, role:"user", status:0, roomName: room_name, duration: "0"})
 				console.log("RoomUser ===> ", user)
 				await this.roomUser.save(user)
 				let res = await this.roomUser.find({where: {userID: +userID, roomName: room_name}})

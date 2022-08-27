@@ -35,9 +35,9 @@ export class RoomUsers
 	// rooms: Rooms
 
 	@Column({
-		default: 0
+		default: "0"
 	})
-	duration: number
+	duration: string
 
 	@Column()
 	status: number

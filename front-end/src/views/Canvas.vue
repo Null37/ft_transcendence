@@ -1,6 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
-import P5 from "p5";
+// import P5 from "p5";
 // import "p5/lib/addons/p5.dom";
 
 export default Vue.extend({

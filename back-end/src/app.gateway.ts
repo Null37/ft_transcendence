@@ -36,11 +36,21 @@ import { blockService } from './users/block.service';
 	}
   
 	handleConnection(client: Socket, ...args: any[]) {
-	//   this.logger.log(`Client connected:    ${client}`);
+	  this.logger.log(`Client connected:    ${client}`);
+	  
 	//   console.log(`Client connected:    ${client.}`);
 	}
 
-
+	@SubscribeMessage('connectUser')
+	async handleConnectuser(client: Socket, username: string, label: string)
+	{
+		this.logger.log("reached connect user")
+		let usr = await this.usersService.find_username("boodeer");
+		// if (usr)
+		// {
+			console.log(usr)
+		// }
+	}
 
 
 
@@ -65,6 +75,7 @@ import { blockService } from './users/block.service';
 	//   return { event: 'msgToClient', data: text };
 	}
 
+	// deprecated
 	@SubscribeMessage('InteractUsers')
 	async handleInteractUser(client: Socket, message: {user1: number, user2: number, interaction: string, duration: number, roomName: string}): Promise<any> {
 
@@ -86,7 +97,7 @@ import { blockService } from './users/block.service';
 			return ;
 
 		usr2.role = message.interaction;
-		usr2.duration = Date.now() +  message.duration;
+		// usr2.duration = Date.now() +  message.duration;
 		await this.roomsService.roomUser.save(usr2);
 		if (message.interaction == "ban")
 			client.broadcast.to(message.roomName).emit('leaveRoom', message.user2) // must be checked in the front end to kick the banned user.
@@ -168,18 +179,47 @@ import { blockService } from './users/block.service';
 		/* 
 			1- Check if the receiver is muted/banned in the room
 		*/
-		
+		// {text: this.placeHolder, room: this.currentRoom, userID: this.me[0].id}
+
 		this.logger.log(`received a message: ${message.text} from ${client.id} will be sent to ${message.room}`)
 		
-		console.log(message)
-		// let tmp = await this.blockService.find_blocked(2, 11)
-		// console.log("blocked list ", tmp, " userID: ", message.userID);
+		
+		let usr = await this.roomsService.roomUser.findOne({where: {userID: message.userID, roomName: message.room}})
+		if ((usr.status == 1 && +usr.duration > Date.now()))
+			return ;
+		
+			if (message.text.startsWith("/ban ") || message.text.startsWith("/mute "))
+		{
+			if (usr.role == "user")
+				return ;
 
-		// tmp.id 
+			console.log(usr)
+			let arr = message.text.split(' ');
+			console.log(arr[1] + " ====> " + arr[2])
+			if (arr.length != 3)
+				return ;
+			let valid = /^[0-9]+$/.test(arr[2]) ? +arr[2] : -1;
+			if (valid == -1)
+				return ;
+	
+			try {
+				let res = await this.usersService.find_username(arr[1])
+				if (!res)
+					return ;
+				let foo = await this.roomsService.roomUser.findOneOrFail({where: {userID: res.id, roomName: message.room}})
+				foo.duration = (Date.now() + (valid * 1000)).toString();
+				foo.status = arr[0] == "/ban" ? 2 : 1;
+				await this.roomsService.roomUser.save(foo);
+
+				//! add ban socket emit here
+			} catch (error) {
+				console.log("entered the catch pat")
+			}
+			return ;
+		}
 
 		let userProfile = await this.usersService.findbyId(message.userID)
 
-		
 		client.broadcast.to(message.room).emit('msgToRoom',
 		{
 			roomName: message.room,

@@ -46,17 +46,13 @@ export class AppController {
   async send_Qr_code(@Request() req)
   {
     let user = await this.authService.get_user(req.user.name)
-    console.log("user ====> ", user)
     if(user == null)
       throw new NotFoundException('user not found')
-    console.log("adctive 2FA ==> ", "<", user.two_factor_authentication, ">")
     var speakeasy = require("speakeasy");
     if(user.two_factor_authentication == false)
     {
       // start generate secret 
-      console.log("here")
       var secret = speakeasy.generateSecret({name: "ft_transcendence (" + user.username +")"});
-      console.log("secret obj", secret)
       await this.authService.update_info({id: user.id, secret: secret.base32})
       var QRcode = require('qrcode')
       const generateQR = async (text) => {
