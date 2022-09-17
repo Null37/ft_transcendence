@@ -5,68 +5,126 @@ import UserAvatar from '../components/UserAvatar.vue';
 import FriendList from '../components/FriendList.vue';
 import FriendsStatus from '../components/FriendsStatus.vue';
 import EditProfile from '@/components/EditProfile.vue';
-import axios from 'axios';  
+import axios from 'axios';
+import io from 'socket.io-client';
+import { FingerprintSpinner } from 'epic-spinners';
+import { AtomSpinner } from 'epic-spinners';
+import { SelfBuildingSquareSpinner  } from 'epic-spinners';
+import { OrbitSpinner } from 'epic-spinners';
+import { SemipolarSpinner  } from 'epic-spinners';
+import { FulfillingSquareSpinner } from 'epic-spinners';
+import { SpringSpinner } from 'epic-spinners';
+import { HalfCircleSpinner } from 'epic-spinners';
+
+import VueToast from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
+Vue.use(VueToast, { position: 'top-right' });
 
 export default Vue.extend({
     name: "App",
+
     methods: {
-      setUsernameMethod: function()
-      {
+      setUsernameMethod: function() {
         if (this.usernameEdit.length >= 5 && this.usernameEdit.length <= 10)
         {
           const token = localStorage.getItem('token');
 
-
           if (token)
           {
-            axios.patch('/update', {
-              username: this.usernameEdit 
-            }, {
-              headers: {
-                Authorization: token
-              }
-            }).then(res => {
+            axios.patch('/update',
+              { username: this.usernameEdit },
+              { headers: { Authorization: token }
+            })
+            .then(res => {
               this.username = this.usernameEdit;
               this.setUsername = false;
             })
-            .catch(error => {
-              console.log(error);
-            });
+            .catch(error => { console.log(error); });
           }
         }
+      },
+      emitJoin() {
+        console.log('EMITTING JOIN');
+        
+        this.gameSocket.emit('joinQueue');
+        this.isLoading = true;
+      },
+      emitCancel() {
+        console.log('EMITTING CANCEL');
+
+        this.gameSocket.emit('cancelQueue');
+        this.isLoading = false;
+      },
+      testToast() {
+        Vue.$toast.open('<span class="text-body-1">Howdy!</span>');
       }
     },
+
     data: () => ({
-      usernameEdit: "",
-      setUsername: false,
-      avatar: "",
-      intra_login: "",
-      status: "",
-      username: "",
-      drawer: null
+      usernameEdit: "" as string,
+      setUsername: false as Boolean,
+      avatar: "" as string,
+      intra_login: "" as string,
+      status: "" as string,
+      username: "" as string,
+      drawer: null,
+      gameSocket: null as any,
+      isLoading: false as Boolean,
+      socketURL: "" as string,
     }),
-	mounted () {
-    const token = localStorage.getItem('token');
-    
-    if (token)
-    {
-      axios.get('/user/me', {
-        headers: {
-          Authorization: token
-      }}).then(res => {
-        this.avatar = res.data.avatar;
-        this.username = res.data.username;
-        this.intra_login = res.data.intra_login;
-        this.status = res.data.status;
-        if (this.username === null)
-          this.setUsername = true;
-      })
-      .catch(error => {
-        console.log(error);
+
+    created () {
+      this.socketURL = location.protocol + "//" + location.hostname + ":" + 3000 + "/game";
+      // console.log(this.socketURL, 'SOCKET URL GAME.VUE');
+
+      this.gameSocket = io(this.socketURL, {
+        transportOptions: {
+          polling: { extraHeaders: { Authorization: 'Bearer ' + localStorage.getItem('token') } },
+        },
       });
-    }
-	},
-  components: { TopBar, UserAvatar, FriendList, FriendsStatus, EditProfile }
+
+      this.gameSocket.on('queueResponse', (data: any) => {
+        console.log('CLIENT: GOT ACKNOWLEDGMENT FROM SERVER');
+
+        // redirection
+        if (typeof data.identifiers === 'object' && typeof data.identifiers[0]?.id === 'string')
+          // send id to ping pong view
+          this.$router.push({ name: 'Play', query: { match: "" + data.identifiers[0].id, } })
+        else
+          // feedback
+          console.error('Error Occured: queueResponse', );
+
+        this.isLoading = false;
+      });
+    },
+
+    mounted () {
+      const token = localStorage.getItem('token');
+
+      if (token)
+      {
+        axios.get('/user/me', {
+          headers: {
+            Authorization: token
+        }}).then(res => {
+          this.avatar = res.data.avatar;
+          this.username = res.data.username;
+          this.intra_login = res.data.intra_login;
+          this.status = res.data.status;
+          if (this.username === null)
+            this.setUsername = true;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      }
+      
+      if (this.$route.params.error !== undefined) {
+
+        Vue.$toast.error(this.$route.params.error);
+      }
+    },
+    components: { TopBar, UserAvatar, FriendList, FriendsStatus, EditProfile, FingerprintSpinner, AtomSpinner, SelfBuildingSquareSpinner, OrbitSpinner, SemipolarSpinner, FulfillingSquareSpinner, SpringSpinner, HalfCircleSpinner }
 });
 </script>
 
@@ -149,14 +207,58 @@ export default Vue.extend({
           <v-col
             cols="12"
           >
+          <v-btn
+          color="white" class="black--text"
+          x-large
+          v-on:click="testToast()"
+          >
+              Show Toast
+          </v-btn>
             <div class="text-center">
-                <v-btn
-                color="white"
-                class="black--text"
-                x-large
-                >
+              <v-btn v-if="!isLoading"
+              color="white" class="black--text"
+              x-large
+              v-on:click="emitJoin()"
+              >
                   Search for Game
-                  </v-btn>
+              </v-btn>
+
+              <v-btn v-if="isLoading"
+              color="white" class="black--text"
+              x-large
+              v-on:click="emitCancel()"
+              >
+                <!-- <fingerprint-spinner
+                  :animation-duration=1000
+                  :size="50"
+                  color="#666"
+                /> -->
+                <!-- <atom-spinner
+                  :animation-duration=1000
+                  :size="50"
+                  color="#444"
+                /> -->
+                <!-- <half-circle-spinner
+                  :animation-duration=1000
+                  :size="50"
+                  color="#444"
+                /> -->
+                <semipolar-spinner
+                  :animation-duration=1000
+                  :size="50"
+                  color="#444"
+                />
+                <!-- <orbit-spinner
+                  :animation-duration=1000
+                  :size="50"
+                  color="#444"
+                /> -->
+                <!-- <self-building-square-spinner
+                  :animation-duration=1000
+                  :size="50"
+                  color="#444"
+                /> -->
+              </v-btn>
             </div>
           </v-col>
         </v-row>
@@ -225,5 +327,8 @@ export default Vue.extend({
 {
   display: inline-flex;
 }
-</style>
 
+.v-toast {
+    font-family: Helvetica, sans-serif;
+}
+</style>

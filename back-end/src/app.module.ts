@@ -13,11 +13,14 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { historyCtroller } from './history.controller';
 import { GameGateway } from './game.gateway';
+import { CanvasGateway } from './canvas.gateway';
+import { GamesModule } from './games/games.module';
 
 @Module({
   imports: [AuthModule, 
     UsersModule,
-	RoomsModule,
+    RoomsModule,
+    GamesModule,
     TypeOrmModule.forRoot(
     {
         type: 'postgres',
@@ -33,6 +36,6 @@ import { GameGateway } from './game.gateway';
     ServeStaticModule.forRoot({rootPath: join('/back-end/src', 'public'), serveRoot: '/public/',serveStaticOptions: {index: false},})
   ],
   controllers: [AppController, FrinedCtroller, BlockCtroller, historyCtroller],
-  providers: [AppService, pass_42Guard, AppGateway, GameGateway],
+  providers: [AppService, pass_42Guard, AppGateway, GameGateway, CanvasGateway],
 })
 export class AppModule {}

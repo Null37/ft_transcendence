@@ -16,24 +16,21 @@ import { SocketInstance } from '@/main';
 // })
 export default Vue.extend({
     name: "App",
-	sockets: {
-		msgToClient(data) {
-      console.log("dataaaa >> ");
-      console.log(data);
-      this.messages.push({id: this.messages.length, from: data.sender, room: data.roomName, message: data.message});
-      if (this.currentRoom == data.roomName)
-        this.showmessages.push({id: this.showmessages.length, from: data.sender, room: data.roomName, message: data.message});
-		},
-    msgToRoom(data) {
-      
-      this.messages.push({id: this.messages.length, from: data.sender, room: data.roomName, message: data.message});
-      if (this.currentRoom == data.roomName)
-        this.showmessages.push({id: this.showmessages.length, from: data.sender, room: data.roomName, message: data.message});
-		}
-
-
-
-	},
+    sockets: {
+      msgToClient(data) {
+        console.log("dataaaa >> ");
+        console.log(data);
+        this.messages.push({id: this.messages.length, from: data.sender, room: data.roomName, message: data.message});
+        if (this.currentRoom == data.roomName)
+          this.showmessages.push({id: this.showmessages.length, from: data.sender, room: data.roomName, message: data.message});
+      },
+      msgToRoom(data) {
+        
+        this.messages.push({id: this.messages.length, from: data.sender, room: data.roomName, message: data.message});
+        if (this.currentRoom == data.roomName)
+          this.showmessages.push({id: this.showmessages.length, from: data.sender, room: data.roomName, message: data.message});
+      }
+    },
     data: () => ({
       setUsername: false,
       Title: "Add new friends or join rooms to start chatting",
@@ -302,16 +299,18 @@ export default Vue.extend({
       }}).then(async (res) => {
         await this.me.push(res.data);
         this.avatar = this.me[0].avatar;
-        if (this.me.username === null)
+        if (this.me[0].username === null)
           this.setUsername = true;
       })
       .catch(error => {
         console.log(error);
       });
-	setTimeout((() => {
-		this.$socket.emit('connectUser', this.me[0].username, "blabla");
-		
-	}).bind(this), 1000);
+
+      // this.$socket.emit('connectUser', this.me[0].username, "blabla");
+
+      this.$public.connect();
+      this.$public.emit('msgToServer', "blabla");
+
 
       axios.get('/users', {
         headers: {

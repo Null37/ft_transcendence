@@ -1,5 +1,6 @@
 
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm"
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { Games } from "./games.entity"
 
 
 @Entity()
@@ -28,6 +29,12 @@ export class Users
     two_factor_authentication: boolean = false
 
 
-    @Column("text", { array: true, default: [], nullable: false })
-    socket_savier: string[]
+	@Column("text", { array: true, default: [], nullable: false })
+	socket_savier: string[]
+
+    @OneToMany(() => Games, games => games.player_one)
+    // hosted: Games[];
+    @OneToMany(() => Games, games => games.player_two)
+    // joined: Games[];
+    games: Games[];
 }

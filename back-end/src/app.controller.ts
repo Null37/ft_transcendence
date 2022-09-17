@@ -10,11 +10,13 @@ import { stringify } from 'querystring';
 import { write } from 'fs';
 import { body_dto } from './DTO/body.dto';
 import { UsersService } from './users/users.service';
+import { GamesService } from "./games/games.service";
 
 
 @Controller()
 export class AppController {
   constructor(private readonly authService: AuthService,
+		private readonly gamesservice: GamesService,
     private readonly userdata: UsersService) {}
 
   @UseGuards(pass_42Guard)
@@ -25,7 +27,7 @@ export class AppController {
     console.log("two ==> ", req.user.two_factor_authenticatio)
     if(req.user.two_factor_authentication == true)
     {
-      console.log("id ===> " , req.user.id)
+      // console.log("id ===> " , req.user.id)
       // redirect to new 2fa without set token
        return res.redirect("http://localhost:8080/2FA?id=" + req.user.id)
     }
@@ -33,9 +35,9 @@ export class AppController {
     {
       
         const accessToken = this.authService.login(req.user)
-        console.log(accessToken)
-        console.log("username ==> ", req.user.username);
-        console.log("false")
+        // console.log(accessToken)
+        // console.log("username ==> ", req.user.username);
+        // console.log("false")
         return res.redirect("http://localhost:8080/Game?token="+accessToken);
       }
     console.log("==============================================")
@@ -46,13 +48,17 @@ export class AppController {
   async send_Qr_code(@Request() req)
   {
     let user = await this.authService.get_user(req.user.name)
+    // console.log("user ====> ", user)
     if(user == null)
       throw new NotFoundException('user not found')
+    // console.log("adctive 2FA ==> ", "<", user.two_factor_authentication, ">")
     var speakeasy = require("speakeasy");
     if(user.two_factor_authentication == false)
     {
       // start generate secret 
+      // console.log("here")
       var secret = speakeasy.generateSecret({name: "ft_transcendence (" + user.username +")"});
+      // console.log("secret obj", secret)
       await this.authService.update_info({id: user.id, secret: secret.base32})
       var QRcode = require('qrcode')
       const generateQR = async (text) => {
@@ -193,4 +199,17 @@ export class AppController {
   }
 
 
+
+  @UseGuards(jwtGuard)
+  @Get('verify_game/:id')
+  async verify_game(@Param('id') gameId) // get information about a game
+  {
+    // search for game using ID
+    let game = null;
+
+    try { game = await this.gamesservice.get_game(gameId); }
+    catch (error) { console.log('ERROR OCCURED VERIFY GAME', error); }
+
+    return game;
+  }
 }

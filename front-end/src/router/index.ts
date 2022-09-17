@@ -16,8 +16,8 @@ const routes: Array<RouteConfig> = [
     component: Login
   },
   {
-    name: 'Canvas',
-    path: '/Canvas',
+    name: 'Play',
+    path: '/Play',
     component: Canvas
   },
   {
