@@ -202,7 +202,7 @@ import axios from 'axios';
       },
       updateusername: function()
       {
-        if (this.usernameEdit.length >= 5 && this.usernameEdit.length <= 10 && this.usernameEdit !== this.username)
+        if (this.usernameEdit && this.usernameEdit.length >= 5 && this.usernameEdit.length <= 10 && this.usernameEdit !== this.username)
         {
           const token = localStorage.getItem('token');
 
