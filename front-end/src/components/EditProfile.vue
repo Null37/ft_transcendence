@@ -204,6 +204,7 @@ import axios from 'axios';
       {
         if (this.usernameEdit && this.usernameEdit.length >= 5 && this.usernameEdit.length <= 10 && this.usernameEdit !== this.username)
         {
+			console.log("username == ", this.usernameEdit);
           const token = localStorage.getItem('token');
 
           if (token)

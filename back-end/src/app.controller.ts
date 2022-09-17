@@ -23,24 +23,16 @@ export class AppController {
   @Get('login')
   async login(@Request() req, @Response() res) 
   {
-    console.log("==============================================")
-    console.log("two ==> ", req.user.two_factor_authenticatio)
     if(req.user.two_factor_authentication == true)
     {
-      // console.log("id ===> " , req.user.id)
-      // redirect to new 2fa without set token
        return res.redirect("http://localhost:8080/2FA?id=" + req.user.id)
     }
     else
     {
       
         const accessToken = this.authService.login(req.user)
-        // console.log(accessToken)
-        // console.log("username ==> ", req.user.username);
-        // console.log("false")
         return res.redirect("http://localhost:8080/Game?token="+accessToken);
       }
-    console.log("==============================================")
 
   }
   @UseGuards(jwtGuard)
@@ -48,10 +40,8 @@ export class AppController {
   async send_Qr_code(@Request() req)
   {
     let user = await this.authService.get_user(req.user.name)
-    // console.log("user ====> ", user)
     if(user == null)
       throw new NotFoundException('user not found')
-    // console.log("adctive 2FA ==> ", "<", user.two_factor_authentication, ">")
     var speakeasy = require("speakeasy");
     if(user.two_factor_authentication == false)
     {
@@ -79,7 +69,6 @@ export class AppController {
   @Put('2FA/verify')
   async verfiy_2fa(@Body(new ValidationPipe()) bd: body_dto, @Response() res)
   {
-    console.log("id , number", bd.id, bd.number)
     let user = await this.authService.get_se(bd.id)
     let findit = await this.userdata.findbyId(bd.id)
     if(user == null)
@@ -88,9 +77,6 @@ export class AppController {
     var verified = speakeasy.totp.verify({ secret: user,
        encoding: 'base32',
        token: bd.number });
-    console.log(bd);
-    console.log("findit ===> ", findit)
-    console.log("findit two ===> ", findit.two_factor_authentication)
 
     if(verified == true && findit.two_factor_authentication == false)
     {
@@ -100,7 +86,6 @@ export class AppController {
     }
     if (verified == true && findit.two_factor_authentication == true)
     {
-      console.log("ana hna ")
       const accessToken = this.authService.login(findit)
       return res.json({token: accessToken});
     }
@@ -132,7 +117,6 @@ export class AppController {
   @Get('users')
   async get_all_users() // get all users data
   {
-    console.log("start find users") // check with front-end if is work
     let users = await this.authService.get_all()
     return users
   }
@@ -155,11 +139,9 @@ export class AppController {
   @Patch('update')
   async update_user(@Request() req , @Body() body)
   {
-    console.log("check test ==> " , body.username)
     let uniq_test = null
     if(body.username != undefined)
       uniq_test = await this.authService.check_username(body.username) // check username with database
-    console.log(uniq_test)
     if(uniq_test != null)
       throw new BadRequestException('USERNAME NOT UNIQ')   // 400  bad req
      this.authService.update_info({id: req.user.sub, username: body.username,  status: body.status, avatar: body.avatar});
@@ -172,9 +154,7 @@ export class AppController {
     storage: diskStorage({
       destination: 'src/public', // uoload location
       filename: (req, file, cp) => {
-        console.log("body ==> ", req.user)
         // file.filename = req.user['name']
-        console.log('start save image file ==>', file.originalname)
         //parse(file.originalname).name.replace('\/s/g', '')
         const fullpath: string =  file.originalname // full path of requset file
         const path_parse: path.ParsedPath = path.parse(fullpath)
@@ -191,8 +171,6 @@ export class AppController {
   {
     if(file.filename == 'null')
       throw new BadGatewayException("not an image") // req 502
-    console.log("start upload file") 
-    console.log(file);
     let path_file = "http://localhost:3000/public/" + file.filename
     this.authService.update_info({id: req.user.sub, avatar: path_file})
     return path_file;

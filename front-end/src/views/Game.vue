@@ -107,12 +107,18 @@ export default Vue.extend({
           headers: {
             Authorization: token
         }}).then(res => {
-          this.avatar = res.data.avatar;
-          this.username = res.data.username;
-          this.intra_login = res.data.intra_login;
-          this.status = res.data.status;
-          if (this.username === null)
-            this.setUsername = true;
+			this.$socket.connect();
+        	this.avatar = res.data.avatar;
+        	this.username = res.data.username;
+        	this.intra_login = res.data.intra_login;
+        	this.status = res.data.status;
+        	if (this.username === null)
+            	this.setUsername = true;
+			else
+			{
+				console.log("this.username ", this.username);
+				this.$socket.emit('connectUser', this.username, "online");
+			}
         })
         .catch(error => {
           console.log(error);
