@@ -36,4 +36,24 @@ export class GamesService {
 			relations: ['player_one', 'player_two'],
 		});
 	}
+
+	async invite_game(host: Users)
+	{
+		return await this.gamesdata
+				.createQueryBuilder()
+				.insert()
+				.values({player_one: host, player_two: null, score_one: 0, score_two: 0, finished: 0})
+				.returning('id')
+				.execute();
+	}
+
+	finish_game(id: string, left_score: number, right_score: number)
+	{
+		this.gamesdata
+		.createQueryBuilder()
+		.update(Games)
+		.set({ finished: 1, score_one: left_score, score_two: right_score, })
+		.where("id = :id", { id: id })
+		.execute();
+	}
 }

@@ -22,7 +22,7 @@ export class Games
 	@JoinColumn()
 	player_one: Users;
 
-	@ManyToOne(() => Users, player => player.games, {nullable: false})
+	@ManyToOne(() => Users, player => player.games, {nullable: true})
 	@JoinColumn()
 	player_two: Users;
 

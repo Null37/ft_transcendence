@@ -42,7 +42,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 		let ind = this.queuePlayers.findIndex((elm: any) => elm.sockId == client.id );
 		if (ind != -1)
 			this.queuePlayers.splice(ind,1);
-		console.log("SERVER: TOTAL QUEUE PLAYERS NOW", this.queuePlayers.length);
+		// console.log("SERVER: TOTAL QUEUE PLAYERS NOW", this.queuePlayers.length);
 	}
 
 
@@ -66,7 +66,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 		if (this.queuePlayers.findIndex((elm: any) => elm.sockId == client.id ) === -1)
 			{ this.queuePlayers.push({ sockId: client.id, token: tkn }); }
 
-		console.log("SERVER: TOTAL QUEUE PLAYERS", this.queuePlayers.length);
+		// console.log("SERVER: TOTAL QUEUE PLAYERS", this.queuePlayers.length);
 
 		if (this.queuePlayers.length >= 2) {
 
@@ -82,6 +82,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 			this.queuePlayers.splice(0, 2);
 		}
 
-		console.log(this.queuePlayers);
+		// console.log(this.queuePlayers);
 	}
 } 

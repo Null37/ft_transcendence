@@ -212,4 +212,20 @@ export class AppController {
 
     return game;
   }
+
+  @UseGuards(jwtGuard)
+  @Get('invite_game/:id')
+  async invite_game(@Param('id') userId) // get information about a game
+  {
+    // search for game using ID
+    let game = null;
+
+    try {
+      let findit = await this.userdata.findbyId(userId);
+      game = await this.gamesservice.invite_game(findit);
+    }
+    catch (error) { console.log('ERROR OCCURED VERIFY USER', error); }
+
+    return game;
+  }
 }
