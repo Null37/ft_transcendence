@@ -11,7 +11,7 @@ import * as bcrypt from 'bcrypt';
 export class RoomsService {
 	constructor(
 	@InjectRepository(Rooms)
-	private readonly  rooms: Repository<Rooms>,
+	public readonly  rooms: Repository<Rooms>,
 	@InjectRepository(RoomUsers)
 	public readonly roomUser: Repository<RoomUsers>
 	){}

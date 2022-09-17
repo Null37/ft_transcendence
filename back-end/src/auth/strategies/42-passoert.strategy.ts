@@ -11,7 +11,7 @@ export class passport_42 extends PassportStrategy(Strategy) {
 	constructor(private readonly usra: UsersService) {
     super({
 		clientSecret: jwtConstants.secret,
-		clientID: 'ef83b7d3fe620b89e5e1defe0d47a56f796f2e037454c8fab1533bd0f9676cac',
+		clientID: '3f898cb71115b6afcb8219bbfc835014640317c0d8b46306fc6b69b869d988f1',
 		callbackURL: 'http://localhost:3000/login',
     },
 	async function verify(accessToken, refreshToken, profile, cb) 

@@ -28,6 +28,6 @@ export class Users
     two_factor_authentication: boolean = false
 
 
-    @Column({select: false, array: true, type: 'json', nullable: true})
-    socket_savier
+    @Column("text", { array: true, default: [], nullable: false })
+    socket_savier: string[]
 }

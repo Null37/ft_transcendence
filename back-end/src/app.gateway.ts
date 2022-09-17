@@ -10,7 +10,7 @@ import {
 import { RoomsService } from './rooms/rooms.service';
 import { UsersService } from './users/users.service';
 import { blockService } from './users/block.service';
-  
+import * as bcrypt from 'bcrypt';
   @WebSocketGateway({
 	  cors: {
 		  origin: "*"
@@ -31,8 +31,23 @@ import { blockService } from './users/block.service';
 	  this.logger.log('Initialized!');
 	}
   
-	handleDisconnect(client: Socket) {
+	async handleDisconnect(client: Socket) {
+
+		/* 
+			1- find the socket id
+			2- remove it
+			3- if array is empty broadcast to all users status update
+		*/
 	  this.logger.log(`Client disconnected: ${client.id}`);
+	  let usrs = await this.usersService.findAll();
+	  for (let i = 0; i < usrs.length; i++)
+	  {
+		console.log(usrs[i])
+		if (usrs[i].socket_savier.includes(client.id))
+			usrs[i].socket_savier.splice(usrs[i].socket_savier.indexOf(client.id), 1)
+		console.log(usrs[i])
+		await this.usersService.update(usrs[i])
+	  }
 	}
   
 	handleConnection(client: Socket, ...args: any[]) {
@@ -44,12 +59,24 @@ import { blockService } from './users/block.service';
 	@SubscribeMessage('connectUser')
 	async handleConnectuser(client: Socket, username: string, label: string)
 	{
-		this.logger.log("reached connect user")
-		let usr = await this.usersService.find_username("boodeer");
-		// if (usr)
-		// {
-			console.log(usr)
-		// }
+		/* 
+			1- check if the user exists in the data base
+			2- change status to online if the old status is not "game"
+			3- 
+		*/
+		// let usr = await this.usersService.find_username("boodeer");
+		let usr = await this.usersService.find_username(username);
+		if (usr)
+		{
+			if (usr.status != "game")
+				usr.status = label;
+			usr.socket_savier.includes(client.id) ? null : usr.socket_savier.push(client.id)
+			// usr.socket_savier.push(client.id)
+			await this.usersService.update(usr)
+			this.wss.emit('statusChanged', username, label)
+		}
+		console.log(usr)
+
 	}
 
 
@@ -188,7 +215,20 @@ import { blockService } from './users/block.service';
 		if ((usr.status == 1 && +usr.duration > Date.now()))
 			return ;
 		
-			if (message.text.startsWith("/ban ") || message.text.startsWith("/mute "))
+		if (message.text.startsWith("/changepassword ") && usr.role == "moderator")
+		{
+			let arr = message.text.split(' ');
+			let findRoom = await this.roomsService.rooms.findOne({where: {roomName: message.room}})
+			if (findRoom) //! To be checked
+			{
+				if (arr.length > 1 || arr[1].length)
+					findRoom.password =  await bcrypt.hash(arr[1], 10); 
+				else
+					findRoom.password = "";
+			}
+			await this.roomsService.rooms.save(findRoom)
+		}
+		else if (message.text.startsWith("/ban ") || message.text.startsWith("/mute "))
 		{
 			if (usr.role == "user")
 				return ;
