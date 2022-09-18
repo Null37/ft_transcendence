@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 
 
 @Injectable()
+
 export class RoomsService {
 	constructor(
 	@InjectRepository(Rooms)
@@ -90,7 +91,7 @@ export class RoomsService {
 				return res;
 			}
 			else
-				return "User already joined";
+				return usrexist;
 		}
 	}
 

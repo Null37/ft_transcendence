@@ -372,8 +372,14 @@ import * as bcrypt from 'bcrypt';
 		
 		
 		let usr = await this.roomsService.roomUser.findOne({where: {userID: message.userID, roomName: message.room}})
+		console.log("user is banned for: ", +usr.duration - Date.now(), "===> status" , usr.status)
+
+		console.log("usr ====> ", usr, "====> role: ", usr.role)
 		if ((usr.status == 1 && +usr.duration > Date.now()))
+		{
+			console.log("rani hena")
 			return ;
+		}
 		if (message.text.split(" ")[0] == "/leave")
 		{
 			console.log("here")
@@ -386,21 +392,40 @@ import * as bcrypt from 'bcrypt';
 				return ;
 			}
 		}
-		if (message.text.startsWith("/changepassword ") && usr.role == "moderator")
+		if (message.text.startsWith("/changepassword ") && (usr.role == "moderator" || usr.role == "mod"))
 		{
+			console.log("here for debug1")
 			let arr = message.text.split(' ');
 			let findRoom = await this.roomsService.rooms.findOne({where: {roomName: message.room}})
 			if (findRoom) //! To be checked
 			{
 				if (arr.length > 1 && arr[1].length)
-					findRoom.password =  await bcrypt.hash(arr[1], 10); 
+				{
+					findRoom.password =  await bcrypt.hash(arr[1], 10);
+					findRoom.state = 1;
+				}
 				else
+				{
 					findRoom.password = "";
+					findRoom.state = 0;
+				}
 			}
 			await this.roomsService.rooms.save(findRoom)
+			return ;
+		}
+		else if (message.text.startsWith("/admin ") && (usr.role == "moderator" || usr.role == "mod"))
+		{
+			console.log("reached the admin part here")
+			let arr = message.text.split(' ');
+			let res = await this.usersService.find_username(arr[1])
+			let foo = await this.roomsService.roomUser.findOneOrFail({where: {userID: res.id, roomName: message.room}})
+			foo.role = "admin"
+			await this.roomsService.roomUser.save(foo)
+			return ;
 		}
 		else if (message.text.startsWith("/ban ") || message.text.startsWith("/mute "))
 		{
+			console.log("rani hena3")
 			if (usr.role == "user")
 				return ;
 
@@ -434,6 +459,7 @@ import * as bcrypt from 'bcrypt';
 			}
 			return ;
 		}
+		console.log("rani hena4")
 
 		let userProfile = await this.usersService.findbyId(message.userID)
 
