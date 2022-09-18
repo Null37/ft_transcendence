@@ -187,7 +187,8 @@ export default Vue.extend({
         // const rightbarH: number = WIDTH - BARWIDTH;
         // const rightbarV: number = HEIGHT/2 - BARHEIGHT / 2;
 
-
+		this.$socket.emit('connectUserGame', localStorage.getItem('token'));
+		
         // Creating the sketch itself
         const sketch = (p5: P5) => {
 

@@ -24,7 +24,13 @@ export default Vue.extend({
     name: "App",
 
     methods: {
-      setUsernameMethod: function() {
+		logout: function()
+		{
+			console.log("disconnecting the user from the website")
+			this.$socket.emit('disconnectUser', this.username);
+			
+		},
+		setUsernameMethod: function() {
         if (this.usernameEdit.length >= 5 && this.usernameEdit.length <= 10)
         {
           const token = localStorage.getItem('token');
@@ -117,7 +123,7 @@ export default Vue.extend({
 			else
 			{
 				console.log("this.username ", this.username);
-				this.$socket.emit('connectUser', this.username, "online");
+				this.$socket.emit('connectUser', this.username, "Online");
 			}
         })
         .catch(error => {
@@ -188,6 +194,7 @@ export default Vue.extend({
             <router-link style="text-decoration: none;" to="/Logout">
                 <v-list-item
                     link
+					@click="logout()"
                 >
                     <v-list-item-content>
                     <v-list-item-title>Logout</v-list-item-title>

@@ -72,6 +72,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.path === "/Logout")
   {
     localStorage.removeItem("token");
+	// this.$socket.emit('disconnectUser');
     return next({ name: 'Login' });
   }
   else if (to.path === "/2FA" && to.query.id !== undefined)

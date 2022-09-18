@@ -32,10 +32,32 @@ export default Vue.extend({
       },
 	  leaveRoom(data)
 	  {
+		console.log("[Community.vue] data to leave room reached  == ", data)
+		if (this.me[0].username === data[0])
+		{
+			// console.log("÷rooms ", this.rooms);
+			this.rooms = this.rooms.filter(r => r.roomName !== data[1]);
+			this.$socket.emit('leaveRoom', data[0]);
+			this.currentRoom = "";
+			
+		}
 		// receive username and roomName than remove it from arr
 	  },
-	  UserStatus(data)
+	  statusChanged(data)
 	  {
+
+		console.log("dattta === ", data, " | friendlist length == ", this.friendlist.length);
+		console.log(this.friendlist);
+		for (let i = 0; i < this.friendlist.length; i++)
+		{
+			if (this.friendlist[i].username === data.username)
+			{
+				this.friendlist[i].status = data.status;
+				console.log("this.friendlist[i].status == ", this.friendlist[i].status ," | data.status == ", data.status, " | data.username == ", data.username);
+				break ;
+			}
+		}
+		// console.log("User == ". data.username, " status == ", dtata.status);
 		// receive username and status than update it in arr
 	  }
     },
@@ -76,6 +98,12 @@ export default Vue.extend({
 
     }),
     methods: {
+		logout: function()
+		{
+			console.log("disconnecting the user from the website")
+			this.$socket.emit('disconnectUser', this.username);
+			
+		},
       changeAvatar: function(newavatar)
       {
         this.avatar = newavatar;
@@ -338,7 +366,7 @@ export default Vue.extend({
         if (this.me[0].username === null)
 			this.setUsername = true;
 		else
-			this.$socket.emit('connectUser', this.me[0].username, "online");
+			this.$socket.emit('connectUser', this.me[0].username, "Online");
 		console.log("this.me[0].username", this.me[0].username);
 	}).bind(this))
 	.catch(error => {
@@ -375,6 +403,7 @@ export default Vue.extend({
               this.friendlist.forEach(element => {
                 if (element.username == el.username)
                 {
+					console.log(element)
                   ret = false;
                 }
               });
@@ -501,6 +530,7 @@ export default Vue.extend({
             <router-link style="text-decoration: none;" to="/Logout">
                 <v-list-item
                     link
+					@click="logout()"
                 >
                     <v-list-item-content>
                     <v-list-item-title>Logout</v-list-item-title>

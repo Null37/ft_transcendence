@@ -28,9 +28,12 @@ export class Users
     @Column()
     two_factor_authentication: boolean = false
 	
-    @Column({nullable : true, select: false})
-    inGamesock: string
+    // @Column({nullable : true, select: false})
+    // inGamesock: string
 
+	@Column("text", { array: true, default: [], nullable: false })
+	inGamesock: string[]
+	
 	@Column("text", { array: true, default: [], nullable: false })
 	socket_savier: string[]
 

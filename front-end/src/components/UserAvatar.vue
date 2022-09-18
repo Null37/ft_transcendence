@@ -36,6 +36,7 @@ export default Vue.extend({
         <v-hover
         v-slot="{ hover }"
         v-for="r in rooms"
+		v-if="r.duration <= Date.now()"
         :key="r.id"
         >
           <v-avatar
