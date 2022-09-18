@@ -46,16 +46,16 @@ import * as bcrypt from 'bcrypt';
 			  usrs[i].socket_savier.splice(usrs[i].socket_savier.indexOf(client.id), 1)
 			  if (usrs[i].socket_savier.length == 0)
 			  {
-				// if (usrs[i].inGamesock.length !== 0)
-				// {
-				// 	usrs[i].status = "In-Game";
-				// 	this.wss.emit('statusChanged', {debug: "socket disconnect", username: usrs[i].username, status: "In-Game"});
-				// }
-				// else
-				// {
+				if (usrs[i].inGamesock.length !== 0)
+				{
+					usrs[i].status = "In-Game";
+					this.wss.emit('statusChanged', {debug: "socket disconnect", username: usrs[i].username, status: "In-Game"});
+				}
+				else
+				{
 					usrs[i].status = "offline";
 					this.wss.emit('statusChanged', {debug: "socket disconnect", username: usrs[i].username, status: "offline"});
-				// }
+				}
 			}
 		}
 		else if (usrs[i].inGamesock.includes(client.id))
