@@ -11,7 +11,6 @@ import { FrinedCtroller } from './friend.controller';
 import { BlockCtroller } from './block.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { historyCtroller } from './history.controller';
 import { GameGateway } from './game.gateway';
 import { CanvasGateway } from './canvas.gateway';
 import { GamesModule } from './games/games.module';
@@ -35,7 +34,7 @@ import { GamesModule } from './games/games.module';
     //, {serveStaticOptions: {index: false , extensions: ['png', 'jpeg', 'jpg', 'bmp', 'ico']}}
     ServeStaticModule.forRoot({rootPath: join('/back-end/src', 'public'), serveRoot: '/public/',serveStaticOptions: {index: false},})
   ],
-  controllers: [AppController, FrinedCtroller, BlockCtroller, historyCtroller],
+  controllers: [AppController, FrinedCtroller, BlockCtroller],
   providers: [AppService, pass_42Guard, AppGateway, GameGateway, CanvasGateway],
 })
 export class AppModule {}

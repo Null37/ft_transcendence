@@ -37,4 +37,13 @@ export class Users
     @OneToMany(() => Games, games => games.player_two)
     // joined: Games[];
     games: Games[];
+
+    @Column({ default: "" })
+    first_win: string
+
+    @Column({ default: "" })
+    conquer: string
+
+    @Column({ default: 0 })
+    level: number;
 }

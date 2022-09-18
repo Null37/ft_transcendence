@@ -15,4 +15,11 @@ export class user_dto
 
     two_factor_authentication?: boolean = false
     socket_savier?
+
+
+    first_win?: string = ""
+
+    conquer?: string = ""
+
+    level?: number = 0
 } 

@@ -7,10 +7,11 @@ import { Buffer } from 'buffer/'; // slash at the end is intended
 
 import VueToast from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
+import UserAvatarVue from '@/components/UserAvatar.vue';
 Vue.use(VueToast, { position: 'top-right' });
 
 const HEIGHT = 600;
-const WIDTH = 800;
+const WIDTH = 1000;
 const BARWIDTH = 20;
 const BARHEIGHT = 80;
 const BALLRADIUS = 20;
@@ -25,7 +26,8 @@ export default Vue.extend({
         timefunc: null as null | Function,
         gameover: false as boolean,
         isLoading: false as boolean,
-        seconds: 5 as number,
+        seconds: 0 as number,
+        displayText: "" as string,
 
         leftScore: 0 as number,
         rightScore: 0 as number,
@@ -76,7 +78,7 @@ export default Vue.extend({
         { headers: { Authorization: token } })
 
         .then((res: any) => {
-            // console.table(res.data);
+            console.table(res.data);
 
             // data not recieved properly
             if (typeof res.data !== 'object')
@@ -98,6 +100,7 @@ export default Vue.extend({
             {
                 let usr = JSON.parse(Buffer .from(token.split('.')[1], 'base64').toString('utf8'));
                 // console.log('PLAYER DETAILS', res.data.player_one, res.data.player_two);
+                console.table(usr);
 
                 if (usr.sub === res.data.player_one.id) {
 
@@ -105,14 +108,36 @@ export default Vue.extend({
                     this.playerSide = 'left';
                 }
 
-                if (usr.sub === res.data.player_two.id) {
+                // invited player
+                if (usr.sub !== res.data.player_one.id && !res.data.player_two) {
+
+                    console.log('PROBABLY INVITED');
+                    axios.get('/accept_invite/' + usr.sub + '/' + this.gameId,
+                    { headers: { Authorization: token } })
+                    .then(() => {
+                        // res.data.player_two.username
+                    })
+                    .catch((err2) => {
+                        Vue.$toast.error( 'An error occured! Going back to lobby in 5s');
+                        console.error('axios : verify_game ERROR', err2);
+
+                        setTimeout(() => {
+                            this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } });
+                        }, 5 * 1000);
+                    });
+
+                    this.playerMode = 'player';
+                    this.playerSide = 'right';
+                }
+                else if (res.data.player_two && usr.sub === res.data.player_two.id) {
 
                     this.playerMode = 'player';
                     this.playerSide = 'right';
                 }
 
                 window.document.querySelector("#leftPlayer")!.innerHTML = res.data.player_one.username.toUpperCase();
-                window.document.querySelector("#rightPlayer")!.innerHTML = res.data.player_two.username.toUpperCase();
+                if (res.data.player_two)
+                    window.document.querySelector("#rightPlayer")!.innerHTML = res.data.player_two.username.toUpperCase();
             }
 
             return 0;
@@ -136,18 +161,10 @@ export default Vue.extend({
         // console.log('CLIENT GAME ID', this.gameId);
 
         this.gameSocket = io(this.socketURL, {
-            extraHeaders: { "c": "d" },
             transportOptions: {
-                polling: { //extraHeaders: {
-                    "a": "b",
+                polling: { extraHeaders: {
                     Authorization: 'Bearer ' + localStorage.getItem('token'),
-            },// },
-            query: {
-                xyz: 42
-            },
-            auth: {
-                param: 'value',
-            }
+            }, },
             },
         });
 
@@ -191,25 +208,33 @@ export default Vue.extend({
             // redirect
         });
 
-        // get acknowledgement that server recieved the read
+        // timer from server for starting the game
         this.gameSocket?.on("setCountdown", (data: any) => {
             console.log("CLIENT: Got countdown!", data);
-
-            // start game here...
-            // this.p5?.redraw();
-            // this.p5?.textAlign(this.p5.CENTER);
-            // this.p5?.fill(255, 255, 255);
-            // this.p5?.text(data.seconds, WIDTH/2, HEIGHT/2);
-            // this.p5?.redraw();
-
 
             this.isLoading = true;
             this.seconds = data.seconds;
             this.p5?.redraw();
             this.isLoading = false;
+        });
 
-            // console.log(this.p5);
+        // timer from server for starting the game
+        this.gameSocket?.on("setText", (data: any) => {
+            console.log("CLIENT: Text from server!", data);
 
+            this.p5?.noLoop();
+            this.gameover = true;
+            this.isLoading = true;
+            this.seconds = 0;
+            this.displayText = data.message;
+            console.log(this.isLoading, this.seconds, this.displayText);
+            setTimeout(() => {
+                this.p5?.redraw();
+                this.p5?.redraw();
+                this.displayText = "";
+                this.isLoading = false;
+                console.log(this.isLoading, this.seconds, this.displayText);
+            }, 0.25 * 1000);
         });
     },
 
@@ -234,7 +259,7 @@ export default Vue.extend({
 
 
             // The sketch draw method
-            // Game loop
+            // Game lo-op
             p5.draw = () => {
                 console.log('still going');
 
@@ -260,19 +285,31 @@ export default Vue.extend({
 				p5.rect(this.rightbarH, this.rightbarV, BARWIDTH, BARHEIGHT);
 
 
+                this.p5?.fill('yellow');
+                this.p5?.triangle(320 + WIDTH/2, 80 + HEIGHT/2, 160 + WIDTH/2, 160 + HEIGHT/2, 240 + WIDTH/2, 160 + HEIGHT/2);
+                this.p5?.triangle(3*80-10 + WIDTH/2, 2*80-10 + HEIGHT/2, 4*80-10 + WIDTH/2, 2*80-10 + HEIGHT/2, 2*80-10 + WIDTH/2, 3*80-10 + HEIGHT/2);
+
+
                 // ping pong ball
 				p5.fill(255);
 				p5.circle(this.ballH, this.ballV, BALLRADIUS);
 
                 if (this.isLoading) {
 
-                    // console.log("should draw...", this.seconds);
-                    this.p5?.textAlign(this.p5.CENTER);
-                    this.p5?.fill('white');
-                    this.p5?.textSize(75);
-                    this.p5?.stroke('dodgerblue');
-                    this.p5?.text(this.seconds, WIDTH/2, HEIGHT/2);
-                    this.p5?.noStroke();
+                    if (this.seconds !== 0) {
+                        this.p5?.textAlign(this.p5.CENTER);
+                        this.p5?.fill('yellow');
+                        this.p5?.textSize(150);
+                        this.p5?.text(this.seconds, WIDTH/2, HEIGHT/2);
+                    }
+
+                    if (this.displayText !== "") {
+                        console.log('SHOULD WRITE ------');
+                        this.p5?.textAlign(this.p5.CENTER);
+                        this.p5?.fill('yellow');
+                        this.p5?.textSize(100);
+                        this.p5?.text(this.displayText, WIDTH/2, HEIGHT/2);
+                    }
                 }
             };
         };
@@ -303,7 +340,10 @@ export default Vue.extend({
                         <h1>Ping Pong Match</h1>
                         <small>(UP - DOWN)</small><br/>
                         <div>
-                            <a href="/game" class="btn" >Surrender!</a>
+                            <a href="/game" class="btn" >
+                                <!-- {{ playerMode === "spectator" ? "Leave" : "Surrender!" }} -->
+                                Leave
+                            </a>
                         </div>
                     </div>
 
@@ -311,15 +351,6 @@ export default Vue.extend({
                         <div id="rightPlayer">PLAYER TWO</div>
                         <div style="font-weight: bold;font-size: 50px;" >{{ rightScore }}</div>
                     </div>
-                </div>
-                <div style="text-align: center;margin: 10px;">
-                    <!-- <button class="btn" id="startBtn" onclick="play()" >Start!</button>
-                    <button class="btn" id="pauseBtn" onclick="pauseGame()" >Pause!</button>
-                    <button class="btn" id="resetBtn" onclick="resetGame()" >Reset!</button> -->
-                    <!-- <a href="/game" class="btn" >Surrender!</a> -->
-                    <!-- <button class="btn" id="testBtn" onclick="TestMe()" >Test!</button>
-                    <button class="btn" id="testBtn1" onclick="TestMe1()" >Ping!</button>
-                    <button class="btn" id="testBtn2" onclick="TestMe2()" >LoopIt!</button> -->
                 </div>
                 <div id="game"></div>
             </div>

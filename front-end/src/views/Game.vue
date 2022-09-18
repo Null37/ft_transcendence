@@ -55,9 +55,20 @@ export default Vue.extend({
         this.gameSocket.emit('cancelQueue');
         this.isLoading = false;
       },
-      testToast() {
-        Vue.$toast.open('<span class="text-body-1">Howdy!</span>');
-      }
+
+      // speedy game
+      emitSpeedyJoin() {
+        console.log('EMITTING JOIN');
+        
+        this.gameSocket.emit('joinSpeedyQueue');
+        this.isLoading = true;
+      },
+      emitSpeedyCancel() {
+        console.log('EMITTING CANCEL');
+
+        this.gameSocket.emit('cancelSpeedyQueue');
+        this.isLoading = false;
+      },
     },
 
     data: () => ({
@@ -100,6 +111,7 @@ export default Vue.extend({
 
     mounted () {
       const token = localStorage.getItem('token');
+          console.log('===========', token);
 
       if (token)
       {
@@ -207,13 +219,6 @@ export default Vue.extend({
           <v-col
             cols="12"
           >
-          <v-btn
-          color="white" class="black--text"
-          x-large
-          v-on:click="testToast()"
-          >
-              Show Toast
-          </v-btn>
             <div class="text-center">
               <v-btn v-if="!isLoading"
               color="white" class="black--text"
@@ -228,38 +233,34 @@ export default Vue.extend({
               x-large
               v-on:click="emitCancel()"
               >
-                <!-- <fingerprint-spinner
-                  :animation-duration=1000
-                  :size="50"
-                  color="#666"
-                /> -->
-                <!-- <atom-spinner
-                  :animation-duration=1000
-                  :size="50"
-                  color="#444"
-                /> -->
-                <!-- <half-circle-spinner
-                  :animation-duration=1000
-                  :size="50"
-                  color="#444"
-                /> -->
                 <semipolar-spinner
                   :animation-duration=1000
                   :size="50"
                   color="#444"
                 />
-                <!-- <orbit-spinner
-                  :animation-duration=1000
-                  :size="50"
-                  color="#444"
-                /> -->
-                <!-- <self-building-square-spinner
-                  :animation-duration=1000
-                  :size="50"
-                  color="#444"
-                /> -->
               </v-btn>
             </div>
+            <!-- <div class="text-center">
+              <v-btn v-if="!isLoading"
+              color="white" class="black--text"
+              x-large
+              v-on:click="emitSpeedyJoin()"
+              >
+                  Search for Speedy Game
+              </v-btn>
+
+              <v-btn v-if="isLoading"
+              color="white" class="black--text"
+              x-large
+              v-on:click="emitSpeedyCancel()"
+              >
+                <semipolar-spinner
+                  :animation-duration=1000
+                  :size="50"
+                  color="#444"
+                />
+              </v-btn>
+            </div> -->
           </v-col>
         </v-row>
       </v-container>

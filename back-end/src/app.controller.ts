@@ -228,4 +228,22 @@ export class AppController {
 
     return game;
   }
+
+  @UseGuards(jwtGuard)
+  @Get('accept_invite/:user/:game')
+  async accept_invite(@Param('user') userid, @Param('game') gameid) // get information about a game
+  {
+    try {
+      let invited = await this.userdata.findbyId(userid);
+      this.gamesservice.accept_invite(invited, gameid);
+    }
+    catch (error) { console.log('ERROR OCCURED VERIFY USER', error); }
+  }
+
+  @UseGuards(jwtGuard)
+  @Get('get_history/:id')
+  async get_history(@Param('id') userid) // get information about a player with their game history
+  {
+    return (this.gamesservice.get_history(userid));
+  }
 }
