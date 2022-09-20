@@ -25,6 +25,9 @@ export class RoomsService {
 			return "Chat room already exists";
 		if (roomElem.password)
 			roomElem.password = await bcrypt.hash(roomElem.password, 10);
+		if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(roomElem.roomName))
+			return "Room name can't contain special characters";
+			
 		let tmp = this.rooms.create(roomElem);
 
 		let usr = this.roomUser.create({
