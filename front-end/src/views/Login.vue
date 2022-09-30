@@ -2,7 +2,10 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-    data: () => ({drawer: null})
+    data: () => ({
+      drawer: null,
+      loginLink: "http://"+process.env.VUE_APP_HOSTIP+":"+process.env.VUE_APP_BACKPORT+"/Login" as string,
+    }),
 });
 </script>
 
@@ -22,7 +25,7 @@ export default Vue.extend({
             md="4"
           >
             <div class="text-center">
-              <a href="http://localhost:3000/Login">
+              <a v-bind:href=loginLink>
                 <v-btn
                 color="white"
                 class="black--text"
