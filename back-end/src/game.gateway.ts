@@ -86,7 +86,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 	}
 
 
-	@SubscribeMessage('cancelQueue')
+	@SubscribeMessage('cancelSpeedyQueue')
 	handleCancelSpeedyQueue(client: Socket) {
 		console.log('SERVER: Game client wanted to leave the queue');
 
@@ -97,14 +97,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 	}
 
 
-	@SubscribeMessage('joinQueue')
+	@SubscribeMessage('joinSpeedyQueue')
 	async handleJoinSpeedyQueue(client: Socket) {
-		console.log("SERVER: GOT REQUEST TO JOIN");
+		console.log("SERVER: GOT REQUEST TO JOIN SPEEDY");
 
 		let tkn = JSON.parse(Buffer.from(client.handshake.headers.authorization.split('.')[1], 'base64').toString('utf8'));
 
-
-		console.log("SERVER: Game client joined the queue", client.id);
+		console.log("SERVER: Game client joined the queue speedy", client.id);
 
 		// user already joined
 		// update socket
@@ -117,22 +116,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 		if (this.queuePlayers.findIndex((elm: any) => elm.sockId == client.id ) === -1)
 			{ this.queuePlayers.push({ sockId: client.id, token: tkn }); }
 
-		// console.log("SERVER: TOTAL QUEUE PLAYERS", this.queuePlayers.length);
-
 		if (this.queuePlayers.length >= 2) {
 
 			let usr1 = await this.userservice.findOne(this.queuePlayers[0].token.name);
 			let usr2 = await this.userservice.findOne(this.queuePlayers[1].token.name);
 
-			let new_game_id = await this.gamesservice.startGame(usr1, usr2);
+			let new_game_id = await this.gamesservice.startGame(usr1, usr2, 2);
 
-			// this.gamesservice.getAll().then(res => console.table('GAMES HERE', res) );
-
-			this.wss.to([this.queuePlayers[0].sockId, this.queuePlayers[1].sockId]).emit('queueResponse', new_game_id);
+			this.wss.to([this.queuePlayers[0].sockId, this.queuePlayers[1].sockId]).emit('queueSpeedyResponse', new_game_id);
 
 			this.queuePlayers.splice(0, 2);
 		}
-
-		// console.log(this.queuePlayers);
 	}
 } 

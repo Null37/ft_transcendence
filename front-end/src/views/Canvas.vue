@@ -7,13 +7,12 @@ import { Buffer } from 'buffer/'; // slash at the end is intended
 
 import VueToast from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
-import UserAvatarVue from '@/components/UserAvatar.vue';
 Vue.use(VueToast, { position: 'top-right' });
 
-const HEIGHT = 600;
 const WIDTH = 1000;
+const HEIGHT = WIDTH / 2;
 const BARWIDTH = 20;
-const BARHEIGHT = 80;
+const BARHEIGHT = 100;
 const BALLRADIUS = 20;
 
 export default Vue.extend({
@@ -45,12 +44,15 @@ export default Vue.extend({
     }),
 
     methods: {
+		back2game () {
+			this.gameSocket.close();
+			this.$router.push({ name: 'Game' });
+		}
     },
 
     // called before mounted
     async created() {
         this.socketURL = location.protocol + "//" + location.hostname + ":" + 3000 + "/canvas";
-        // console.log(this.socketURL, 'SOCKET URL CANVAS.VUE');
         const token = localStorage.getItem('token');
 
         // VALIDATING
@@ -109,7 +111,8 @@ export default Vue.extend({
                 }
 
                 // invited player
-                if (usr.sub !== res.data.player_one.id && !res.data.player_two) {
+                if (usr.sub !== res.data.player_one.id
+                    && !res.data.player_two) {
 
                     console.log('PROBABLY INVITED');
                     axios.get('/accept_invite/' + usr.sub + '/' + this.gameId,
@@ -129,14 +132,15 @@ export default Vue.extend({
                     this.playerMode = 'player';
                     this.playerSide = 'right';
                 }
-                else if (res.data.player_two && usr.sub === res.data.player_two.id) {
+                else if (res.data.player_two &&
+                        usr.sub === res.data.player_two.id) {
 
                     this.playerMode = 'player';
                     this.playerSide = 'right';
                 }
 
                 window.document.querySelector("#leftPlayer")!.innerHTML = res.data.player_one.username.toUpperCase();
-                if (res.data.player_two)
+                if (res.data.player_two) // protecting for game invite
                     window.document.querySelector("#rightPlayer")!.innerHTML = res.data.player_two.username.toUpperCase();
             }
 
@@ -158,8 +162,6 @@ export default Vue.extend({
             return ;
         // VALIDATING
 
-        // console.log('CLIENT GAME ID', this.gameId);
-
         this.gameSocket = io(this.socketURL, {
             transportOptions: {
                 polling: { extraHeaders: {
@@ -170,11 +172,6 @@ export default Vue.extend({
 
         // Infrom the server that the current player/ready is ready to receive data
         this.gameSocket.emit("playerReady", { gameid: this.gameId, side: this.playerSide });
-        this.gameSocket.on("testing", (data: any) => {
-            // 
-            console.log('IT WORKED', data);
-        });
-
 
         this.gameSocket.on("recieveCoord", (data: any) => {
             console.log("CLIENT: GOT COORDINATION FROM SERVER!", data);
@@ -226,14 +223,23 @@ export default Vue.extend({
             this.gameover = true;
             this.isLoading = true;
             this.seconds = 0;
+
+            // specify what to write
             this.displayText = data.message;
-            console.log(this.isLoading, this.seconds, this.displayText);
+
             setTimeout(() => {
+                // draw to write text
                 this.p5?.redraw();
                 this.p5?.redraw();
                 this.displayText = "";
                 this.isLoading = false;
-                console.log(this.isLoading, this.seconds, this.displayText);
+
+                setTimeout(() => {
+
+					this.gameSocket.close();
+					this.$router.push({ name: 'Game', });
+                }, 2 * 1000);
+
             }, 0.25 * 1000);
         });
     },
@@ -242,6 +248,11 @@ export default Vue.extend({
 
         // Creating the sketch itself
         const sketch = (p5: P5) => {
+
+            p5.windowResized = () => {
+                p5.resizeCanvas(p5.windowWidth, p5.windowWidth / 2);
+                p5.redraw();
+            }
 
             // The sketch setup method 
             p5.setup = () => {
@@ -285,9 +296,9 @@ export default Vue.extend({
 				p5.rect(this.rightbarH, this.rightbarV, BARWIDTH, BARHEIGHT);
 
 
-                this.p5?.fill('yellow');
-                this.p5?.triangle(320 + WIDTH/2, 80 + HEIGHT/2, 160 + WIDTH/2, 160 + HEIGHT/2, 240 + WIDTH/2, 160 + HEIGHT/2);
-                this.p5?.triangle(3*80-10 + WIDTH/2, 2*80-10 + HEIGHT/2, 4*80-10 + WIDTH/2, 2*80-10 + HEIGHT/2, 2*80-10 + WIDTH/2, 3*80-10 + HEIGHT/2);
+                // this.p5?.fill('yellow');
+                // this.p5?.triangle(320 + WIDTH/2, 80 + HEIGHT/2, 160 + WIDTH/2, 160 + HEIGHT/2, 240 + WIDTH/2, 160 + HEIGHT/2);
+                // this.p5?.triangle(3*80-10 + WIDTH/2, 2*80-10 + HEIGHT/2, 4*80-10 + WIDTH/2, 2*80-10 + HEIGHT/2, 2*80-10 + WIDTH/2, 3*80-10 + HEIGHT/2);
 
 
                 // ping pong ball
@@ -332,7 +343,8 @@ export default Vue.extend({
             <div class="text-center">
                 <div style="width:100%;">
                     <div style="display:inline-block;width:20%;text-align:center;">
-                        <div id="leftPlayer">PLAYER ONE</div>
+                        <div :style="[ playerSide == 'left' ? {'background':'#5310a9'} : {} ]"
+                            id="leftPlayer">PLAYER ONE</div>
                         <div style="font-weight: bold;font-size: 50px;" >{{ leftScore }}</div>
                     </div>
 
@@ -340,15 +352,15 @@ export default Vue.extend({
                         <h1>Ping Pong Match</h1>
                         <small>(UP - DOWN)</small><br/>
                         <div>
-                            <a href="/game" class="btn" >
-                                <!-- {{ playerMode === "spectator" ? "Leave" : "Surrender!" }} -->
+                            <button class="btn" @click="back2game">
                                 Leave
-                            </a>
+                            </button>
                         </div>
                     </div>
 
                     <div style="display:inline-block;width:19%;text-align:center;">
-                        <div id="rightPlayer">PLAYER TWO</div>
+                        <div :style="[ playerSide == 'right' ? {'background':'#5310a9'} : {} ]"
+                            id="rightPlayer">PLAYER TWO {{ playerSide }}</div>
                         <div style="font-weight: bold;font-size: 50px;" >{{ rightScore }}</div>
                     </div>
                 </div>
