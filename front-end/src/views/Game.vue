@@ -38,9 +38,20 @@ export default Vue.extend({
             .then(res => {
               this.username = this.usernameEdit;
               this.setUsername = false;
+              this.isUsernameError = false;
+              this.usernameError = "";
             })
-            .catch(error => { console.log(error); });
+            .catch(error => {
+              console.log(error);
+              this.isUsernameError = true;
+              this.usernameError = "Username is not unique!";
+            });
           }
+        }
+        else
+        {
+          this.isUsernameError = true;
+          this.usernameError = "The username must be between 5 and 10 chars!";
         }
       },
       emitJoin() {
@@ -61,13 +72,13 @@ export default Vue.extend({
         console.log('EMITTING JOIN');
         
         this.gameSocket.emit('joinSpeedyQueue');
-        this.isLoading = true;
+        this.isSpeedyLoading = true;
       },
       emitSpeedyCancel() {
         console.log('EMITTING CANCEL');
 
         this.gameSocket.emit('cancelSpeedyQueue');
-        this.isLoading = false;
+        this.isSpeedyLoading = false;
       },
     },
 
@@ -81,7 +92,10 @@ export default Vue.extend({
       drawer: null,
       gameSocket: null as any,
       isLoading: false as Boolean,
+      isSpeedyLoading: false as Boolean,
       socketURL: "" as string,
+      isUsernameError: false as Boolean,
+      usernameError: "" as string,
     }),
 
     created () {
@@ -104,6 +118,20 @@ export default Vue.extend({
         else
           // feedback
           console.error('Error Occured: queueResponse', );
+
+        this.isLoading = false;
+      });
+
+      this.gameSocket.on('queueSpeedyResponse', (data: any) => {
+        console.log('CLIENT: GOT ACKNOWLEDGMENT FROM SERVER');
+
+        // redirection
+        if (typeof data.identifiers === 'object' && typeof data.identifiers[0]?.id === 'string')
+          // send id to ping pong view
+          this.$router.push({ name: 'Speedy', query: { match: "" + data.identifiers[0].id, } })
+        else
+          // feedback
+          console.error('Error Occured: queueSpeedyResponse', );
 
         this.isLoading = false;
       });
@@ -221,15 +249,14 @@ export default Vue.extend({
           >
             <div class="text-center">
               <v-btn v-if="!isLoading"
-              color="white" class="black--text"
+              color="white" class="black--text btn-m"
               x-large
               v-on:click="emitJoin()"
               >
-                  Search for Game
+                  Normal Game
               </v-btn>
-
               <v-btn v-if="isLoading"
-              color="white" class="black--text"
+              color="white" class="black--text btn-m"
               x-large
               v-on:click="emitCancel()"
               >
@@ -240,17 +267,17 @@ export default Vue.extend({
                 />
               </v-btn>
             </div>
-            <!-- <div class="text-center">
-              <v-btn v-if="!isLoading"
-              color="white" class="black--text"
+
+            <div class="text-center">
+              <v-btn v-if="!isSpeedyLoading"
+              color="yellow" class="black--text btn-m"
               x-large
               v-on:click="emitSpeedyJoin()"
               >
-                  Search for Speedy Game
+                  Speedy Game
               </v-btn>
-
-              <v-btn v-if="isLoading"
-              color="white" class="black--text"
+              <v-btn v-if="isSpeedyLoading"
+              color="yellow" class="black--text btn-m"
               x-large
               v-on:click="emitSpeedyCancel()"
               >
@@ -260,7 +287,7 @@ export default Vue.extend({
                   color="#444"
                 />
               </v-btn>
-            </div> -->
+            </div>
           </v-col>
         </v-row>
       </v-container>
@@ -276,6 +303,9 @@ export default Vue.extend({
         <v-card-title class="justify-center">
           <span class="text-h5">Set your username</span>
         </v-card-title>
+        <v-card-text v-if="isUsernameError" class="justify-center">
+          <span class="red--text">{{ usernameError }}</span>
+        </v-card-text>
         <v-card-text>
           <v-container>
             <v-row>
@@ -331,5 +361,9 @@ export default Vue.extend({
 
 .v-toast {
     font-family: Helvetica, sans-serif;
+}
+
+.btn-m {
+  margin-bottom: 15px;
 }
 </style>

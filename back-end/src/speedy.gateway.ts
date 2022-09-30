@@ -1,7 +1,6 @@
 import { OnGatewayConnection, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Socket, Server } from "socket.io";
 import { GamesService } from "./games/games.service";
-import { UsersService } from "./users/users.service";
 
 interface GameObj {
 	p1SockId: string,
@@ -24,23 +23,22 @@ const WIDTH: number = 1000;
 const HEIGHT: number = WIDTH / 2;
 const BARWIDTH: number = 20;
 const BARHEIGHT: number = 100;
-const BARSPEED: number = 8;
+const BARSPEED: number = 10; // speedy version
 const WINSCORE: number = 8;
 
 const BALLRADIUS: number = 20;
-var HBALLSPEED: number = 8;
-var VBALLSPEED: number = HBALLSPEED * -1;
+var HBALLSPEED: number = 10; // speedy version
+var VBALLSPEED: number = HBALLSPEED * -1; // speedy version
 
 @WebSocketGateway({
 	cors: { origin: "*" },
-	namespace: "/canvas"
+	namespace: "/speedy"
 })
-export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
+export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 	@WebSocketServer() wss: Server;
 
 	constructor(
 		private readonly gamesservice: GamesService,
-		// private readonly userservice: UsersService,
 	) { }
 
 	private gamePlayers: Array<GameObj> = [];
@@ -58,7 +56,6 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 	private rightScore: Array<number> = [];
 
 	private gameTimers: Array<any> = [];
-	private ballTimers: Array<any> = [];
 	private startTimers: Array<any> = [];
 
 	initBallnBar(ind: number) {
@@ -80,37 +77,37 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 			this.wss.to(
 				[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
 					(this.gamePlayers[ind].spectators)
-			).emit('setCountdown', { seconds: 5, });
+			).emit('setCountdownSpeedy', { seconds: 5, });
 
 			this.startTimers[ind] = setTimeout(() => {
 				console.log("SERVER: set timeOUT 4");
 				this.wss.to(
 					[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
 						(this.gamePlayers[ind].spectators)
-				).emit('setCountdown', { seconds: 4, });
+				).emit('setCountdownSpeedy', { seconds: 4, });
 
 				this.startTimers[ind] = setTimeout(() => {
 					console.log("SERVER: set timeOUT 3");
 					this.wss.to(
 						[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
 							(this.gamePlayers[ind].spectators)
-					).emit('setCountdown', { seconds: 3, });
+					).emit('setCountdownSpeedy', { seconds: 3, });
 
 					this.startTimers[ind] = setTimeout(() => {
 						console.log("SERVER: set timeOUT 2");
 						this.wss.to(
 							[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
 								(this.gamePlayers[ind].spectators)
-						).emit('setCountdown', { seconds: 2, });
+						).emit('setCountdownSpeedy', { seconds: 2, });
 
 						this.startTimers[ind] = setTimeout(() => {
 							this.wss.to(
 								[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
 									(this.gamePlayers[ind].spectators)
-							).emit('setCountdown', { seconds: 1, });
+							).emit('setCountdownSpeedy', { seconds: 1, });
 
-							this.startTimers[ind] = setTimeout(async () => {
-								await this.startGame(ind);
+							this.startTimers[ind] = setTimeout(() => {
+								this.startGame(ind);
 
 							}, 1000);
 						}, 1000);
@@ -120,26 +117,52 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 		}, 1000);
 	}
 
-	async startGame(ind: number) {
+	startGame(ind: number) {
 
 		this.leftScore[ind] = 0;
 		this.rightScore[ind] = 0;
 
-		this.gameTimers[ind] = setInterval(async () => {
+		this.gameTimers[ind] = setInterval(() => {
 
-			// Ball touched left
-			if (this.ballH[ind] - BALLRADIUS / 2 <= BARWIDTH) {
-				// Bounce
-				if (
-					(this.ballV[ind] >= this.leftbarV[ind] &&
-						this.ballV[ind] <= this.leftbarV[ind] + BARHEIGHT)
-				) {
-					HBALLSPEED *= -1;
+			this.ballH[ind] += HBALLSPEED;
+			this.ballV[ind] += VBALLSPEED;
+
+			if (this.ballH[ind] <= BARWIDTH || this.ballH[ind] >= WIDTH - BARWIDTH) {
+				HBALLSPEED *= -1;
+
+				// left goal
+				if (this.ballH[ind] - BALLRADIUS / 2 < BARWIDTH &&
+					(this.ballV[ind] < this.leftbarV[ind] ||
+						this.ballV[ind] > this.leftbarV[ind] + BARHEIGHT)) {
+					// score for p2
+					this.rightScore[ind] += 1;
+					if (this.rightScore[ind] >= WINSCORE) {
+
+						// stop game
+						clearInterval(this.gameTimers[ind]);
+
+						// update game in DB
+						this.finishGame(ind);
+
+						this.wss.to(this.gamePlayers[ind].p1SockId)
+							.emit("setTextSpeedy", { message: "LOST" });
+
+						this.wss.to(this.gamePlayers[ind].p2SockId)
+							.emit("setTextSpeedy", { message: "WINNER" });
+
+						// game over for spectators
+						if (this.gamePlayers[ind].spectators.length > 0) {
+							this.wss.to(this.gamePlayers[ind].spectators)
+								.emit("setTextSpeedy", { message: "GAME OVER" });
+						}
+					}
+					this.initBallnBar(ind);
 				}
-				// Score
-				else if ( // passed behind the bar
-					(this.ballH[ind] <= BARWIDTH)
-				) {
+
+				// right goal
+				if (this.ballH[ind] + BALLRADIUS / 2 > WIDTH - BARWIDTH &&
+					(this.ballV[ind] < this.rightbarV[ind] ||
+						this.ballV[ind] > this.rightbarV[ind] + BARHEIGHT)) {
 					// score for p1
 					this.leftScore[ind] += 1;
 					if (this.leftScore[ind] >= WINSCORE) {
@@ -150,89 +173,28 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 						// update game in DB
 						this.finishGame(ind);
 						this.wss.to(this.gamePlayers[ind].p1SockId)
-							.emit("setText", { message: "WINNER" });
+							.emit("setTextSpeedy", { message: "WINNER" });
 
 						this.wss.to(this.gamePlayers[ind].p2SockId)
-							.emit("setText", { message: "LOST" });
+							.emit("setTextSpeedy", { message: "LOST" });
 
 						// game over for spectators
 						if (this.gamePlayers[ind].spectators.length > 0) {
 							this.wss.to(this.gamePlayers[ind].spectators)
-								.emit("setText", { message: "GAME OVER" });
+								.emit("setTextSpeedy", { message: "GAME OVER" });
 						}
 					}
 					this.initBallnBar(ind);
-
-					// pause for a second after scoring
-					const date = Date.now();
-					let currentDate = null;
-					do {
-						currentDate = Date.now();
-					} while (currentDate - date < 1000);
-
-					HBALLSPEED *= -1;
 				}
 			}
 
-			// Ball touched right
-			if (this.ballH[ind] + BALLRADIUS / 2 >= WIDTH - BARWIDTH) {
-				// Bounce
-				if (
-					(this.ballV[ind] >= this.rightbarV[ind] &&
-						this.ballV[ind] <= this.rightbarV[ind] + BARHEIGHT)
-				) {
-					HBALLSPEED *= -1;
-				}
-				// Score
-				else if ( // passed behind the bar
-					(this.ballH[ind] >= WIDTH - BARWIDTH)
-				) {
-					// score for p1
-					this.rightScore[ind] += 1;
-					if (this.rightScore[ind] >= WINSCORE) {
-
-						// stop game
-						clearInterval(this.gameTimers[ind]);
-
-						// update game in DB
-						this.finishGame(ind);
-						this.wss.to(this.gamePlayers[ind].p1SockId)
-							.emit("setText", { message: "WINNER" });
-
-						this.wss.to(this.gamePlayers[ind].p2SockId)
-							.emit("setText", { message: "LOST" });
-
-						// game over for spectators
-						if (this.gamePlayers[ind].spectators.length > 0) {
-							this.wss.to(this.gamePlayers[ind].spectators)
-								.emit("setText", { message: "GAME OVER" });
-						}
-					}
-					this.initBallnBar(ind);
-
-					// pause for a second after scoring
-					const date = Date.now();
-					let currentDate = null;
-					do {
-						currentDate = Date.now();
-					} while (currentDate - date < 1000);
-
-					HBALLSPEED *= -1;
-				}
-			}
-
-			// Ball touched top or bottom
-			if (this.ballV[ind] - BALLRADIUS / 2 < 0 ||
-				this.ballV[ind] + BALLRADIUS / 2 > HEIGHT)
+			if (this.ballV[ind] - BALLRADIUS / 2 < 0 || this.ballV[ind] + BALLRADIUS / 2 > HEIGHT)
 				VBALLSPEED *= -1;
-
-			this.ballH[ind] += HBALLSPEED;
-			this.ballV[ind] += VBALLSPEED;
 
 			this.wss.to(
 				[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
 					(this.gamePlayers[ind].spectators)
-			).emit('recieveCoord', {
+			).emit("recieveCoordSpeedy", {
 				ballH: this.ballH[ind],
 				ballV: this.ballV[ind],
 				leftbarH: this.leftbarH[ind],
@@ -242,7 +204,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 				leftScore: this.leftScore[ind],
 				rightScore: this.rightScore[ind],
 			});
-		}, 0.015 * 1000);
+		}, 0.01 * 1000);
 	}
 
 	finishGame(ind: number) {
@@ -256,11 +218,11 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 		// notify player and spectators
 		this.wss.to(
 			[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
-				(this.gamePlayers[ind].spectators)).emit("gamefinished");
+				(this.gamePlayers[ind].spectators)).emit("gamefinishedSpeedy");
 	}
 
 
-	@SubscribeMessage('playerReady')
+	@SubscribeMessage('playerReadySpeedy')
 	handlePlayerReady(client: Socket, ...args: any[]) {
 
 		// console.log('SERVER PLAYER READY', args);
@@ -316,7 +278,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 		// console.log(ind, this.gamePlayers);
 	}
 
-	@SubscribeMessage('moveBarUp')
+	@SubscribeMessage('moveBarUpSpeedy')
 	handleMoveBarUp(client: Socket, ...args: any[]) {
 
 		// console.log('SERVER: GOT REQUEST TO MOVE BAR UP', args);
@@ -344,7 +306,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 		}
 	}
 
-	@SubscribeMessage('moveBarDown')
+	@SubscribeMessage('moveBarDownSpeedy')
 	handleMoveBarDown(client: Socket, ...args: any[]) {
 
 		// console.log('SERVER: GOT REQUEST TO MOVE BAR DOWN', args);
@@ -402,7 +364,6 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 				// stop streaming
 				clearInterval(this.gameTimers[ind]);
-				clearInterval(this.ballTimers[ind]);
 				clearInterval(this.startTimers[ind]);
 
 				// left player quitted
@@ -424,13 +385,13 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 				if (client.id === this.gamePlayers[ind].p2SockId) {
 
 					this.wss.to(this.gamePlayers[ind].p1SockId)
-						.emit("setText", { message: "WINNER" });
+						.emit("setTextSpeedy", { message: "WINNER" });
 				}
 
 				if (client.id === this.gamePlayers[ind].p1SockId) {
 
 					this.wss.to(this.gamePlayers[ind].p2SockId)
-						.emit("setText", { message: "WINNER" });
+						.emit("setTextSpeedy", { message: "WINNER" });
 				}
 
 				// game over for spectators
@@ -438,7 +399,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 				if (this.gamePlayers[ind].spectators.length > 0)
 					this.wss.to(this.gamePlayers[ind].spectators)
-						.emit("setText", { message: "GAME OVER" });
+						.emit("setTextSpeedy", { message: "GAME OVER" });
 			}
 		}
 
@@ -449,6 +410,5 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 				this.gamePlayers[index].spectators.splice(ind2, 1);
 		});
 	}
-
 
 }

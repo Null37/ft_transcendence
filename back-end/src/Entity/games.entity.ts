@@ -9,6 +9,7 @@ export class games_dto
 	score_one: number = 0;
 	score_two: number = 0;
 	finished: number = 0;
+	type: number = 1;
 	created_at: Date;
 }
 
@@ -34,6 +35,11 @@ export class Games
 
 	@Column()
 	finished: number = 0;
+
+	@Column()
+	type: number = 1;
+	// 1 : normal game
+	// 2 : speedy game
 
 	@CreateDateColumn()
 	created_at: Date;

@@ -23,12 +23,12 @@ export class GamesService {
 		});
 	}
 
-	async startGame(host: Users, guest: Users) {
+	async startGame(host: Users, guest: Users, gameType: number = 1) {
 
 		return await this.gamesdata
 				.createQueryBuilder()
 				.insert()
-				.values({player_one: host, player_two: guest, score_one: 0, score_two: 0, finished: 0})
+				.values({player_one: host, player_two: guest, score_one: 0, score_two: 0, type: gameType, finished: 0})
 				.returning('id')
 				.execute();
 	}
@@ -41,12 +41,12 @@ export class GamesService {
 		});
 	}
 
-	async invite_game(host: Users)
+	async invite_game(host: Users, gameType: number = 1)
 	{
 		return await this.gamesdata
 				.createQueryBuilder()
 				.insert()
-				.values({player_one: host, player_two: null, score_one: 0, score_two: 0, finished: 0})
+				.values({player_one: host, player_two: null, score_one: 0, score_two: 0, type: gameType, finished: 0})
 				.returning('id')
 				.execute();
 	}
@@ -65,18 +65,18 @@ export class GamesService {
 
 			// p one wins
 			if (gm.score_one == 4) {
-				gm.player_one.first_win = "http://localhost:3000/public/achievements/success.png";
+				gm.player_one.first_win = "/public/achievements/success.png";
 			}
 
 			// p two wins
 			else if (gm.score_two == 4) {
-				gm.player_two.first_win = "http://localhost:3000/public/achievements/success.png";
+				gm.player_two.first_win = "/public/achievements/success.png";
 			}
 
 			// if (gm.player_two)
 			// 	exit();
-			gm.player_one.conquer = "http://localhost:3000/public/achievements/conquer.png";
-			gm.player_two.conquer = "http://localhost:3000/public/achievements/conquer.png";
+			gm.player_one.conquer = "/public/achievements/conquer.png";
+			gm.player_two.conquer = "/public/achievements/conquer.png";
 
 			gm.player_one.level += 1;
 			gm.player_two.level += 1;

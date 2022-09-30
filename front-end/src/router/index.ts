@@ -5,6 +5,7 @@ import Login from '../views/Login.vue';
 import Game from '../views/Game.vue';
 import TWOFA from '../views/2FA.vue';
 import Canvas from '../views/Canvas.vue';
+import Speedy from '../views/Speedy.vue';
 import axios from 'axios';
 
 Vue.use(VueRouter)
@@ -19,6 +20,11 @@ const routes: Array<RouteConfig> = [
     name: 'Play',
     path: '/Play',
     component: Canvas
+  },
+  {
+    name: 'Speedy',
+    path: '/Speedy',
+    component: Speedy
   },
   {
     name: '2FA',

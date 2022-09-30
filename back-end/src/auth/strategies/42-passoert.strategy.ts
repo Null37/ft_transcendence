@@ -10,9 +10,9 @@ import { jwtConstants } from '../constants';
 export class passport_42 extends PassportStrategy(Strategy) {
 	constructor(private readonly usra: UsersService) {
     super({
-		clientSecret: jwtConstants.secret,
-		clientID: '3f898cb71115b6afcb8219bbfc835014640317c0d8b46306fc6b69b869d988f1',
-		callbackURL: 'http://localhost:3000/login',
+		clientID: '9a9063566068d7a986caea4ee8f8d7b91ed1fe0d5959ea278dc8cae5ea2eaa8a', // process.env.APIID
+		clientSecret: 'b5cb5f8b755bb1354a629c7fcc94edbf0239db0d6b781ba12f83fc29fc8c7c5e', // process.env.APISECRET
+		callbackURL: 'http://localhost:3000/login', // process.env.APIREDIRECT
     },
 	async function verify(accessToken, refreshToken, profile, cb) 
 	{
