@@ -24,6 +24,10 @@ export default Vue.extend({
     name: "App",
 
     methods: {
+    changeAvatarC: function(newavatar)
+    {
+      this.avatar = newavatar;
+    },
 		logout: function()
 		{
 			console.log("disconnecting the user from the website")
@@ -198,7 +202,7 @@ export default Vue.extend({
         <v-hover
         v-slot="{ hover }"
         >
-          <EditProfile :avatar="avatar" />
+          <EditProfile @changeAvatar="changeAvatarC" :avatar="avatar" />
         </v-hover>
       </v-navigation-drawer>
 
