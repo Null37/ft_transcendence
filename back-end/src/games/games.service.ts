@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { exit } from "process";
 import { identity } from "rxjs";
+import { filter } from "src/DTO/filter.dto";
 import { Games } from "src/Entity/games.entity";
 import { Users } from "src/Entity/users.entity";
 import { Repository } from "typeorm";
@@ -87,13 +88,13 @@ export class GamesService {
 		});
 	}
 
-	get_history(id: number)
+	get_history(id: filter)
 	{
 		return this.gamesdata
 		.createQueryBuilder('games')
 		.leftJoinAndSelect("games.player_one", "player_one")
 		.leftJoinAndSelect("games.player_two", "player_two")
-		.where("games.player_two = :plo", { plo: id })
+		.where("games.player_one = :plo", { plo: id })
 		.orWhere("games.player_two = :plt", { plt: id })
 		.getMany();
 	}

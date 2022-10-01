@@ -1,16 +1,15 @@
-import { BadGatewayException, BadRequestException, Body, Controller, FileTypeValidator, Get, Header, HttpException, HttpStatus, Logger, NotFoundException, Param, ParseFilePipe, Patch, Post, Put, Query, Redirect, Req, Request, Res, Response, UploadedFile, UseFilters, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, Body, Controller, FileTypeValidator, Get, Header, HttpException, HttpStatus, Logger, NotFoundException, Param, ParseFilePipe, ParseUUIDPipe, Patch, Post, Put, Query, Redirect, Req, Request, Res, Response, UploadedFile, UseFilters, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { pass_42Guard } from './auth/guards/passport-42-auth.guard';
 import { jwtGuard } from './auth/guards/jwt-auth.guard';
 import * as path from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { get, request } from 'http';
-import { stringify } from 'querystring';
-import { write } from 'fs';
 import { body_dto } from './DTO/body.dto';
 import { UsersService } from './users/users.service';
 import { GamesService } from "./games/games.service";
+import { Matches, matches, MATCHES } from 'class-validator';
+import { filter } from './DTO/filter.dto';
 
 
 @Controller()
@@ -129,8 +128,19 @@ export class AppController {
 
   @UseGuards(jwtGuard)
   @Get('user/:id')
-  async get_user(@Request() Req, @Param('id') par)
+  async get_user(@Request() Req, @Param('id') par: string)
   {
+    // check of parm
+    // let pagePattern: RegExp  = new RegExp('[0-9][a-b]','g')
+    const regex = new RegExp('^[a-zA-Z]+$'); // check for security
+
+    console.log(regex.test(par));
+    if(regex.test(par) == true)
+    {
+     console.log(" 2 check test  -=== > ", regex.test(par))
+    }
+    else
+      throw new BadRequestException()
     if (par === 'me')
       par = Req.user.name;
     // find usr and get data
@@ -227,7 +237,7 @@ export class AppController {
 
   @UseGuards(jwtGuard)
   @Get('get_history/:id')
-  async get_history(@Param('id') userid) // get information about a player with their game history
+  async get_history(@Param('id') userid: filter) // get information about a player with their game history
   {
     return (this.gamesservice.get_history(userid));
   }
