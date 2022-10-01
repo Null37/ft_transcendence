@@ -134,13 +134,8 @@ export class AppController {
     // let pagePattern: RegExp  = new RegExp('[0-9][a-b]','g')
     const regex = new RegExp('^[a-zA-Z]+$'); // check for security
 
-    console.log(regex.test(par));
-    if(regex.test(par) == true)
-    {
-     console.log(" 2 check test  -=== > ", regex.test(par))
-    }
-    else
-      throw new BadRequestException()
+    if(regex.test(par) == false)
+       throw new BadRequestException()
     if (par === 'me')
       par = Req.user.name;
     // find usr and get data
@@ -154,6 +149,9 @@ export class AppController {
   @Patch('update')
   async update_user(@Request() req , @Body() body)
   {
+    const regex = new RegExp('^[a-zA-Z0-9]+$'); // check for security
+    if(regex.test(body.username) == false)
+      throw new BadRequestException()
     let uniq_test = null
     if(body.username != undefined)
       uniq_test = await this.authService.check_username(body.username) // check username with database
