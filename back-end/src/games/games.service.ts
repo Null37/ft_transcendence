@@ -88,16 +88,10 @@ export class GamesService {
 		});
 	}
 
-	get_history(id: number)
+	async get_history(id: number)
 	{
-		// return this.gamesdata
-		// .createQueryBuilder('games')
-		// .leftJoinAndSelect("games.player_one", "player_one")
-		// .leftJoinAndSelect("games.player_two", "player_two")
-		// .where("games.player_one = :plo", { plo: id })
-		// .orWhere("games.player_two = :plt", { plt: id })
-		// .getMany();
-		return this.playersdata.find({
+	
+		return await this.playersdata.find({
 			where: {
 				id: id,
 			},
@@ -107,13 +101,6 @@ export class GamesService {
 	}
 	async get_achievm(id: number)
 	{
-		// return this.gamesdata
-		// .createQueryBuilder('games')
-		// .leftJoinAndSelect("games.player_one", "player_one")
-		// .leftJoinAndSelect("games.player_two", "player_two")
-		// .where("games.player_one = :plo", { plo: id })
-		// .orWhere("games.player_two = :plt", { plt: id })
-		// .getMany();
 		return await this.playersdata.find({
 			where: {
 				id: id,
