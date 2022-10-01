@@ -46,7 +46,9 @@ export default Vue.extend({
     methods: {
 		back2game () {
 			this.gameSocket.close();
+            console.log("---  back2game");
 			this.$router.push({ name: 'Game' });
+            
 		}
     },
 
@@ -237,13 +239,15 @@ export default Vue.extend({
                 setTimeout(() => {
 
 					this.gameSocket.close();
+                    
+
 					this.$router.push({ name: 'Game', });
                 }, 2 * 1000);
 
             }, 0.25 * 1000);
         });
     },
-    
+
     mounted() {
 
         // Creating the sketch itself
