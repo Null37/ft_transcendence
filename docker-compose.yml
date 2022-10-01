@@ -38,6 +38,8 @@ services:
         dockerfile: front-end.dockerfile
       depends_on:
         - back-end
+      env_file:
+        - ./.env.local
       volumes:
         - ./front-end:/front-end
      #   - ./images:/front-end/public/images
