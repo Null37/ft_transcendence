@@ -197,7 +197,7 @@ export class AppController {
   @Get('verify_game/:id')
   async verify_game(@Param('id') gameId) // get information about a game
   {
-    const regex = new RegExp('^[a-zA-Z0-9]+$'); // check for security
+    const regex = new RegExp('^[a-zA-Z0-9\-]+$'); // check for security
     if(regex.test(gameId) == false)
       throw new BadRequestException()
     // search for game using ID
@@ -231,6 +231,9 @@ export class AppController {
   @Get('accept_invite/:user/:game')
   async accept_invite(@Param('user') userid, @Param('game') gameid) // get information about a game
   {
+    const regex = new RegExp('^[0-9]+$'); // check for security
+    if(regex.test(userid.toString()) == false)
+      throw new BadRequestException()
     try {
       let invited = await this.userdata.findbyId(userid);
       this.gamesservice.accept_invite(invited, gameid);
