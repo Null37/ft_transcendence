@@ -247,4 +247,13 @@ export class AppController {
       throw new BadRequestException()
     return (await this.gamesservice.get_history(userid));
   }
+  @UseGuards(jwtGuard)
+  @Get('get_achievm/:id')
+  async get_achiev(@Param('id') userid: number) // get information about a player with their game history
+  {
+    const regex = new RegExp('^[0-9]+$'); // check for security
+    if(regex.test(userid.toString()) == false)
+      throw new BadRequestException()
+    return (await this.gamesservice.get_achievm(userid));
+  }
 }
