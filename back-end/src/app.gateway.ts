@@ -143,8 +143,8 @@ import * as bcrypt from 'bcrypt';
 	}
 
 	async handleConnection(client: Socket, ...args: any[]) {
-	  this.logger.log(`Client connected:    ${client}`);
-	  const token = client.handshake.headers.authorization;
+		const token = client.handshake.headers.authorization;
+		this.logger.log(`Client connected:    ${client.id}`);
 	  if (token)
 	  {
 		  var base64Url = token.split('.')[1];
@@ -164,7 +164,7 @@ import * as bcrypt from 'bcrypt';
 				}
 					
 			  }
-			  console.log(`user.status: ${user.status}`);
+			  console.log(`user.status: ${user?.status}`);
 		  }
 	  }
 	}
