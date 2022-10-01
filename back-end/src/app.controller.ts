@@ -1,16 +1,15 @@
-import { BadGatewayException, BadRequestException, Body, Controller, FileTypeValidator, Get, Header, HttpException, HttpStatus, Logger, NotFoundException, Param, ParseFilePipe, Patch, Post, Put, Query, Redirect, Req, Request, Res, Response, UploadedFile, UseFilters, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, Body, Controller, FileTypeValidator, Get, Header, HttpException, HttpStatus, Logger, NotFoundException, Param, ParseFilePipe, ParseUUIDPipe, Patch, Post, Put, Query, Redirect, Req, Request, Res, Response, UploadedFile, UseFilters, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { pass_42Guard } from './auth/guards/passport-42-auth.guard';
 import { jwtGuard } from './auth/guards/jwt-auth.guard';
 import * as path from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { get, request } from 'http';
-import { stringify } from 'querystring';
-import { write } from 'fs';
 import { body_dto } from './DTO/body.dto';
 import { UsersService } from './users/users.service';
 import { GamesService } from "./games/games.service";
+import { Matches, matches, MATCHES } from 'class-validator';
+import { filter } from './DTO/filter.dto';
 
 
 @Controller()
@@ -129,8 +128,14 @@ export class AppController {
 
   @UseGuards(jwtGuard)
   @Get('user/:id')
-  async get_user(@Request() Req, @Param('id') par)
+  async get_user(@Request() Req, @Param('id') par: string)
   {
+    // check of parm
+    // let pagePattern: RegExp  = new RegExp('[0-9][a-b]','g')
+    const regex = new RegExp('^[a-zA-Z]+$'); // check for security
+
+    if(regex.test(par) == false)
+       throw new BadRequestException()
     if (par === 'me')
       par = Req.user.name;
     // find usr and get data
@@ -144,6 +149,9 @@ export class AppController {
   @Patch('update')
   async update_user(@Request() req , @Body() body)
   {
+    const regex = new RegExp('^[a-zA-Z0-9]+$'); // check for security
+    if(regex.test(body.username) == false)
+      throw new BadRequestException()
     let uniq_test = null
     if(body.username != undefined)
       uniq_test = await this.authService.check_username(body.username) // check username with database
@@ -189,6 +197,9 @@ export class AppController {
   @Get('verify_game/:id')
   async verify_game(@Param('id') gameId) // get information about a game
   {
+    const regex = new RegExp('^[a-zA-Z0-9\-]+$'); // check for security
+    if(regex.test(gameId) == false)
+      throw new BadRequestException()
     // search for game using ID
     let game = null;
 
@@ -204,7 +215,9 @@ export class AppController {
   {
     // search for game using ID
     let game = null;
-
+    const regex = new RegExp('^[0-9]+$'); // check for security
+    if(regex.test(userId) == false)
+      throw new BadRequestException()
     try {
       let findit = await this.userdata.findbyId(userId);
       game = await this.gamesservice.invite_game(findit);
@@ -218,6 +231,12 @@ export class AppController {
   @Get('accept_invite/:user/:game')
   async accept_invite(@Param('user') userid, @Param('game') gameid) // get information about a game
   {
+    const regex = new RegExp('^[0-9]+$'); // check for security
+    if(regex.test(userid.toString()) == false)
+      throw new BadRequestException()
+    const regex2 = new RegExp('^[a-zA-Z0-9\-]+$'); // uuid check for security 
+    if(regex2.test(gameid) == false)
+        throw new BadRequestException()
     try {
       let invited = await this.userdata.findbyId(userid);
       this.gamesservice.accept_invite(invited, gameid);
@@ -227,8 +246,20 @@ export class AppController {
 
   @UseGuards(jwtGuard)
   @Get('get_history/:id')
-  async get_history(@Param('id') userid) // get information about a player with their game history
+  async get_history(@Param('id') userid: number) // get information about a player with their game history
   {
-    return (this.gamesservice.get_history(userid));
+    const regex = new RegExp('^[0-9]+$'); // check for security
+    if(regex.test(userid.toString()) == false)
+      throw new BadRequestException()
+    return (await this.gamesservice.get_history(userid));
+  }
+  @UseGuards(jwtGuard)
+  @Get('get_achievm/:id')
+  async get_achiev(@Param('id') userid: number) // get information about a player with their game history
+  {
+    const regex = new RegExp('^[0-9]+$'); // check for security
+    if(regex.test(userid.toString()) == false)
+      throw new BadRequestException()
+    return (await this.gamesservice.get_achievm(userid));
   }
 }

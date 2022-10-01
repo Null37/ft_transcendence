@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Request, UseGuards } from "@nestjs/common";
+import { BadRequestException, Controller, Get, Param, Request, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth/auth.service";
 import { jwtGuard } from "./auth/guards/jwt-auth.guard";
 import { blockService } from "./users/block.service";
@@ -13,19 +13,25 @@ export class BlockCtroller {
   @Get('find')
   async all_blocked(@Request() req)
   {
+    
       return await this.block_base.get_blocked(req.user.sub); 
   }
 
   @Get(':id')
   async block_user(@Request() req, @Param('id') par_id)
   {
-    
+    const regex = new RegExp('^[0-9]+$'); // check for security
+    if(regex.test(par_id.toString()) == false)
+      throw new BadRequestException()
     await this.block_base.block({user_id: req.user.sub, block_list: par_id}, req.user.sub, par_id)
   }
 
   @Get('unblock/:id')
   async unblock_user(@Request() req, @Param('id') par_id)
   {
+    const regex = new RegExp('^[0-9]+$'); // check for security
+    if(regex.test(par_id.toString()) == false)
+      throw new BadRequestException()
     return await this.block_base.unblock(par_id, req.user.sub);
 
   }

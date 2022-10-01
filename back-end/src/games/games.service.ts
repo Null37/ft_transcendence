@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { exit } from "process";
 import { identity } from "rxjs";
+import { filter } from "src/DTO/filter.dto";
 import { Games } from "src/Entity/games.entity";
 import { Users } from "src/Entity/users.entity";
 import { Repository } from "typeorm";
@@ -87,15 +88,25 @@ export class GamesService {
 		});
 	}
 
-	get_history(id: number)
+	async get_history(id: number)
 	{
-		return this.gamesdata
-		.createQueryBuilder('games')
-		.leftJoinAndSelect("games.player_one", "player_one")
-		.leftJoinAndSelect("games.player_two", "player_two")
-		.where("games.player_one = :plo", { plo: id })
-		.orWhere("games.player_two = :plt", { plt: id })
-		.getMany();
+	
+		return await this.playersdata.find({
+			where: {
+				id: id,
+			},
+			relations: {
+				games: true,
+		}});
+	}
+	async get_achievm(id: number)
+	{
+		return await this.playersdata.find({
+			where: {
+				id: id,
+			},
+			select: { first_win : true, conquer: true}
+		});
 	}
 
 	accept_invite(invited: Users, gameid: string)
