@@ -44,7 +44,7 @@ export class RoomController {
 	@Post('joinRoom/:id')
 	async joinRoom(@Body() body, @Param() param, @Request() req): Promise<any>
 	{
-		if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(param.id))
+		if (!/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(param.id))
 		{
 			console.log("room's id's: ",param.id)
 	
