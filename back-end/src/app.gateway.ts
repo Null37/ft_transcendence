@@ -419,6 +419,8 @@ import * as bcrypt from 'bcrypt';
 			return ;
 		}
 		let usr = await this.roomsService.roomUser.findOne({where: {userID: message.userID, roomName: message.room}})
+		if (!usr)
+			return ;
 		console.log("user is banned for: ", +usr.duration - Date.now(), "===> status" , usr.status)
 
 		console.log("usr ====> ", usr, "====> role: ", usr.role)
@@ -435,6 +437,11 @@ import * as bcrypt from 'bcrypt';
 				await this.roomsService.roomUser.delete({roomName: message.room, userID: message.userID})
 				client.leave(message.room)
 				let tmp69 = await this.usersService.findbyId(message.userID)
+				// add new logic to leave room if empty (deleted)
+				let roomnb = await this.roomsService.roomUser.find({where: {roomName: message.room}})
+				console.log("deleting the room ===> ", roomnb)
+				if (roomnb.length == 0)
+					await this.roomsService.rooms.delete({roomName: message.room})
 				this.wss.to(message.room).emit('leaveRoom', tmp69.username, message.room);
 				return ;
 			}
@@ -490,6 +497,8 @@ import * as bcrypt from 'bcrypt';
 				if (!res)
 					return ;
 				let foo = await this.roomsService.roomUser.findOneOrFail({where: {userID: res.id, roomName: message.room}})
+				if (foo.role == "mod" || foo.role == "moderator")
+					return ;
 				foo.duration = (Date.now() + (valid * 1000)).toString();
 				foo.status = arr[0] == "/ban" ? 2 : 1;
 				let username = await this.usersService.findbyId(res.id)
