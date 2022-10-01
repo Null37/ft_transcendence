@@ -234,6 +234,9 @@ export class AppController {
     const regex = new RegExp('^[0-9]+$'); // check for security
     if(regex.test(userid.toString()) == false)
       throw new BadRequestException()
+    const regex2 = new RegExp('^[a-zA-Z0-9\-]+$'); // uuid check for security 
+    if(regex2.test(gameid) == false)
+        throw new BadRequestException()
     try {
       let invited = await this.userdata.findbyId(userid);
       this.gamesservice.accept_invite(invited, gameid);
