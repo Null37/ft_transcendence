@@ -247,6 +247,8 @@ export default Vue.extend({
     mounted() {
 
         // Creating the sketch itself
+        this.$socket.emit('connectUserGame', localStorage.getItem('token'));
+
         const sketch = (p5: P5) => {
 
             p5.windowResized = () => {

@@ -24,7 +24,13 @@ export default Vue.extend({
     name: "App",
 
     methods: {
-      setUsernameMethod: function() {
+		logout: function()
+		{
+			console.log("disconnecting the user from the website")
+			this.$socket.emit('disconnectUser', this.username);
+			
+		},
+		setUsernameMethod: function() {
         if (this.usernameEdit.length >= 5 && this.usernameEdit.length <= 10)
         {
           const token = localStorage.getItem('token');
@@ -147,12 +153,18 @@ export default Vue.extend({
           headers: {
             Authorization: token
         }}).then(res => {
-          this.avatar = res.data.avatar;
-          this.username = res.data.username;
-          this.intra_login = res.data.intra_login;
-          this.status = res.data.status;
-          if (this.username === null)
-            this.setUsername = true;
+			this.$socket.connect();
+        	this.avatar = res.data.avatar;
+        	this.username = res.data.username;
+        	this.intra_login = res.data.intra_login;
+        	this.status = res.data.status;
+        	if (this.username === null)
+            	this.setUsername = true;
+			else
+			{
+				console.log("this.username ", this.username);
+				this.$socket.emit('connectUser', this.username, "Online");
+			}
         })
         .catch(error => {
           console.log(error);
@@ -222,6 +234,7 @@ export default Vue.extend({
             <router-link style="text-decoration: none;" to="/Logout">
                 <v-list-item
                     link
+					@click="logout()"
                 >
                     <v-list-item-content>
                     <v-list-item-title>Logout</v-list-item-title>

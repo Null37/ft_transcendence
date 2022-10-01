@@ -12,8 +12,9 @@ import axios from 'axios';
       creatroom: function (){
 
         const token = localStorage.getItem('token');
+		var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
 
-        if (token && this.roomname.length > 0)
+        if (token && this.roomname && this.roomname.length > 0 && !format.test(this.roomname))
         {
           let st = 0;
           if (this.roompassword != '')

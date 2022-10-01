@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 
 
 @Injectable()
+
 export class RoomsService {
 	constructor(
 	@InjectRepository(Rooms)
@@ -24,6 +25,9 @@ export class RoomsService {
 			return "Chat room already exists";
 		if (roomElem.password)
 			roomElem.password = await bcrypt.hash(roomElem.password, 10);
+		if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(roomElem.roomName))
+			return "Room name can't contain special characters";
+			
 		let tmp = this.rooms.create(roomElem);
 
 		let usr = this.roomUser.create({
@@ -59,6 +63,8 @@ export class RoomsService {
 			let usrexist = await this.roomUser.findOne({where: {userID: +userID, roomName: room_name}})
 			
 			// if (usrexist && usrexist.status == 1 && usrexist.duration && +usrexist.duration > Date.now())
+			console.log("usrexist ==> ")
+			console.log(usrexist);
 			if (usrexist && usrexist.status == 2 && usrexist.duration && +usrexist.duration > Date.now())
 				return "User is banned from this chat";
 			
@@ -88,7 +94,7 @@ export class RoomsService {
 				return res;
 			}
 			else
-				return "User already joined";
+				return usrexist;
 		}
 	}
 

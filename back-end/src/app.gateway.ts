@@ -38,22 +38,135 @@ import * as bcrypt from 'bcrypt';
 			2- remove it
 			3- if array is empty broadcast to all users status update
 		*/
-	  this.logger.log(`Client disconnected: ${client.id}`);
 	  let usrs = await this.usersService.findAll();
 	  for (let i = 0; i < usrs.length; i++)
 	  {
-		console.log(usrs[i])
-		if (usrs[i].socket_savier.includes(client.id))
-			usrs[i].socket_savier.splice(usrs[i].socket_savier.indexOf(client.id), 1)
-		console.log(usrs[i])
-		await this.usersService.update(usrs[i])
+		  if (usrs[i].socket_savier.includes(client.id))
+		  {
+			  usrs[i].socket_savier.splice(usrs[i].socket_savier.indexOf(client.id), 1)
+			  if (usrs[i].socket_savier.length == 0)
+			  {
+				if (usrs[i].inGamesock.length !== 0)
+				{
+					usrs[i].status = "In-Game";
+					this.wss.emit('statusChanged', {debug: "socket disconnect", username: usrs[i].username, status: "In-Game"});
+				}
+				else
+				{
+					usrs[i].status = "offline";
+					this.wss.emit('statusChanged', {debug: "socket disconnect", username: usrs[i].username, status: "offline"});
+				}
+			}
+		}
+		else if (usrs[i].inGamesock.includes(client.id))
+		{
+			usrs[i].inGamesock.splice(usrs[i].inGamesock.indexOf(client.id), 1)
+			console.log("zebi's length", usrs[i].inGamesock.length)
+			if (usrs[i].inGamesock.length == 0)
+			{
+				console.log("socket's length", usrs[i].socket_savier.length)
+				if (usrs[i].socket_savier.length !== 0)
+				{
+					this.wss.emit('statusChanged', {debug: "socket disconnect", username: usrs[i].username, status: "Online"});
+					usrs[i].status = "Online";
+				}
+				else
+				{
+					this.wss.emit('statusChanged', {debug: "socket disconnect", username: usrs[i].username, status: "offline"});
+					usrs[i].status = "offline";
+				}
+			}
+		}
+		await this.usersService.update(usrs[i]) // probably should be inside the if statement but i'm lazy to test it now
 	  }
+	//   this.wss.emit('statusChanged', {debug: "socket disconnect", username: "placeholder", status: "offline"});
+
+
+
+
+
+	//   const token = client.handshake.headers.authorization;
+	//   var base64Url = token.split('.')[1];
+	//   var base64 = base64Url.replace('-', '+').replace('_', '/');
+	//    console.log(JSON.parse(atob(base64)));
+
+
+
+
+
 	}
-  
-	handleConnection(client: Socket, ...args: any[]) {
+	@SubscribeMessage('disconnectUser')
+	async disconnectUser(client: Socket, username: string): Promise<any> {
+		this.logger.log(`Disconect userdisconnected: ${client.id}`);
+		const user = await this.usersService.find_username(username)
+		if (user)
+		{
+			user.status = "offline";
+			user.socket_savier = []
+			user.inGamesock = []
+		}
+		await this.usersService.update(user)
+		this.wss.emit('statusChanged', {debug: "sDisconect userdisconnected", username: user.username, status: "offline"});
+		// let usrs = await this.usersService.findAll();
+		// for (let i = 0; i < usrs.length; i++)
+		// {
+		//   if (usrs[i].socket_savier.includes(client.id))
+		//   {
+		// 	  console.log("reached user ====> ", usrs[i].username)
+		// 	  usrs[i].socket_savier.splice(usrs[i].socket_savier.indexOf(client.id), 1)
+		// 	  console.log("length of the socket savier ====> ", usrs[i].socket_savier)
+		// 	  if (usrs[i].socket_savier.length == 0)
+		// 	  {
+		// 		  usrs[i].status = "offline";
+		// 		  this.wss.emit('statusChanged', {debug: "socket disconnect", username: usrs[i].username, status: "offline"});
+		// 	  }
+		//   }
+		//   else if (usrs[i].inGamesock.includes(client.id))
+		//   {
+		// 	  usrs[i].inGamesock.splice(usrs[i].inGamesock.indexOf(client.id), 1)
+		// 	  if (usrs[i].inGamesock.length == 0)
+		// 	  {
+		// 		  if (usrs[i].socket_savier.length !== 0)
+		// 		  {
+		// 			  this.wss.emit('statusChanged', {debug: "socket disconnect", username: usrs[i].username, status: "Online"});
+		// 			  usrs[i].status = "Online";
+		// 		  }
+		// 		  else
+		// 		  {
+		// 			  this.wss.emit('statusChanged', {debug: "socket disconnect", username: usrs[i].username, status: "offline"});
+		// 			  usrs[i].status = "offline";
+		// 		  }
+		// 	  }
+		//   }
+		//   await this.usersService.update(usrs[i]) // probably should be inside the if statement but i'm lazy to test it now
+		// }
+	}
+
+	async handleConnection(client: Socket, ...args: any[]) {
 	  this.logger.log(`Client connected:    ${client}`);
-	  
-	//   console.log(`Client connected:    ${client.}`);
+	  const token = client.handshake.headers.authorization;
+	  if (token)
+	  {
+		  var base64Url = token.split('.')[1];
+		  if (base64Url)
+		  {
+			  var base64 = base64Url.replace('-', '+').replace('_', '/');
+			  const tmp = JSON.parse(atob(base64));
+			  console.log(tmp);
+			  const user = await this.usersService.findOne(tmp.name)
+			  if (user)
+			  {
+				console.log("ya zebiiiiiiiii", user.status)
+				if (user.status !== "In-Game")
+				{
+					user.status = "Online";
+					user.socket_savier.includes(client.id) ? null : user.socket_savier.push(client.id) // add socket in case of Online only (game socket is added in the inGamesock)
+				}
+					
+			  }
+			  console.log(`user.status: ${user?.status}`);
+		  }
+	  }
 	}
 
 	@SubscribeMessage('connectUser')
@@ -61,27 +174,67 @@ import * as bcrypt from 'bcrypt';
 	{
 		/* 
 			1- check if the user exists in the data base
-			2- change status to online if the old status is not "game"
+			2- change status to Online if the old status is not "game"
 			3- 
 		*/
 		// let usr = await this.usersService.find_username("boodeer");
-		let usr = await this.usersService.find_username(username);
+		let usr = await this.usersService.find_username(username[0]);
+
 		if (usr)
 		{
-			if (usr.status != "game")
-				usr.status = label;
-			usr.socket_savier.includes(client.id) ? null : usr.socket_savier.push(client.id)
+			if (username[1] != "In-Game")
+			{
+				if (usr.status !== "In-Game")
+					usr.status = username[1];
+				usr.socket_savier.includes(client.id) ? null : usr.socket_savier.push(client.id) // add socket in case of Online only (game socket is added in the inGamesock)
+			}
+			else if (username[1] == "In-Game")
+			{
+				usr.status = username[1];
+				usr.inGamesock.includes(client.id) ? null : usr.inGamesock.push(client.id) // add socket in case of Online only (game socket is added in the inGamesock)
+			}
 			// usr.socket_savier.push(client.id)
 			await this.usersService.update(usr)
-			this.wss.emit('statusChanged', username, label)
 		}
-		console.log(usr)
+		console.log("usr =====> ", username[0])
+		if (usr.status != "In-Game")
+			this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "Online"})
+		else
+		this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "In-Game"})
 
 	}
 
 
 
+	@SubscribeMessage('connectUserGame')
+	async handleConnectuserGame(client: Socket, token: string)
+	{
 
+		var base64Url = token.split('.')[1];
+		if (base64Url)
+		{
+			var base64 = base64Url.replace('-', '+').replace('_', '/');
+			if (base64)
+			{
+				const tmp = JSON.parse(atob(base64));
+				console.log(tmp);
+				const usr = await this.usersService.findOne(tmp.name)
+		
+				// let usr = await this.usersService.find_username(username);
+		
+				if (usr)
+				{
+						usr.status =  "In-Game";
+						usr.inGamesock.includes(client.id) ? null : usr.inGamesock.push(client.id) // add socket in case of Online only (game socket is added in the inGamesock)
+						usr.socket_savier.includes(client.id) ? usr.socket_savier.splice(usr.socket_savier.indexOf(client.id), 1) : null // remove socket from Online
+					// usr.socket_savier.push(client.id)
+					await this.usersService.update(usr)
+				}
+				// console.log("usr =====> ", username)
+				this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "In-Game"})
+			}
+		}
+	}
 
 
 
@@ -143,12 +296,19 @@ import * as bcrypt from 'bcrypt';
 		broadcast the userID to update other users front-end
 	*/
 	@SubscribeMessage('leaveRoom')
-	handleLeaveRoom(client: Socket, room: string): void {
+	async handleLeaveRoom(client: Socket, room: string): Promise<any> {
 		//TODO: check if room is protected and if user is not banned etc...
 		// this.roomsService.
 		client.leave(room);
 		//TODO Delete the user from UsersRoom table.
+		// let usrs = await this.roomsService.roomUser.find({where: {roomName: room}})
 
+		const token = client.handshake.headers.authorization;
+		var base64Url = token.split('.')[1];
+		var base64 = base64Url.replace('-', '+').replace('_', '/');
+		console.log(JSON.parse(atob(base64)));
+		let usr = await this.usersService.find_username(JSON.parse(atob(base64)).username);
+		await this .roomsService.roomUser.delete({roomName: room, userID: usr.id})
 		// client.broadcast.to(room).emit('leaveRoom', userID);
 	}
 
@@ -177,7 +337,7 @@ import * as bcrypt from 'bcrypt';
 		// tmp.id 
 
 		let userProfile = await this.usersService.findbyId(message.sender)
-		console.log(userProfile)
+		// console.log(userProfile)
 		if (tmp == null)
 		{
 			client.broadcast.to(message.room).emit('msgToClient',
@@ -212,24 +372,60 @@ import * as bcrypt from 'bcrypt';
 		
 		
 		let usr = await this.roomsService.roomUser.findOne({where: {userID: message.userID, roomName: message.room}})
+		console.log("user is banned for: ", +usr.duration - Date.now(), "===> status" , usr.status)
+
+		console.log("usr ====> ", usr, "====> role: ", usr.role)
 		if ((usr.status == 1 && +usr.duration > Date.now()))
-			return ;
-		
-		if (message.text.startsWith("/changepassword ") && usr.role == "moderator")
 		{
+			console.log("rani hena")
+			return ;
+		}
+		if (message.text.split(" ")[0] == "/leave")
+		{
+			console.log("here")
+			if (usr)
+			{
+				await this.roomsService.roomUser.delete({roomName: message.room, userID: message.userID})
+				client.leave(message.room)
+				let tmp69 = await this.usersService.findbyId(message.userID)
+				this.wss.to(message.room).emit('leaveRoom', tmp69.username, message.room);
+				return ;
+			}
+		}
+		if (message.text.startsWith("/changepassword ") && (usr.role == "moderator" || usr.role == "mod"))
+		{
+			console.log("here for debug1")
 			let arr = message.text.split(' ');
 			let findRoom = await this.roomsService.rooms.findOne({where: {roomName: message.room}})
 			if (findRoom) //! To be checked
 			{
-				if (arr.length > 1 || arr[1].length)
-					findRoom.password =  await bcrypt.hash(arr[1], 10); 
+				if (arr.length > 1 && arr[1].length)
+				{
+					findRoom.password =  await bcrypt.hash(arr[1], 10);
+					findRoom.state = 1;
+				}
 				else
+				{
 					findRoom.password = "";
+					findRoom.state = 0;
+				}
 			}
 			await this.roomsService.rooms.save(findRoom)
+			return ;
+		}
+		else if (message.text.startsWith("/admin ") && (usr.role == "moderator" || usr.role == "mod"))
+		{
+			console.log("reached the admin part here")
+			let arr = message.text.split(' ');
+			let res = await this.usersService.find_username(arr[1])
+			let foo = await this.roomsService.roomUser.findOneOrFail({where: {userID: res.id, roomName: message.room}})
+			foo.role = "admin"
+			await this.roomsService.roomUser.save(foo)
+			return ;
 		}
 		else if (message.text.startsWith("/ban ") || message.text.startsWith("/mute "))
 		{
+			console.log("rani hena3")
 			if (usr.role == "user")
 				return ;
 
@@ -249,14 +445,21 @@ import * as bcrypt from 'bcrypt';
 				let foo = await this.roomsService.roomUser.findOneOrFail({where: {userID: res.id, roomName: message.room}})
 				foo.duration = (Date.now() + (valid * 1000)).toString();
 				foo.status = arr[0] == "/ban" ? 2 : 1;
+				let username = await this.usersService.findbyId(res.id)
 				await this.roomsService.roomUser.save(foo);
 
 				//! add ban socket emit here
+				if (arr[0] == "/ban")
+				{
+					this.wss.to(message.room).emit('leaveRoom', username.username, message.room);
+					// await this .roomsService.roomUser.delete({roomName: message.room, userID: res.id})
+				}
 			} catch (error) {
 				console.log("entered the catch pat")
 			}
 			return ;
 		}
+		console.log("rani hena4")
 
 		let userProfile = await this.usersService.findbyId(message.userID)
 
