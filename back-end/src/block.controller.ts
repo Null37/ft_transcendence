@@ -21,7 +21,7 @@ export class BlockCtroller {
   async block_user(@Request() req, @Param('id') par_id)
   {
     const regex = new RegExp('^[0-9]+$'); // check for security
-    if(regex.test(par_id) == false)
+    if(regex.test(par_id.toString()) == false)
       throw new BadRequestException()
     await this.block_base.block({user_id: req.user.sub, block_list: par_id}, req.user.sub, par_id)
   }
@@ -30,7 +30,7 @@ export class BlockCtroller {
   async unblock_user(@Request() req, @Param('id') par_id)
   {
     const regex = new RegExp('^[0-9]+$'); // check for security
-    if(regex.test(par_id) == false)
+    if(regex.test(par_id.toString()) == false)
       throw new BadRequestException()
     return await this.block_base.unblock(par_id, req.user.sub);
 

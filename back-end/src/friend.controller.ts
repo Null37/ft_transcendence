@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Request, UseGuards } from "@nestjs/common";
+import { BadRequestException, Controller, Get, Param, Request, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth/auth.service";
 import { jwtGuard } from "./auth/guards/jwt-auth.guard";
 import { FriendService } from "./users/friend.service";
@@ -16,6 +16,9 @@ export class FrinedCtroller {
     console.log("test ==> par_id", par_id)
     console.log("test ==> user", req.user)
     console.log("test ==> id", req.user.sub)
+    const regex = new RegExp('^[0-9]+$'); // check for security
+    if(regex.test(par_id.toString()) == false)
+      throw new BadRequestException()
     let test_user = await this.friend_base.add_frined({user_id: req.user.sub, friend_id: par_id})
     console.log("new data" ,test_user)
     let newdata = await this.friend_base.find_friends(req.user.sub)
@@ -30,6 +33,9 @@ export class FrinedCtroller {
     console.log("test ==> par_id", par_id)
     console.log("test ==> user", req.user)
     console.log("test ==> id", req.user.sub)
+    const regex = new RegExp('^[0-9]+$'); // check for security
+    if(regex.test(par_id.toString()) == false)
+      throw new BadRequestException()
     // const target_user = await this.authService.get_user(req.user.name)
     // console.log("found user ==> ", target_user)
     // req.user.sub id of user and req.user.name login of user all data from token
