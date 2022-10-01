@@ -197,6 +197,9 @@ export class AppController {
   @Get('verify_game/:id')
   async verify_game(@Param('id') gameId) // get information about a game
   {
+    const regex = new RegExp('^[a-zA-Z0-9]+$'); // check for security
+    if(regex.test(gameId) == false)
+      throw new BadRequestException()
     // search for game using ID
     let game = null;
 
@@ -212,7 +215,9 @@ export class AppController {
   {
     // search for game using ID
     let game = null;
-
+    const regex = new RegExp('^[0-9]+$'); // check for security
+    if(regex.test(userId) == false)
+      throw new BadRequestException()
     try {
       let findit = await this.userdata.findbyId(userId);
       game = await this.gamesservice.invite_game(findit);
@@ -235,8 +240,11 @@ export class AppController {
 
   @UseGuards(jwtGuard)
   @Get('get_history/:id')
-  async get_history(@Param('id') userid: filter) // get information about a player with their game history
+  async get_history(@Param('id') userid: number) // get information about a player with their game history
   {
-    return (this.gamesservice.get_history(userid));
+    const regex = new RegExp('^[0-9]+$'); // check for security
+    if(regex.test(userid.toString()) == false)
+      throw new BadRequestException()
+    return (await this.gamesservice.get_history(userid));
   }
 }

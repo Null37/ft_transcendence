@@ -88,15 +88,22 @@ export class GamesService {
 		});
 	}
 
-	get_history(id: filter)
+	get_history(id: number)
 	{
-		return this.gamesdata
-		.createQueryBuilder('games')
-		.leftJoinAndSelect("games.player_one", "player_one")
-		.leftJoinAndSelect("games.player_two", "player_two")
-		.where("games.player_one = :plo", { plo: id })
-		.orWhere("games.player_two = :plt", { plt: id })
-		.getMany();
+		// return this.gamesdata
+		// .createQueryBuilder('games')
+		// .leftJoinAndSelect("games.player_one", "player_one")
+		// .leftJoinAndSelect("games.player_two", "player_two")
+		// .where("games.player_one = :plo", { plo: id })
+		// .orWhere("games.player_two = :plt", { plt: id })
+		// .getMany();
+		return this.playersdata.find({
+			where: {
+				id: id,
+			},
+			relations: {
+				games: true,
+		}});
 	}
 
 	accept_invite(invited: Users, gameid: string)
