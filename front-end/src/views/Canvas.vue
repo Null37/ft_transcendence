@@ -46,7 +46,8 @@ export default Vue.extend({
     methods: {
 		back2game () {
 			this.gameSocket.close();
-            console.log("---  back2game");
+           const token = localStorage.getItem('token');
+            this.$socket.emit('clearGame', token)
 			this.$router.push({ name: 'Game' });
             
 		}
@@ -96,6 +97,8 @@ export default Vue.extend({
             if (res.data.finished == 1)
             {
                 console.log('redirecting with expiration error');
+                const token = localStorage.getItem('token');
+                this.$socket.emit('clearGame', token)
                 this.$router.push({ name: 'Game', params: { error: "This game has already finished!" } });
                 return 1;
             }
@@ -239,15 +242,18 @@ export default Vue.extend({
                 setTimeout(() => {
 
 					this.gameSocket.close();
-                    
-
-					this.$router.push({ name: 'Game', });
+                    const token = localStorage.getItem('token');
+                    this.$socket.emit('clearGame', token)
+					this.$router.push({ name: 'Game' });
                 }, 2 * 1000);
 
             }, 0.25 * 1000);
         });
     },
-
+    beforeDestroy () {
+        const token = localStorage.getItem('token');
+        this.$socket.emit('clearGame', token)      
+    },
     mounted() {
 
         // Creating the sketch itself

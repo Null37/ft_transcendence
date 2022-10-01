@@ -84,7 +84,6 @@ import * as bcrypt from 'bcrypt';
 
 
 
-
 	//   const token = client.handshake.headers.authorization;
 	//   var base64Url = token.split('.')[1];
 	//   var base64 = base64Url.replace('-', '+').replace('_', '/');
@@ -95,6 +94,36 @@ import * as bcrypt from 'bcrypt';
 
 
 	}
+
+	@SubscribeMessage('clearGame')
+	async clearGame(client: Socket, token: any)
+		{
+
+			var base64Url = token.split('.')[1];
+			if (base64Url)
+			{
+				var base64 = base64Url.replace('-', '+').replace('_', '/');
+				if (base64)
+				{
+					const tmp = JSON.parse(atob(base64));
+					console.log(tmp);
+					const usr = await this.usersService.findOne(tmp.name)
+			
+					// let usr = await this.usersService.find_username(username);
+			
+					if (usr)
+					{
+							usr.status =  "Online";
+							usr.inGamesock = []
+							usr.socket_savier.includes(client.id) ? usr.socket_savier.splice(usr.socket_savier.indexOf(client.id), 1) : null // remove socket from Online
+						// usr.socket_savier.push(client.id)
+						await this.usersService.update(usr)
+					}
+					// console.log("usr =====> ", username)
+					this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "Online"})
+				}
+			}
+		}
 	@SubscribeMessage('disconnectUser')
 	async disconnectUser(client: Socket, username: string): Promise<any> {
 		this.logger.log(`Disconect userdisconnected: ${client.id}`);
