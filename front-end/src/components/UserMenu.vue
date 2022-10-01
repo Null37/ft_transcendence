@@ -69,6 +69,13 @@
         </v-list-item>
         <v-list-item
           link
+          v-if="user.status === 'In-Game'"
+          @click="redirectToGame()"
+        >
+          <v-list-item-title >Spectate Game</v-list-item-title>
+        </v-list-item>
+        <v-list-item
+          link
           v-else-if="status === 'friend' || status === 'user'"
           @click="blockuser(user)"
         >
@@ -86,6 +93,10 @@ import axios from 'axios';
     data: () => ({
     }),
     methods: {
+      redirectToGame: function ()
+      {
+
+      },
       unblockuser: function (user)
       {
         const token = localStorage.getItem('token');

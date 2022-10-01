@@ -46,7 +46,7 @@ export default Vue.extend({
     methods: {
 		back2game () {
 			this.gameSocket.close();
-           const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token');
             this.$socket.emit('clearGame', token)
 			this.$router.push({ name: 'Game' });
             
