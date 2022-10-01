@@ -244,10 +244,10 @@ import * as bcrypt from 'bcrypt';
 
 
 	@SubscribeMessage('connectUserGame')
-	async handleConnectuserGame(client: Socket, token: string)
+	async handleConnectuserGame(client: Socket, ...token: any[])
 	{
 
-		var base64Url = token.split('.')[1];
+		var base64Url = token[0].token.split('.')[1];
 		if (base64Url)
 		{
 			var base64 = base64Url.replace('-', '+').replace('_', '/');
@@ -270,7 +270,7 @@ import * as bcrypt from 'bcrypt';
 					await this.usersService.update(usr)
 				}
 				// console.log("usr =====> ", username)
-				this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "In-Game"})
+				this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "In-Game", gameID: token[0].GameId})
 			}
 		}
 	}

@@ -93,7 +93,7 @@ export class GamesService {
 		.createQueryBuilder('games')
 		.leftJoinAndSelect("games.player_one", "player_one")
 		.leftJoinAndSelect("games.player_two", "player_two")
-		.where("games.player_two = :plo", { plo: id })
+		.where("games.player_one = :plo", { plo: id })
 		.orWhere("games.player_two = :plt", { plt: id })
 		.getMany();
 	}

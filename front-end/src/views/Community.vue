@@ -46,7 +46,7 @@ export default Vue.extend({
 	  statusChanged(data)
 	  {
 
-      console.log("dattta === ", data, " | friendlist length == ", this.friendlist.length);
+      console.log("dattta === ", data, " | friendlist length == ", this.friendlist.length, "data ===> ", data);
       console.log(this.friendlist);
       for (let i = 0; i < this.friendlist.length; i++)
       {
@@ -253,7 +253,7 @@ export default Vue.extend({
             roomName: this.currentRoom,
             from: this.me[0],
           });
-		  this.showmessages.push({
+		      this.showmessages.push({
             message: "Use /leave to leave this chat room",
             roomName: this.currentRoom,
             from: this.me[0],
@@ -262,7 +262,7 @@ export default Vue.extend({
         }
         else if (!this.roomorfriend && e.target.value !== '' && e.target.value.startsWith("/"))
         {
-			var arr = this.placeHolder.split(" ");
+			      var arr = this.placeHolder.split(" ");
           	if (arr[0] !== '/ban' && arr[0] !== '/mute' && arr[0] !== '/leave' && arr[0] !== '/admin' && arr[0] !== '/changepassword' && arr[0] !== '/help')
           	{
 
@@ -272,27 +272,52 @@ export default Vue.extend({
               		from: this.me[0],
             		});
           	}
-			else if ((arr[0] === '/ban' || arr[0] === '/mute') && arr.length !== 3)
-			{
-				this.showmessages.push({
-        			message: "Wrong number of arguments. Please use /help.",
-              		roomName: this.currentRoom,
-              		from: this.me[0],
-            		});
-			}
-			else if ((arr[0] === '/admin' || arr[0] === '/changepassword') && arr.length  !== 2)
-			{
-				this.showmessages.push({
-        			message: "Wrong number of arguments. Please use /help.",
-              		roomName: this.currentRoom,
-              		from: this.me[0],
-            		});
-			}
-			else
-			{
-				this.$socket.emit('msgToRoom', {text: this.placeHolder, room: this.currentRoom, userID: this.me[0].id})
-			}
+            else if ((arr[0] === '/ban' || arr[0] === '/mute') && arr.length !== 3)
+            {
+              this.showmessages.push({
+                    message: "Wrong number of arguments. Please use /help.",
+                        roomName: this.currentRoom,
+                        from: this.me[0],
+                      });
+            }
+            else if ((arr[0] === '/admin' || arr[0] === '/changepassword') && arr.length  !== 2)
+            {
+              this.showmessages.push({
+                    message: "Wrong number of arguments. Please use /help.",
+                        roomName: this.currentRoom,
+                        from: this.me[0],
+                      });
+            }
+            else
+            {
+              this.$socket.emit('msgToRoom', {text: this.placeHolder, room: this.currentRoom, userID: this.me[0].id})
+            }
           this.placeHolder = "";
+        }
+        else if (this.roomorfriend && e.target.value == "/invite")
+        {
+
+              const token = localStorage.getItem('token');
+
+              if (token)
+              {
+                axios.get('/invite_game/'+this.me[0].id, {
+                  headers: {
+                    Authorization: token
+                  }
+                }).then((function (res) {
+                  console.log("Game created:   http://localhost:8080/play?match="+res.data.generatedMaps[0].id);
+                  this.placeHolder = "http://localhost:8080/play?match="+res.data.generatedMaps[0].id;
+                  this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, sender: this.me[0].id, receiver: this.receiverID})
+                  this.placeHolder = "";
+                  this.$router.push({ path: '/play?match='+res.data.generatedMaps[0].id })
+                  this.$router.go(1);
+                this.$router.go(1);
+                }).bind(this))
+                .catch(error => {
+                  console.log(error);
+                });
+              }
         }
         else if (e.target.value !== '' && this.currentRoom != '')
         {
