@@ -210,9 +210,9 @@ import * as bcrypt from 'bcrypt';
 			3- 
 		*/
 		// let usr = await this.usersService.find_username("boodeer");
-		if (username.length > 15)
+		if (username?.length > 15)
 			return ;
-		if (label.length > 15)
+		if (label?.length > 15)
 			return ;
 		
 		let usr = await this.usersService.find_username(username[0]);
