@@ -46,19 +46,36 @@ export default Vue.extend({
 	  statusChanged(data)
 	  {
 
-		console.log("dattta === ", data, " | friendlist length == ", this.friendlist.length);
-		console.log(this.friendlist);
-		for (let i = 0; i < this.friendlist.length; i++)
-		{
-			if (this.friendlist[i].username === data.username)
-			{
-				this.friendlist[i].status = data.status;
-				console.log("this.friendlist[i].status == ", this.friendlist[i].status ," | data.status == ", data.status, " | data.username == ", data.username);
-				break ;
-			}
-		}
-		// console.log("User == ". data.username, " status == ", dtata.status);
-		// receive username and status than update it in arr
+      console.log("dattta === ", data, " | friendlist length == ", this.friendlist.length);
+      console.log(this.friendlist);
+      for (let i = 0; i < this.friendlist.length; i++)
+      {
+        if (this.friendlist[i].username === data.username)
+        {
+          this.friendlist[i].status = data.status;
+          console.log("this.friendlist[i].status == ", this.friendlist[i].status ," | data.status == ", data.status, " | data.username == ", data.username);
+          return ;
+        }
+      }
+
+      for (let i = 0; i < this.users.length; i++)
+      {
+        if (this.users[i].username === data.username)
+        {
+          this.users[i].status = data.status;
+          return ;
+        }
+      }
+
+      for (let i = 0; i < this.blocked.length; i++)
+      {
+        if (this.blocked[i].username === data.username)
+        {
+          this.blocked[i].status = data.status;
+          return ;
+        }
+      }
+    
 	  }
     },
     data: () => ({
@@ -101,7 +118,7 @@ export default Vue.extend({
 		logout: function()
 		{
 			console.log("disconnecting the user from the website")
-			this.$socket.emit('disconnectUser', this.username);
+			this.$socket.emit('disconnectUser', this.me[0].username);
 			
 		},
       changeAvatar: function(newavatar)

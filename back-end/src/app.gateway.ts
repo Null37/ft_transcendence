@@ -104,9 +104,9 @@ import * as bcrypt from 'bcrypt';
 			user.status = "offline";
 			user.socket_savier = []
 			user.inGamesock = []
+			await this.usersService.update(user)
+			this.wss.emit('statusChanged', {debug: "sDisconect userdisconnected", username: user.username, status: "offline"});
 		}
-		await this.usersService.update(user)
-		this.wss.emit('statusChanged', {debug: "sDisconect userdisconnected", username: user.username, status: "offline"});
 		// let usrs = await this.usersService.findAll();
 		// for (let i = 0; i < usrs.length; i++)
 		// {

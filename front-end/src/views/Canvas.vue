@@ -243,7 +243,7 @@ export default Vue.extend({
             }, 0.25 * 1000);
         });
     },
-
+    
     mounted() {
 
         // Creating the sketch itself
