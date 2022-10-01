@@ -248,8 +248,8 @@ export default Vue.extend({
         this.$socket.emit('clearGame', token)      
     },
 	mounted() {
-		
-        this.$socket.emit('connectUserGame', {token: localStorage.getItem('token'), GameId : this.gameId});
+		if (this.playerMode !== 'spectator')
+        	this.$socket.emit('connectUserGame', {token: localStorage.getItem('token'), GameId : this.gameId});
 
 		// Creating the sketch itself
 		const sketch = (p5: P5) => {

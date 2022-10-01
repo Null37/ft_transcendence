@@ -109,6 +109,7 @@ import * as bcrypt from 'bcrypt';
 				console.log(tmp);
 				if (tmp.name.length > 15)
 					return ;
+				console.log("tmp.name ==> ", tmp.name);
 				const usr = await this.usersService.findOne(tmp.name)
 		
 				// let usr = await this.usersService.find_username(username);

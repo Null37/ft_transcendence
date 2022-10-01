@@ -67,19 +67,20 @@
         >
           <v-list-item-title >Unblock</v-list-item-title>
         </v-list-item>
-        <v-list-item
-          link
-          v-if="user.status === 'In-Game'"
-          @click="redirectToGame()"
-        >
-          <v-list-item-title >Spectate Game</v-list-item-title>
-        </v-list-item>
+       
         <v-list-item
           link
           v-else-if="status === 'friend' || status === 'user'"
           @click="blockuser(user)"
         >
           <v-list-item-title >block</v-list-item-title>
+        </v-list-item>
+        <v-list-item
+          link
+          v-if="user.status === 'In-Game'"
+          @click="redirectToGame()"
+        >
+          <v-list-item-title >Spectate Game</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>
@@ -95,7 +96,6 @@ import axios from 'axios';
     methods: {
       redirectToGame: function ()
       {
-
       },
       unblockuser: function (user)
       {

@@ -143,7 +143,8 @@ export default Vue.extend({
                     this.playerMode = 'player';
                     this.playerSide = 'right';
                 }
-
+                if (this.playerMode !== 'spectator')
+                    this.$socket.emit('connectUserGame', {token: localStorage.getItem('token'), GameId : this.gameId});
                 window.document.querySelector("#leftPlayer")!.innerHTML = res.data.player_one.username.toUpperCase();
                 if (res.data.player_two) // protecting for game invite
                     window.document.querySelector("#rightPlayer")!.innerHTML = res.data.player_two.username.toUpperCase();
@@ -257,7 +258,9 @@ export default Vue.extend({
     mounted() {
 
         // Creating the sketch itself
-        this.$socket.emit('connectUserGame', {token: localStorage.getItem('token'), GameId : this.gameId});
+        console.log("Player mode ===>   ",this.playerMode);
+        if (this.playerMode !== 'spectator')
+            this.$socket.emit('connectUserGame', {token: localStorage.getItem('token'), GameId : this.gameId});
 
         const sketch = (p5: P5) => {
 
