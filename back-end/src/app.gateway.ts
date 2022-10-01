@@ -97,36 +97,40 @@ import * as bcrypt from 'bcrypt';
 
 	@SubscribeMessage('clearGame')
 	async clearGame(client: Socket, token: any)
-		{
+	{
 
-			var base64Url = token.split('.')[1];
-			if (base64Url)
+		var base64Url = token.split('.')[1];
+		if (base64Url)
+		{
+			var base64 = base64Url.replace('-', '+').replace('_', '/');
+			if (base64)
 			{
-				var base64 = base64Url.replace('-', '+').replace('_', '/');
-				if (base64)
+				const tmp = JSON.parse(atob(base64));
+				console.log(tmp);
+				if (tmp.name.length > 15)
+					return ;
+				const usr = await this.usersService.findOne(tmp.name)
+		
+				// let usr = await this.usersService.find_username(username);
+		
+				if (usr)
 				{
-					const tmp = JSON.parse(atob(base64));
-					console.log(tmp);
-					const usr = await this.usersService.findOne(tmp.name)
-			
-					// let usr = await this.usersService.find_username(username);
-			
-					if (usr)
-					{
-							usr.status =  "Online";
-							usr.inGamesock = []
-							usr.socket_savier.includes(client.id) ? usr.socket_savier.splice(usr.socket_savier.indexOf(client.id), 1) : null // remove socket from Online
-						// usr.socket_savier.push(client.id)
-						await this.usersService.update(usr)
-					}
-					// console.log("usr =====> ", username)
-					this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "Online"})
+						usr.status =  "Online";
+						usr.inGamesock = []
+						usr.socket_savier.includes(client.id) ? usr.socket_savier.splice(usr.socket_savier.indexOf(client.id), 1) : null // remove socket from Online
+					// usr.socket_savier.push(client.id)
+					await this.usersService.update(usr)
 				}
+				// console.log("usr =====> ", username)
+				this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "Online"})
 			}
 		}
+	}
 	@SubscribeMessage('disconnectUser')
 	async disconnectUser(client: Socket, username: string): Promise<any> {
 		this.logger.log(`Disconect userdisconnected: ${client.id}`);
+		if (username.length > 15)
+			return ;
 		const user = await this.usersService.find_username(username)
 		if (user)
 		{
@@ -185,7 +189,6 @@ import * as bcrypt from 'bcrypt';
 			  const user = await this.usersService.findOne(tmp.name)
 			  if (user)
 			  {
-				console.log("ya zebiiiiiiiii", user.status)
 				if (user.status !== "In-Game")
 				{
 					user.status = "Online";
@@ -207,6 +210,11 @@ import * as bcrypt from 'bcrypt';
 			3- 
 		*/
 		// let usr = await this.usersService.find_username("boodeer");
+		if (username.length > 15)
+			return ;
+		if (label.length > 15)
+			return ;
+		
 		let usr = await this.usersService.find_username(username[0]);
 
 		if (usr)
@@ -247,6 +255,8 @@ import * as bcrypt from 'bcrypt';
 			{
 				const tmp = JSON.parse(atob(base64));
 				console.log(tmp);
+				if (tmp.name.length > 15)
+					return ;
 				const usr = await this.usersService.findOne(tmp.name)
 		
 				// let usr = await this.usersService.find_username(username);
@@ -280,6 +290,8 @@ import * as bcrypt from 'bcrypt';
 	handleMessage(client: Socket, text: string): void {
 	  this.logger.log(`Received message from: ${client.id}, content: ${text}`);
 	//   client.broadcast.emit('msgToClient', text); // the client doesn't receive it
+		if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(text))
+			return ;
 		this.wss.to(client.id).emit('msgToClient', `Received ${text}`);
 	//   return { event: 'msgToClient', data: text };
 	}
@@ -367,6 +379,8 @@ import * as bcrypt from 'bcrypt';
 
 		let userProfile = await this.usersService.findbyId(message.sender)
 		// console.log(userProfile)
+		if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(message.text))
+			return ;
 		if (tmp == null)
 		{
 			client.broadcast.to(message.room).emit('msgToClient',
@@ -399,7 +413,10 @@ import * as bcrypt from 'bcrypt';
 
 		this.logger.log(`received a message: ${message.text} from ${client.id} will be sent to ${message.room}`)
 		
-		
+		if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(message.text) && !message.text.startsWith("/"))
+		{
+			return ;
+		}
 		let usr = await this.roomsService.roomUser.findOne({where: {userID: message.userID, roomName: message.room}})
 		console.log("user is banned for: ", +usr.duration - Date.now(), "===> status" , usr.status)
 

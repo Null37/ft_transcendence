@@ -20,6 +20,8 @@ export class RoomsService {
 	//* Creates a new room and returns it.
 	async create(roomElem: RoomsDTO, userID: string): Promise<any>
 	{
+		if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(roomElem.roomName) || /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(userID))
+			return "Room name can't contain special characters";
 		let exist = await this.rooms.findBy({roomName: roomElem.roomName});
 		if (exist.length)
 			return "Chat room already exists";
@@ -100,6 +102,8 @@ export class RoomsService {
 
 	async leaveUserRoom(userID: string, room_name: string): Promise<any>
 	{
+		if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(room_name))
+			return ;
 		let usr = await this.roomUser.findOne({where: {roomName: room_name, userID: +userID}})
 		if (usr)
 		{
@@ -172,6 +176,8 @@ export class RoomsService {
 
 	async getuserOfRoom(userID: number, roomName: string): Promise<any>
 	{
+		if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(roomName))
+			return ;
 		return this.roomUser.find({where: {userID: userID, roomName: roomName}})
 	}
 	
