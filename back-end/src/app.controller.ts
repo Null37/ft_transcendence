@@ -157,7 +157,7 @@ export class AppController {
       uniq_test = await this.authService.check_username(body.username) // check username with database
     if(uniq_test != null)
       throw new BadRequestException('USERNAME NOT UNIQ')   // 400  bad req
-     this.authService.update_info({id: req.user.sub, username: body.username,  status: body.status, avatar: body.avatar});
+     await this.authService.update_info({id: req.user.sub, username: body.username,  status: body.status, avatar: body.avatar});
   }
 
 

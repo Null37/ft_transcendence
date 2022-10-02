@@ -203,7 +203,7 @@ import * as bcrypt from 'bcrypt';
 	}
 
 	@SubscribeMessage('connectUser')
-	async handleConnectuser(client: Socket, username: string, label: string)
+	async handleConnectuser(client: Socket, ...username: any)
 	{
 		/* 
 			1- check if the user exists in the data base
@@ -211,34 +211,35 @@ import * as bcrypt from 'bcrypt';
 			3- 
 		*/
 		// let usr = await this.usersService.find_username("boodeer");
-		if (username?.length > 15)
+		if (username[0]?.username.length > 15)
 			return ;
-		if (label?.length > 15)
-			return ;
+		// if (label?.length > 15)
+		// 	return ;
 		
-		let usr = await this.usersService.find_username(username[0]);
-
+		let usr = await this.usersService.find_username(username[0].username);
+		console.log("Searching for ----> ", username[0].username, " result ----> ", usr)
 		if (usr)
 		{
-			if (username[1] != "In-Game")
+			console.log("found a user ==> ", usr.username)
+			if (username[0].label != "In-Game")
 			{
 				if (usr.status !== "In-Game")
-					usr.status = username[1];
+					usr.status = username[0].label;
 				usr.socket_savier.includes(client.id) ? null : usr.socket_savier.push(client.id) // add socket in case of Online only (game socket is added in the inGamesock)
 			}
-			else if (username[1] == "In-Game")
+			else if (username[0].label == "In-Game")
 			{
-				usr.status = username[1];
+				usr.status = username[0].label;
 				usr.inGamesock.includes(client.id) ? null : usr.inGamesock.push(client.id) // add socket in case of Online only (game socket is added in the inGamesock)
 			}
 			// usr.socket_savier.push(client.id)
 			await this.usersService.update(usr)
+			if (usr.status != "In-Game")
+				this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "Online"})
+			else
+			this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "In-Game"})
 		}
-		console.log("usr =====> ", username[0])
-		if (usr.status != "In-Game")
-			this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "Online"})
-		else
-		this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "In-Game"})
+		console.log("usr =====> ", username[0].username)
 
 	}
 
