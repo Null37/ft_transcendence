@@ -10,25 +10,7 @@ export class RoomController {
 
 	constructor(private readonly roomService: RoomsService){}
 
-	// @Get('debug')
-	// debug()
-	// {
-	// 	return this.roomService.debuggingLog();
-	// }
 
-	// @Post('test')
-	// async test(){
-	// 	console.log("ciphering test ====> begin")
-		
-	// 	const password = "test123test"
-	// 	const salt = 10;
-
-	// 	const hash = await bcrypt.hash(password, salt);
-	// 	console.log(hash)
-	// 	const isMatch = await bcrypt.compare("test", hash);
-	// 	console.log("ciphering test ====> end")
-	// 	console.log(isMatch)
-	// }
 	
 	@Post('create')
 	async createRoom(@Body() body, @Request() req): Promise<RoomsDTO> {
@@ -46,11 +28,9 @@ export class RoomController {
 	{
 		if (!/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(param.id))
 		{
-			console.log("room's id's: ",param.id)
 	
 			let res = await this.roomService.addUserToRoom(req.user.sub, param.id, body.password);
 			
-			console.log("res ===> ", res)
 			
 			if (typeof res == "string")
 				throw new HttpException(res, HttpStatus.NOT_FOUND)

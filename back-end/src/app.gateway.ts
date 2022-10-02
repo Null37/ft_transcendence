@@ -61,10 +61,8 @@ import * as bcrypt from 'bcrypt';
 		else if (usrs[i].inGamesock.includes(client.id))
 		{
 			usrs[i].inGamesock.splice(usrs[i].inGamesock.indexOf(client.id), 1)
-			console.log("zebi's length", usrs[i].inGamesock.length)
 			if (usrs[i].inGamesock.length == 0)
 			{
-				console.log("socket's length", usrs[i].socket_savier.length)
 				if (usrs[i].socket_savier.length !== 0)
 				{
 					this.wss.emit('statusChanged', {debug: "socket disconnect", username: usrs[i].username, status: "Online"});
@@ -87,7 +85,7 @@ import * as bcrypt from 'bcrypt';
 	//   const token = client.handshake.headers.authorization;
 	//   var base64Url = token.split('.')[1];
 	//   var base64 = base64Url.replace('-', '+').replace('_', '/');
-	//    console.log(JSON.parse(atob(base64)));
+
 
 
 
@@ -106,10 +104,9 @@ import * as bcrypt from 'bcrypt';
 			if (base64)
 			{
 				const tmp = JSON.parse(atob(base64));
-				console.log(tmp);
+
 				if (tmp.name.length > 15)
 					return ;
-				console.log("tmp.name ==> ", tmp.name);
 				const usr = await this.usersService.findOne(tmp.name)
 		
 				// let usr = await this.usersService.find_username(username);
@@ -122,7 +119,6 @@ import * as bcrypt from 'bcrypt';
 					// usr.socket_savier.push(client.id)
 					await this.usersService.update(usr)
 				}
-				// console.log("usr =====> ", username)
 				this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "Online"})
 			}
 		}
@@ -146,9 +142,7 @@ import * as bcrypt from 'bcrypt';
 		// {
 		//   if (usrs[i].socket_savier.includes(client.id))
 		//   {
-		// 	  console.log("reached user ====> ", usrs[i].username)
 		// 	  usrs[i].socket_savier.splice(usrs[i].socket_savier.indexOf(client.id), 1)
-		// 	  console.log("length of the socket savier ====> ", usrs[i].socket_savier)
 		// 	  if (usrs[i].socket_savier.length == 0)
 		// 	  {
 		// 		  usrs[i].status = "offline";
@@ -186,7 +180,6 @@ import * as bcrypt from 'bcrypt';
 		  {
 			  var base64 = base64Url.replace('-', '+').replace('_', '/');
 			  const tmp = JSON.parse(atob(base64));
-			  console.log(tmp);
 			  const user = await this.usersService.findOne(tmp.name)
 			  if (user)
 			  {
@@ -197,7 +190,6 @@ import * as bcrypt from 'bcrypt';
 				}
 					
 			  }
-			  console.log(`user.status: ${user?.status}`);
 		  }
 	  }
 	}
@@ -217,10 +209,8 @@ import * as bcrypt from 'bcrypt';
 		// 	return ;
 		
 		let usr = await this.usersService.find_username(username[0].username);
-		console.log("Searching for ----> ", username[0].username, " result ----> ", usr)
 		if (usr)
 		{
-			console.log("found a user ==> ", usr.username)
 			if (username[0].label != "In-Game")
 			{
 				if (usr.status !== "In-Game")
@@ -239,7 +229,6 @@ import * as bcrypt from 'bcrypt';
 			else
 			this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "In-Game"})
 		}
-		console.log("usr =====> ", username[0].username)
 
 	}
 
@@ -256,7 +245,6 @@ import * as bcrypt from 'bcrypt';
 			if (base64)
 			{
 				const tmp = JSON.parse(atob(base64));
-				console.log(tmp);
 				if (tmp.name.length > 15)
 					return ;
 				const usr = await this.usersService.findOne(tmp.name)
@@ -271,7 +259,6 @@ import * as bcrypt from 'bcrypt';
 					// usr.socket_savier.push(client.id)
 					await this.usersService.update(usr)
 				}
-				// console.log("usr =====> ", username)
 				this.wss.emit('statusChanged',  {debug: "socket connect", username: usr.username, status: "In-Game", gameID: token[0].GameId})
 			}
 		}
@@ -349,7 +336,6 @@ import * as bcrypt from 'bcrypt';
 		const token = client.handshake.headers.authorization;
 		var base64Url = token.split('.')[1];
 		var base64 = base64Url.replace('-', '+').replace('_', '/');
-		console.log(JSON.parse(atob(base64)));
 		let usr = await this.usersService.find_username(JSON.parse(atob(base64)).username);
 		await this .roomsService.roomUser.delete({roomName: room, userID: usr.id})
 		// client.broadcast.to(room).emit('leaveRoom', userID);
@@ -373,14 +359,11 @@ import * as bcrypt from 'bcrypt';
 		
 		// this.logger.log(`received a message: ${message.text} from ${client.id} will be sent to ${message.room}`)
 		
-		// console.log(message)
 		let tmp = await this.blockService.find_blocked(message.receiver, message.sender)
-		// console.log("blocked list ", tmp, " userID: ", message.receiver, "===>", message.sender);
 
 		// tmp.id 
 
 		let userProfile = await this.usersService.findbyId(message.sender)
-		// console.log(userProfile)
 		if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(message.text))
 			return ;
 		if (tmp == null)
@@ -422,17 +405,13 @@ import * as bcrypt from 'bcrypt';
 		let usr = await this.roomsService.roomUser.findOne({where: {userID: message.userID, roomName: message.room}})
 		if (!usr)
 			return ;
-		console.log("user is banned for: ", +usr.duration - Date.now(), "===> status" , usr.status)
 
-		console.log("usr ====> ", usr, "====> role: ", usr.role)
 		if ((usr.status == 1 && +usr.duration > Date.now()))
 		{
-			console.log("rani hena")
 			return ;
 		}
 		if (message.text.split(" ")[0] == "/leave")
 		{
-			console.log("here")
 			if (usr)
 			{
 				await this.roomsService.roomUser.delete({roomName: message.room, userID: message.userID})
@@ -440,7 +419,6 @@ import * as bcrypt from 'bcrypt';
 				let tmp69 = await this.usersService.findbyId(message.userID)
 				// add new logic to leave room if empty (deleted)
 				let roomnb = await this.roomsService.roomUser.find({where: {roomName: message.room}})
-				console.log("deleting the room ===> ", roomnb)
 				if (roomnb.length == 0)
 					await this.roomsService.rooms.delete({roomName: message.room})
 				this.wss.to(message.room).emit('leaveRoom', tmp69.username, message.room);
@@ -449,7 +427,6 @@ import * as bcrypt from 'bcrypt';
 		}
 		if (message.text.startsWith("/changepassword ") && (usr.role == "moderator" || usr.role == "mod"))
 		{
-			console.log("here for debug1")
 			let arr = message.text.split(' ');
 			let findRoom = await this.roomsService.rooms.findOne({where: {roomName: message.room}})
 			if (findRoom) //! To be checked
@@ -470,7 +447,6 @@ import * as bcrypt from 'bcrypt';
 		}
 		else if (message.text.startsWith("/admin ") && (usr.role == "moderator" || usr.role == "mod"))
 		{
-			console.log("reached the admin part here")
 			let arr = message.text.split(' ');
 			let res = await this.usersService.find_username(arr[1])
 			let foo = await this.roomsService.roomUser.findOneOrFail({where: {userID: res.id, roomName: message.room}})
@@ -480,13 +456,10 @@ import * as bcrypt from 'bcrypt';
 		}
 		else if (message.text.startsWith("/ban ") || message.text.startsWith("/mute "))
 		{
-			console.log("rani hena3")
 			if (usr.role == "user")
 				return ;
 
-			console.log(usr)
 			let arr = message.text.split(' ');
-			console.log(arr[1] + " ====> " + arr[2])
 			if (arr.length != 3)
 				return ;
 			let valid = /^[0-9]+$/.test(arr[2]) ? +arr[2] : -1;
@@ -512,11 +485,9 @@ import * as bcrypt from 'bcrypt';
 					// await this .roomsService.roomUser.delete({roomName: message.room, userID: res.id})
 				}
 			} catch (error) {
-				console.log("entered the catch pat")
 			}
 			return ;
 		}
-		console.log("rani hena4")
 
 		let userProfile = await this.usersService.findbyId(message.userID)
 

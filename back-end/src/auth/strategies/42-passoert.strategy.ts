@@ -17,17 +17,14 @@ export class passport_42 extends PassportStrategy(Strategy) {
 	async function verify(accessToken, refreshToken, profile, cb) 
 	{
 		var vr = await usra.findOne(profile.username);
-		console.log(vr);
 		if(vr ==  null)
 		{
-			console.log("not found new user -- start create ----");
 			vr = await usra.create({ // nake name in future // for fornt-end check
 				intra_login: profile.username,
 				avatar: profile._json.image_url,
 				status: "Offline",
 				two_factor_authentication: false
 			})
-			console.log(vr)
 		}
 		return cb(null, vr);
 	});

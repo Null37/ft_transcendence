@@ -73,28 +73,24 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 	startCountdown(ind: number) {
 
 		this.startTimers[ind] = setTimeout(() => {
-			console.log("SERVER: set timeOUT 5");
 			this.wss.to(
 				[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
 					(this.gamePlayers[ind].spectators)
 			).emit('setCountdownSpeedy', { seconds: 5, });
 
 			this.startTimers[ind] = setTimeout(() => {
-				console.log("SERVER: set timeOUT 4");
 				this.wss.to(
 					[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
 						(this.gamePlayers[ind].spectators)
 				).emit('setCountdownSpeedy', { seconds: 4, });
 
 				this.startTimers[ind] = setTimeout(() => {
-					console.log("SERVER: set timeOUT 3");
 					this.wss.to(
 						[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
 							(this.gamePlayers[ind].spectators)
 					).emit('setCountdownSpeedy', { seconds: 3, });
 
 					this.startTimers[ind] = setTimeout(() => {
-						console.log("SERVER: set timeOUT 2");
 						this.wss.to(
 							[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
 								(this.gamePlayers[ind].spectators)
@@ -225,7 +221,6 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 	@SubscribeMessage('playerReadySpeedy')
 	handlePlayerReady(client: Socket, ...args: any[]) {
 
-		// console.log('SERVER PLAYER READY', args);
 
 		// initialized game object
 		let gp: GameObj = { p1SockId: "", p2SockId: "", gameid: "", spectators: [], finished: 0 };
@@ -275,13 +270,11 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 		}
 
 
-		// console.log(ind, this.gamePlayers);
 	}
 
 	@SubscribeMessage('moveBarUpSpeedy')
 	handleMoveBarUp(client: Socket, ...args: any[]) {
 
-		// console.log('SERVER: GOT REQUEST TO MOVE BAR UP', args);
 
 		if (args[0].id === undefined ||
 			args[0].side === undefined)
@@ -309,7 +302,6 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 	@SubscribeMessage('moveBarDownSpeedy')
 	handleMoveBarDown(client: Socket, ...args: any[]) {
 
-		// console.log('SERVER: GOT REQUEST TO MOVE BAR DOWN', args);
 
 		if (args[0].id === undefined ||
 			args[0].side === undefined)
@@ -339,22 +331,18 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 
 	afterInit(server: any) {
-		// console.log("SERVER: Match Web Socket initialized!");
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {
-		console.log("SERVER: Match client connected", client.id);
 	}
 
 	handleDisconnect(client: Socket) {
-		console.log("SERVER: Match client disconnected", client.id);
 
 		// game over if clients disconnects
 
 		// search games
 		let ind: number = this.gamePlayers.findIndex(
 			(elm: any) => elm.p1SockId === client.id || elm.p2SockId === client.id);
-		console.log('SERVER: CLIENT LEFT. INDEX : ', ind);
 
 		// get game player matching this client id
 		if (ind !== -1) {
@@ -395,7 +383,6 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 				}
 
 				// game over for spectators
-				console.log('SERVER: Sending GAME OVER to ', this.gamePlayers[ind].spectators);
 
 				if (this.gamePlayers[ind].spectators.length > 0)
 					this.wss.to(this.gamePlayers[ind].spectators)

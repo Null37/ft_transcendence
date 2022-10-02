@@ -15,7 +15,6 @@
           this.games = res.data;
         }).bind(this))
         .catch(error => {
-          console.log(error);
         });
         axios.get('/get_achievm/'+this.id, {
           headers: {
@@ -23,10 +22,8 @@
           }
         }).then((function (res) {
           this.ach = res.data;
-          console.log("acheee == ", res.data);
         }).bind(this))
         .catch(error => {
-          console.log(error);
         });
       }
     },

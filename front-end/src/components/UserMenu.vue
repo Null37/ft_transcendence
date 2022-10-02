@@ -113,7 +113,6 @@ import axios from 'axios';
             this.$emit("unblockuser", res.data);
           }).bind(this))
           .catch(error => {
-            console.log(error);
           });
 
         }
@@ -132,7 +131,6 @@ import axios from 'axios';
             this.$emit("blockuser", user);
           }).bind(this))
           .catch(error => {
-            console.log(error);
           });
 
         }

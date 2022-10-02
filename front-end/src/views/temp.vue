@@ -24,7 +24,6 @@
 		// called before mounted
 		async created() {
 			this.socketURL = location.protocol + "//" + location.hostname + ":" + 3000 + "/canvas";
-			// console.log(this.socketURL, 'SOCKET URL CANVAS.VUE');
 			const token = localStorage.getItem('token');
 	
 			// VALIDATING
@@ -35,7 +34,6 @@
 			// no query in uri
 			if (this.gameId === "") {
 	
-				console.log('redirecting with missing identifier error', this.gameId);
 				this.$router.push({ name: 'Game', params: { error: "Oops! Game was not found!" } }).catch(() => {});
 				return ;
 			}
@@ -43,7 +41,6 @@
 			// search id in database
 			if (!token)
 			{
-				console.log('redirecting with auth error');
 				this.$router.push({ name: 'Game', params: { error: "Who are you?! Are you logged in?" } }).catch(() => {});
 				return ;
 			}
@@ -52,12 +49,11 @@
 			{ headers: { Authorization: token } })
 	
 			.then((res: any) => {
-				// console.table(res.data);
+
 	
 				// data not recieved properly
 				if (typeof res.data !== 'object')
 				{
-					console.log('redirecting with data error: axios');
 					this.$router.push({ name: 'Game', params: { error: "Oops! Something went wrong!" } }).catch(() => {});
 					return 1;
 				}
@@ -65,7 +61,6 @@
 				// game already ended
 				if (res.data.finished == 1)
 				{
-					console.log('redirecting with expiration error');
 					this.$router.push({ name: 'Game', params: { error: "This game has expired!" } }).catch(() => {});
 					return 1;
 				}
@@ -73,7 +68,6 @@
 				if (res.data.finished == 0)
 				{
 					let usr = JSON.parse(Buffer .from(token.split('.')[1], 'base64').toString('utf8'));
-					// console.log('TOKEN DETAILS', usr.suh, res.data.player_one, res.data.player_two);
 					
 					if (usr.sub === res.data.player_one.id) {
 	
@@ -94,7 +88,7 @@
 			.catch((err: any) => {
 	
 				Vue.$toast.error( 'An error occured! Going back to lobby in 5s');
-				console.error('axios : verify_game ERROR', err);
+
 	
 				setTimeout(() => {
 					this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } }).catch(() => {});
@@ -106,7 +100,6 @@
 				return ;
 			// VALIDATING
 	
-			// console.log('CLIENT GAME ID', this.gameId);
 	
 			this.gameSocket = io(this.socketURL, {
 				transportOptions: {
@@ -119,7 +112,6 @@
 	
 			// get acknowledgement that server recieved the read
 			this.gameSocket.on("playerReadyDone", (data: any) => {
-				console.log("CLIENT: " + this.playerMode + " on the " + this.playerSide + " side is ready!");
 			});
 	
 			// Infrom the server that the current player/ready is ready to receive data
@@ -391,7 +383,6 @@
 				// The sketch draw method
 				// Game loop
 				p5.draw = () => {
-					// console.log('still going');
 	
 					bg(p5);
 	

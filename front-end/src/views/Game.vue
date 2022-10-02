@@ -30,7 +30,7 @@ export default Vue.extend({
     },
 		logout: function()
 		{
-			console.log("disconnecting the user from the website")
+
 			this.$socket.emit('disconnectUser', this.username);
 			
 		},
@@ -50,11 +50,11 @@ export default Vue.extend({
               this.setUsername = false;
               this.isUsernameError = false;
               this.usernameError = "";
-			  console.log("connectUSer of ", this.usernameEdit)
+
 			  this.$socket.emit('connectUser', {username: this.usernameEdit, label: "Online"});
             }).bind(this))
             .catch(error => {
-              console.log(error);
+
               this.isUsernameError = true;
               this.usernameError = "Username is not unique!";
             });
@@ -67,14 +67,14 @@ export default Vue.extend({
         }
       },
       emitJoin() {
-        console.log('EMITTING JOIN');
+
         
         this.gameSocket.emit('joinQueue');
         this.isSpeedyLoading = false;
         this.isLoading = true;
       },
       emitCancel() {
-        console.log('EMITTING CANCEL');
+
 
         this.gameSocket.emit('cancelQueue');
         this.isLoading = false;
@@ -82,14 +82,14 @@ export default Vue.extend({
 
       // speedy game
       emitSpeedyJoin() {
-        console.log('EMITTING JOIN');
+
         
         this.gameSocket.emit('joinSpeedyQueue');
         this.isLoading = false;
         this.isSpeedyLoading = true;
       },
       emitSpeedyCancel() {
-        console.log('EMITTING CANCEL');
+
 
         this.gameSocket.emit('cancelSpeedyQueue');
         this.isSpeedyLoading = false;
@@ -97,14 +97,12 @@ export default Vue.extend({
 	  statusChanged(data: any)
 	  {
 
-      // console.log("dattta === ", data, " | friendlist length == ", this.friendlist.length);
-      // console.log(this.friendlist);
+
       for (let i = 0; i < this.friendlist.length; i++)
       {
         if (this.friendlist[i].username === data.username)
         {
           this.friendlist[i].status = data.status;
-          // console.log("this.friendlist[i].status == ", this.friendlist[i].status ," | data.status == ", data.status, " | data.username == ", data.username);
           return ;
         }
       }
@@ -148,7 +146,6 @@ export default Vue.extend({
 
     created () {
       this.socketURL = location.protocol + "//" + location.hostname + ":" + 3000 + "/game";
-      // console.log(this.socketURL, 'SOCKET URL GAME.VUE');
 
       this.gameSocket = io(this.socketURL, {
         transportOptions: {
@@ -157,29 +154,23 @@ export default Vue.extend({
       });
 
       this.gameSocket.on('queueResponse', (data: any) => {
-        console.log('CLIENT: GOT ACKNOWLEDGMENT FROM SERVER');
 
         // redirection
         if (typeof data.identifiers === 'object' && typeof data.identifiers[0]?.id === 'string')
           // send id to ping pong view
           this.$router.push({ name: 'Play', query: { match: "" + data.identifiers[0].id, } }).catch(() => {})
-        else
-          // feedback
-          console.error('Error Occured: queueResponse', );
+
 
         this.isLoading = false;
       });
 
       this.gameSocket.on('queueSpeedyResponse', (data: any) => {
-        console.log('CLIENT: GOT ACKNOWLEDGMENT FROM SERVER');
 
         // redirection
         if (typeof data.identifiers === 'object' && typeof data.identifiers[0]?.id === 'string')
           // send id to ping pong view
           this.$router.push({ name: 'Speedy', query: { match: "" + data.identifiers[0].id, } }).catch(() => {}).catch(() => {})
-        else
-          // feedback
-          console.error('Error Occured: queueSpeedyResponse', );
+
 
         this.isLoading = false;
       });
@@ -187,7 +178,6 @@ export default Vue.extend({
 
     mounted () {
       const token = localStorage.getItem('token');
-          console.log('===========', token);
 
       if (token)
       {
@@ -204,12 +194,10 @@ export default Vue.extend({
             	this.setUsername = true;
 			else
 			{
-				console.log("this.username ", this.username);
 				this.$socket.emit('connectUser',  {username: this.username, label: "Online"});
 			}
         })
         .catch(error => {
-          console.log(error);
         });
       }
       

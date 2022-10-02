@@ -18,14 +18,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 	private queuePlayers: Array<{ sockId: string, token: any; }> = [];
 
 	afterInit(server: any) {
-		console.log("SERVER: Game Web Socket initialized!");
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {
-		console.log("SERVER: Game client connected", client.id);
 	}
 	handleDisconnect(client: Socket) {
-		console.log("SERVER: Game client disconnected", client.id);
 
 		// pop from QUEUE PLAYERS
 		let ind: number = this.queuePlayers.findIndex((elm: any) => elm.sockId == client.id);
@@ -37,23 +34,19 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 
 	@SubscribeMessage('cancelQueue')
 	handleCancelQueue(client: Socket) {
-		console.log('SERVER: Game client wanted to leave the queue');
 
 		let ind = this.queuePlayers.findIndex((elm: any) => elm.sockId == client.id );
 		if (ind != -1)
 			this.queuePlayers.splice(ind,1);
-		// console.log("SERVER: TOTAL QUEUE PLAYERS NOW", this.queuePlayers.length);
 	}
 
 
 	@SubscribeMessage('joinQueue')
 	async handleJoinQueue(client: Socket) {
-		console.log("SERVER: GOT REQUEST TO JOIN");
 
 		let tkn = JSON.parse(Buffer.from(client.handshake.headers.authorization.split('.')[1], 'base64').toString('utf8'));
 
 
-		console.log("SERVER: Game client joined the queue", client.id);
 
 		// user already joined
 		// update socket
@@ -66,7 +59,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 		if (this.queuePlayers.findIndex((elm: any) => elm.sockId == client.id ) === -1)
 			{ this.queuePlayers.push({ sockId: client.id, token: tkn }); }
 
-		// console.log("SERVER: TOTAL QUEUE PLAYERS", this.queuePlayers.length);
 
 		if (this.queuePlayers.length >= 2) {
 
@@ -82,28 +74,23 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 			this.queuePlayers.splice(0, 2);
 		}
 
-		// console.log(this.queuePlayers);
 	}
 
 
 	@SubscribeMessage('cancelSpeedyQueue')
 	handleCancelSpeedyQueue(client: Socket) {
-		console.log('SERVER: Game client wanted to leave the queue');
 
 		let ind = this.queuePlayers.findIndex((elm: any) => elm.sockId == client.id );
 		if (ind != -1)
 			this.queuePlayers.splice(ind,1);
-		// console.log("SERVER: TOTAL QUEUE PLAYERS NOW", this.queuePlayers.length);
 	}
 
 
 	@SubscribeMessage('joinSpeedyQueue')
 	async handleJoinSpeedyQueue(client: Socket) {
-		console.log("SERVER: GOT REQUEST TO JOIN SPEEDY");
 
 		let tkn = JSON.parse(Buffer.from(client.handshake.headers.authorization.split('.')[1], 'base64').toString('utf8'));
 
-		console.log("SERVER: Game client joined the queue speedy", client.id);
 
 		// user already joined
 		// update socket
