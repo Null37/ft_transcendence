@@ -385,7 +385,7 @@ export default Vue.extend({
             }).then(res => {
               this.setUsername = false;
 			  console.log("connectUSer of ", this.me.username)
-				  this.$socket.emit('connectUser', {username: "boodeer", label: "Online"});
+				  this.$socket.emit('connectUser', {username: this.me.username, label: "Online"});
 
             })
             .catch(error => {
