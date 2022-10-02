@@ -25,7 +25,7 @@ export default Vue.extend({
             ).then((function (res) {
               localStorage.setItem("token", "Bearer " + res.data.token);
               this.error = false;
-              this.$router.push({ path: '/Game' })
+              this.$router.push({ path: '/Game' }).catch(() => {})
               this.$router.go(1);
             }).bind(this))
             .catch((function (err)  {

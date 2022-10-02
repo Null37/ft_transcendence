@@ -67,7 +67,7 @@ export default Vue.extend({
         if (this.gameId === "") {
 
             console.log('redirecting with missing identifier error', this.gameId);
-            this.$router.push({ name: 'Game', params: { error: "Oops! Game was not found!" } });
+            this.$router.push({ name: 'Game', params: { error: "Oops! Game was not found!" } }).catch(() => {}).catch(() => {}).catch(() => {});
             return ;
         }
 
@@ -75,7 +75,7 @@ export default Vue.extend({
         if (!token)
         {
             console.log('redirecting with auth error');
-            this.$router.push({ name: 'Game', params: { error: "Who are you?! Are you logged in?" } });
+            this.$router.push({ name: 'Game', params: { error: "Who are you?! Are you logged in?" } }).catch(() => {}).catch(() => {});
             return ;
         }
 
@@ -89,7 +89,7 @@ export default Vue.extend({
             if (typeof res.data !== 'object')
             {
                 console.log('redirecting with data error: axios');
-                this.$router.push({ name: 'Game', params: { error: "Oops! Something went wrong!" } });
+                this.$router.push({ name: 'Game', params: { error: "Oops! Something went wrong!" } }).catch(() => {});
                 return 1;
             }
 
@@ -99,7 +99,7 @@ export default Vue.extend({
                 console.log('redirecting with expiration error');
                 const token = localStorage.getItem('token');
                 this.$socket.emit('clearGame', token)
-                this.$router.push({ name: 'Game', params: { error: "This game has already finished!" } });
+                this.$router.push({ name: 'Game', params: { error: "This game has already finished!" } }).catch(() => {});
                 return 1;
             }
 
@@ -130,7 +130,7 @@ export default Vue.extend({
                         console.error('axios : verify_game ERROR', err2);
 
                         setTimeout(() => {
-                            this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } });
+                            this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } }).catch(() => {});
                         }, 5 * 1000);
                     });
 
@@ -159,7 +159,7 @@ export default Vue.extend({
             console.error('axios : verify_game ERROR', err);
 
             setTimeout(() => {
-                this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } });
+                this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } }).catch(() => {});
             }, 5 * 1000);
             return 1;
         });
@@ -245,7 +245,7 @@ export default Vue.extend({
 					this.gameSocket.close();
                     const token = localStorage.getItem('token');
                     this.$socket.emit('clearGame', token)
-					this.$router.push({ name: 'Game' });
+					this.$router.push({ name: 'Game' }).catch(() => {});
                 }, 2 * 1000);
 
             }, 0.25 * 1000);

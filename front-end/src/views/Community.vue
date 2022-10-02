@@ -53,8 +53,8 @@ export default Vue.extend({
         if (this.friendlist[i].username === data.username)
         {
           this.friendlist[i].status = data.status;
-
-          
+          if (data.gameID)
+            this.friendlist[i].match = data.gameID;
           return ;
         }
       }
@@ -64,6 +64,8 @@ export default Vue.extend({
         if (this.users[i].username === data.username)
         {
           console.log("this.users[i] == ", this.users[i]);
+          if (data.gameID)
+            this.users[i].match = data.gameID;
           this.users[i].status = data.status;
           return ;
         }
@@ -73,6 +75,8 @@ export default Vue.extend({
       {
         if (this.blocked[i].username === data.username)
         {
+          if (data.gameID)
+            this.blocked[i].match = data.gameID;
           this.blocked[i].status = data.status;
           return ;
         }
@@ -300,7 +304,7 @@ export default Vue.extend({
                   this.placeHolder = "http://localhost:8080/play?match="+res.data.generatedMaps[0].id;
                   this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, sender: this.me[0].id, receiver: this.receiverID})
                   this.placeHolder = "";
-                  this.$router.push({ path: '/play?match='+res.data.generatedMaps[0].id })
+                  this.$router.push({ path: '/play?match='+res.data.generatedMaps[0].id }).catch(() => {})
                   this.$router.go(1);
                 this.$router.go(1);
                 }).bind(this))

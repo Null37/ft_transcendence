@@ -36,7 +36,7 @@
 			if (this.gameId === "") {
 	
 				console.log('redirecting with missing identifier error', this.gameId);
-				this.$router.push({ name: 'Game', params: { error: "Oops! Game was not found!" } });
+				this.$router.push({ name: 'Game', params: { error: "Oops! Game was not found!" } }).catch(() => {});
 				return ;
 			}
 	
@@ -44,7 +44,7 @@
 			if (!token)
 			{
 				console.log('redirecting with auth error');
-				this.$router.push({ name: 'Game', params: { error: "Who are you?! Are you logged in?" } });
+				this.$router.push({ name: 'Game', params: { error: "Who are you?! Are you logged in?" } }).catch(() => {});
 				return ;
 			}
 	
@@ -58,7 +58,7 @@
 				if (typeof res.data !== 'object')
 				{
 					console.log('redirecting with data error: axios');
-					this.$router.push({ name: 'Game', params: { error: "Oops! Something went wrong!" } });
+					this.$router.push({ name: 'Game', params: { error: "Oops! Something went wrong!" } }).catch(() => {});
 					return 1;
 				}
 	
@@ -66,7 +66,7 @@
 				if (res.data.finished == 1)
 				{
 					console.log('redirecting with expiration error');
-					this.$router.push({ name: 'Game', params: { error: "This game has expired!" } });
+					this.$router.push({ name: 'Game', params: { error: "This game has expired!" } }).catch(() => {});
 					return 1;
 				}
 	
@@ -97,7 +97,7 @@
 				console.error('axios : verify_game ERROR', err);
 	
 				setTimeout(() => {
-					this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } });
+					this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } }).catch(() => {});
 				}, 5 * 1000);
 				return 1;
 			});

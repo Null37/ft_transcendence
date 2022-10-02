@@ -78,7 +78,7 @@
         <v-list-item
           link
           v-if="user.status === 'In-Game'"
-          @click="redirectToGame()"
+          @click="redirectToGame(user.match)"
         >
           <v-list-item-title >Spectate Game</v-list-item-title>
         </v-list-item>
@@ -94,8 +94,10 @@ import axios from 'axios';
     data: () => ({
     }),
     methods: {
-      redirectToGame: function ()
+      redirectToGame: function (match)
       {
+        this.$router.push({ path: '/play?match='+match })
+        this.$router.go(1);
       },
       unblockuser: function (user)
       {
