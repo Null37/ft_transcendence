@@ -364,8 +364,8 @@ import * as bcrypt from 'bcrypt';
 		// tmp.id 
 
 		let userProfile = await this.usersService.findbyId(message.sender)
-		if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(message.text))
-			return ;
+		// if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(message.text))
+		// 	return ;
 		if (tmp == null)
 		{
 			client.broadcast.to(message.room).emit('msgToClient',
@@ -397,11 +397,6 @@ import * as bcrypt from 'bcrypt';
 		// {text: this.placeHolder, room: this.currentRoom, userID: this.me[0].id}
 
 		this.logger.log(`received a message: ${message.text} from ${client.id} will be sent to ${message.room}`)
-		
-		if (/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(message.text) && !message.text.startsWith("/"))
-		{
-			return ;
-		}
 		let usr = await this.roomsService.roomUser.findOne({where: {userID: message.userID, roomName: message.room}})
 		if (!usr)
 			return ;
