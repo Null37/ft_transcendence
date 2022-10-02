@@ -20,7 +20,7 @@ export class AuthService {
   {
      return await this.userdata.get_secret(id)
   }
-   get_all()
+  get_all()
   {
     return  this.userdata.findAll()
   }

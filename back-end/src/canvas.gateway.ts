@@ -25,7 +25,7 @@ const HEIGHT: number = WIDTH / 2;
 const BARWIDTH: number = 20;
 const BARHEIGHT: number = 100;
 const BARSPEED: number = 8;
-const WINSCORE: number = 8;
+const WINSCORE: number = 11;
 
 const BALLRADIUS: number = 20;
 var HBALLSPEED: number = 8;
@@ -408,11 +408,11 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 				// left player quitted
 				if (client.id === this.gamePlayers[ind].p1SockId) {
 					this.leftScore[ind] = 0;
-					this.rightScore[ind] = 11;
+					this.rightScore[ind] = WINSCORE;
 				}
 				// right player quitted
 				if (client.id === this.gamePlayers[ind].p2SockId) {
-					this.leftScore[ind] = 11;
+					this.leftScore[ind] = WINSCORE;
 					this.rightScore[ind] = 0;
 				}
 

@@ -45,7 +45,7 @@ export default Vue.extend({
 	  },
 	  statusChanged(data)
 	  {
-
+      console.log("data");
       console.log("dattta === ", data, " | friendlist length == ", this.friendlist.length, "data ===> ", data);
       console.log(this.friendlist);
       for (let i = 0; i < this.friendlist.length; i++)
@@ -53,7 +53,8 @@ export default Vue.extend({
         if (this.friendlist[i].username === data.username)
         {
           this.friendlist[i].status = data.status;
-          console.log("this.friendlist[i].status == ", this.friendlist[i].status ," | data.status == ", data.status, " | data.username == ", data.username);
+
+          
           return ;
         }
       }
@@ -62,6 +63,7 @@ export default Vue.extend({
       {
         if (this.users[i].username === data.username)
         {
+          console.log("this.users[i] == ", this.users[i]);
           this.users[i].status = data.status;
           return ;
         }
@@ -95,19 +97,7 @@ export default Vue.extend({
       drawer: null,
       placeHolder: "",
       tmp: [],
-      showmessages: [{
-        id: 0,
-        message: "Use /help command to see available options",
-        room: "",
-        from: {
-          two_factor_authentication: false,
-          id: 2,
-          username: 'asdfasfd',
-          intra_login: 'hboudhir',
-          avatar: 'https://cdn.intra.42.fr/users/hboudhir.jpg',
-          status: 'Offline'
-          },
-      }],
+      showmessages: [],
       messages: [
       ],
       users: [],
@@ -383,6 +373,8 @@ export default Vue.extend({
               }
             }).then(res => {
               this.setUsername = false;
+              
+
             })
             .catch(error => {
               console.log(error);
@@ -406,9 +398,22 @@ export default Vue.extend({
     	await this.me.push(res.data);
         this.avatar = this.me[0].avatar;
         if (this.me[0].username === null)
-			this.setUsername = true;
-		else
-			this.$socket.emit('connectUser', this.me[0].username, "Online");
+			    this.setUsername = true;
+        else
+        {
+          
+          this.showmessages.push({
+              id: 0,
+              message: "Use /help command to see available options",
+              room: "",
+              from: this.me[0],
+            });
+          this.$socket.emit('connectUser', this.me[0].username, "Online");
+        }
+    
+
+
+
 		console.log("this.me[0].username", this.me[0].username);
 	}).bind(this))
 	.catch(error => {
@@ -597,7 +602,7 @@ export default Vue.extend({
                       class=""
                     >
                       <v-list-item-avatar class="align-self-start mr-2">
-                        <Profile :avatar="message.from.avatar" :username="message.from.username" />                   
+                        <Profile :avatar="message.from.avatar" :id="message.from.id" :username="message.from.username" />                   
                                 
                       </v-list-item-avatar>
                       <v-list-item-content class="received-message">

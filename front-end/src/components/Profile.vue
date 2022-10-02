@@ -1,9 +1,41 @@
 <script lang="ts">
+  import axios from 'axios';
+  
   export default {
+    mounted (){
+      const token = localStorage.getItem('token');
+
+      if (token)
+      {
+        axios.get('/get_history/'+this.id, {
+          headers: {
+            Authorization: token
+          }
+        }).then((function (res) {
+          this.games = res.data;
+        }).bind(this))
+        .catch(error => {
+          console.log(error);
+        });
+        axios.get('/get_achievm/'+this.id, {
+          headers: {
+            Authorization: token
+          }
+        }).then((function (res) {
+          this.ach = res.data;
+          console.log("acheee == ", res.data);
+        }).bind(this))
+        .catch(error => {
+          console.log(error);
+        });
+      }
+    },
     data: () => ({
       dialog: false,
+      games: [],
+      ach: [],
     }),
-    props: ['avatar', 'username']
+    props: ['avatar', 'username', 'id']
   }
 </script>
 
@@ -35,7 +67,7 @@
             <v-row>
               <v-col align="center"
                 justify="center">
-                 <v-avatar size="102">
+                <v-avatar size="102">
                     <img
                         :src="avatar"
                         alt="John"
@@ -53,22 +85,41 @@
               </v-col>
               
             </v-row>
+            <v-row>
+              <v-col v-if="ach.length !== 0 && ach[0].conquer !== ''" align="center"
+                justify="center">
+                <v-avatar tile size="30">
+                    <img
+                        :src="'http://localhost:3000'+ach[0].conquer"
+                        alt="Conquer"
+                    >
+                </v-avatar>
+              </v-col>
+
+              <v-col v-if="ach.length !== 0 && ach[0].first_win !== ''" align="center"
+                justify="center">
+                <v-avatar tile size="30">
+                    <img
+                        :src="'http://localhost:3000'+ach[0].first_win"
+                        alt="First Win"
+                    >
+                </v-avatar>
+              </v-col>
+              
+              
+            </v-row>
             <v-divider style="margin-top: 10px; margin-bottom: 10px;"></v-divider>
             <v-row>
               
               <v-col align="center"
                 justify="center">
-                 <div class="text-subtitle-1">
-                      Null37 0-10 Akira
+                <div v-if="games.length === 0" class="text-subtitle-1">
+                      No history found
                 </div>
-
-                <div class="text-subtitle-1">
-                      Null37 0-10 Akira
+                <div v-for="game in games" class="text-subtitle-1">
+                      {{game.player_one.username}} {{game.score_one}}-{{game.score_two}} {{game.player_two.username}}
                 </div>
-
-                <div class="text-subtitle-1">
-                      Null37 0-10 Akira
-                </div>
+   
               </v-col>
               
             </v-row>

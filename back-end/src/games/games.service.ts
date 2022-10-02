@@ -65,12 +65,12 @@ export class GamesService {
 			gm.score_two = right_score;
 
 			// p one wins
-			if (gm.score_one == 4) {
+			if (gm.score_one == 11 && gm.player_one.first_win === "") {
 				gm.player_one.first_win = "/public/achievements/success.png";
 			}
 
 			// p two wins
-			else if (gm.score_two == 4) {
+			else if (gm.score_two == 11 && gm.player_two.first_win === "") {
 				gm.player_two.first_win = "/public/achievements/success.png";
 			}
 
@@ -91,13 +91,13 @@ export class GamesService {
 	async get_history(id: number)
 	{
 	
-		return await this.playersdata.find({
-			where: {
-				id: id,
-			},
-			relations: {
-				games: true,
-		}});
+		return this.gamesdata
+		.createQueryBuilder('games')
+		.leftJoinAndSelect("games.player_one", "player_one")
+		.leftJoinAndSelect("games.player_two", "player_two")
+		.where("games.player_one = :plo", { plo: id })
+		.orWhere("games.player_two = :plt", { plt: id })
+		.getMany();
 	}
 	async get_achievm(id: number)
 	{
