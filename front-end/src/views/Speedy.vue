@@ -114,8 +114,7 @@ export default Vue.extend({
 						console.log('PROBABLY INVITED');
 						axios.get('/accept_invite/' + usr.sub + '/' + this.gameId,
 							{ headers: { Authorization: token } })
-							.then(() => {
-								// res.data.player_two.username
+							.then((ress) => {
 							})
 							.catch((err2) => {
 								Vue.$toast.error('An error occured! Going back to lobby in 5s');

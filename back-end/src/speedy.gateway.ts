@@ -17,14 +17,12 @@ const searchForGame = (gp: GameObj[], gid: string) => {
 	return ind;
 }
 
-// const WIDTH: number = 1000;
-// const HEIGHT: number = WIDTH / 2;
 const WIDTH: number = 1000;
 const HEIGHT: number = WIDTH / 2;
 const BARWIDTH: number = 20;
 const BARHEIGHT: number = 100;
 const BARSPEED: number = 10; // speedy version
-const WINSCORE: number = 8;
+const WINSCORE: number = 11;
 
 const BALLRADIUS: number = 20;
 var HBALLSPEED: number = 10; // speedy version
@@ -106,8 +104,8 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 									(this.gamePlayers[ind].spectators)
 							).emit('setCountdownSpeedy', { seconds: 1, });
 
-							this.startTimers[ind] = setTimeout(() => {
-								this.startGame(ind);
+							this.startTimers[ind] = setTimeout(async () => {
+								await this.startGame(ind);
 
 							}, 1000);
 						}, 1000);
@@ -369,11 +367,11 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 				// left player quitted
 				if (client.id === this.gamePlayers[ind].p1SockId) {
 					this.leftScore[ind] = 0;
-					this.rightScore[ind] = 11;
+					this.rightScore[ind] = WINSCORE;
 				}
 				// right player quitted
 				if (client.id === this.gamePlayers[ind].p2SockId) {
-					this.leftScore[ind] = 11;
+					this.leftScore[ind] = WINSCORE;
 					this.rightScore[ind] = 0;
 				}
 

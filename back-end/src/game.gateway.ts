@@ -16,6 +16,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 		private readonly userservice: UsersService,
 	){}
 	private queuePlayers: Array<{ sockId: string, token: any; }> = [];
+	private queueSpeedyPlayers: Array<{ sockId: string, token: any; }> = [];
 
 	afterInit(server: any) {
 		console.log("SERVER: Game Web Socket initialized!");
@@ -28,9 +29,15 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 		console.log("SERVER: Game client disconnected", client.id);
 
 		// pop from QUEUE PLAYERS
-		let ind: number = this.queuePlayers.findIndex((elm: any) => elm.sockId == client.id);
-		if (ind !== -1) {
-			this.queuePlayers.splice(ind, 1);
+		let ind1: number = this.queuePlayers.findIndex((elm: any) => elm.sockId == client.id);
+		if (ind1 !== -1) {
+			this.queuePlayers.splice(ind1, 1);
+		}
+
+		// pop from QUEUE PLAYERS
+		let ind2: number = this.queueSpeedyPlayers.findIndex((elm: any) => elm.sockId == client.id);
+		if (ind2 !== -1) {
+			this.queueSpeedyPlayers.splice(ind2, 1);
 		}
 	}
 
@@ -90,10 +97,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 	handleCancelSpeedyQueue(client: Socket) {
 		console.log('SERVER: Game client wanted to leave the queue');
 
-		let ind = this.queuePlayers.findIndex((elm: any) => elm.sockId == client.id );
+		let ind = this.queueSpeedyPlayers.findIndex((elm: any) => elm.sockId == client.id );
 		if (ind != -1)
-			this.queuePlayers.splice(ind,1);
-		// console.log("SERVER: TOTAL QUEUE PLAYERS NOW", this.queuePlayers.length);
+			this.queueSpeedyPlayers.splice(ind,1);
+		// console.log("SERVER: TOTAL QUEUE PLAYERS NOW", this.queueSpeedyPlayers.length);
 	}
 
 
@@ -107,25 +114,28 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 
 		// user already joined
 		// update socket
-		let ind = this.queuePlayers.findIndex((elm: any) => elm.token.sub == tkn.sub );
+		let ind = this.queueSpeedyPlayers.findIndex((elm: any) => elm.token.sub == tkn.sub );
 		if (ind !== -1) {
-			this.queuePlayers[ind].sockId = client.id;
+			this.queueSpeedyPlayers[ind].sockId = client.id;
 		}
 
 		// socket already joined
-		if (this.queuePlayers.findIndex((elm: any) => elm.sockId == client.id ) === -1)
-			{ this.queuePlayers.push({ sockId: client.id, token: tkn }); }
+		if (this.queueSpeedyPlayers.findIndex((elm: any) => elm.sockId == client.id ) === -1)
+			{ this.queueSpeedyPlayers.push({ sockId: client.id, token: tkn }); }
 
-		if (this.queuePlayers.length >= 2) {
+		if (this.queueSpeedyPlayers.length >= 2) {
+			console.log("SERVER: Good");
 
-			let usr1 = await this.userservice.findOne(this.queuePlayers[0].token.name);
-			let usr2 = await this.userservice.findOne(this.queuePlayers[1].token.name);
+			let usr1 = await this.userservice.findOne(this.queueSpeedyPlayers[0].token.name);
+			let usr2 = await this.userservice.findOne(this.queueSpeedyPlayers[1].token.name);
 
 			let new_game_id = await this.gamesservice.startGame(usr1, usr2, 2);
 
-			this.wss.to([this.queuePlayers[0].sockId, this.queuePlayers[1].sockId]).emit('queueSpeedyResponse', new_game_id);
+			console.log('SENDING TO', [this.queueSpeedyPlayers[0].sockId, this.queueSpeedyPlayers[1].sockId]);
+			
+			this.wss.to([this.queueSpeedyPlayers[0].sockId, this.queueSpeedyPlayers[1].sockId]).emit('queueSpeedyResponse', new_game_id);
 
-			this.queuePlayers.splice(0, 2);
+			this.queueSpeedyPlayers.splice(0, 2);
 		}
 	}
 } 

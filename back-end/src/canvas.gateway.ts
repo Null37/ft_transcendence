@@ -1,7 +1,6 @@
 import { OnGatewayConnection, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Socket, Server } from "socket.io";
 import { GamesService } from "./games/games.service";
-import { UsersService } from "./users/users.service";
 
 interface GameObj {
 	p1SockId: string,
@@ -18,8 +17,6 @@ const searchForGame = (gp: GameObj[], gid: string) => {
 	return ind;
 }
 
-// const WIDTH: number = 1000;
-// const HEIGHT: number = WIDTH / 2;
 const WIDTH: number = 1000;
 const HEIGHT: number = WIDTH / 2;
 const BARWIDTH: number = 20;
@@ -40,7 +37,6 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 	constructor(
 		private readonly gamesservice: GamesService,
-		// private readonly userservice: UsersService,
 	) { }
 
 	private gamePlayers: Array<GameObj> = [];
@@ -58,7 +54,6 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 	private rightScore: Array<number> = [];
 
 	private gameTimers: Array<any> = [];
-	private ballTimers: Array<any> = [];
 	private startTimers: Array<any> = [];
 
 	initBallnBar(ind: number) {
@@ -162,13 +157,6 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 						}
 					}
 					this.initBallnBar(ind);
-
-					// pause for a second after scoring
-					const date = Date.now();
-					let currentDate = null;
-					do {
-						currentDate = Date.now();
-					} while (currentDate - date < 1000);
 
 					HBALLSPEED *= -1;
 				}
@@ -402,7 +390,6 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 				// stop streaming
 				clearInterval(this.gameTimers[ind]);
-				clearInterval(this.ballTimers[ind]);
 				clearInterval(this.startTimers[ind]);
 
 				// left player quitted

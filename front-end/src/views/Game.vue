@@ -83,15 +83,23 @@ export default Vue.extend({
       // speedy game
       emitSpeedyJoin() {
         console.log('EMITTING JOIN');
-        
-        this.gameSocket.emit('joinSpeedyQueue');
+
+        console.log('');
+        console.log('');
+        console.log('');
+        console.log(this.gameSocketSpeedy.id);
+        console.log('');
+        console.log('');
+        console.log('');
+
+        this.gameSocketSpeedy.emit('joinSpeedyQueue');
         this.isLoading = false;
         this.isSpeedyLoading = true;
       },
       emitSpeedyCancel() {
         console.log('EMITTING CANCEL');
 
-        this.gameSocket.emit('cancelSpeedyQueue');
+        this.gameSocketSpeedy.emit('cancelSpeedyQueue');
         this.isSpeedyLoading = false;
       },
 	  statusChanged(data: any)
@@ -139,18 +147,26 @@ export default Vue.extend({
       username: "" as string,
       drawer: null,
       gameSocket: null as any,
+      gameSocketSpeedy: null as any,
       isLoading: false as Boolean,
       isSpeedyLoading: false as Boolean,
       socketURL: "" as string,
+      socketSpeedyURL: "" as string,
       isUsernameError: false as Boolean,
       usernameError: "" as string,
     }),
 
     created () {
       this.socketURL = location.protocol + "//" + location.hostname + ":" + 3000 + "/game";
+      this.socketSpeedyURL = location.protocol + "//" + location.hostname + ":" + 3000 + "/game";
       // console.log(this.socketURL, 'SOCKET URL GAME.VUE');
 
       this.gameSocket = io(this.socketURL, {
+        transportOptions: {
+          polling: { extraHeaders: { Authorization: 'Bearer ' + localStorage.getItem('token') } },
+        },
+      });
+      this.gameSocketSpeedy = io(this.socketSpeedyURL, {
         transportOptions: {
           polling: { extraHeaders: { Authorization: 'Bearer ' + localStorage.getItem('token') } },
         },
@@ -170,7 +186,7 @@ export default Vue.extend({
         this.isLoading = false;
       });
 
-      this.gameSocket.on('queueSpeedyResponse', (data: any) => {
+      this.gameSocketSpeedy.on('queueSpeedyResponse', (data: any) => {
         console.log('CLIENT: GOT ACKNOWLEDGMENT FROM SERVER');
 
         // redirection

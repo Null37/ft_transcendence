@@ -107,7 +107,7 @@ export default Vue.extend({
             {
                 let usr = JSON.parse(Buffer .from(token.split('.')[1], 'base64').toString('utf8'));
                 // console.log('PLAYER DETAILS', res.data.player_one, res.data.player_two);
-                console.table(usr);
+                // console.table(usr);
 
                 if (usr.sub === res.data.player_one.id) {
 
@@ -122,8 +122,9 @@ export default Vue.extend({
                     console.log('PROBABLY INVITED');
                     axios.get('/accept_invite/' + usr.sub + '/' + this.gameId,
                     { headers: { Authorization: token } })
-                    .then(() => {
-                        // res.data.player_two.username
+                    .then((ress) => {
+                        res.data.player_tow = ress.data
+                        window.document.querySelector("#rightPlayer")!.innerHTML = ress.data.username.toUpperCase();
                     })
                     .catch((err2) => {
                         Vue.$toast.error( 'An error occured! Going back to lobby in 5s');
@@ -146,6 +147,7 @@ export default Vue.extend({
                 if (this.playerMode !== 'spectator')
                     this.$socket.emit('connectUserGame', {token: localStorage.getItem('token'), GameId : this.gameId});
                 window.document.querySelector("#leftPlayer")!.innerHTML = res.data.player_one.username.toUpperCase();
+
                 if (res.data.player_two) // protecting for game invite
                     window.document.querySelector("#rightPlayer")!.innerHTML = res.data.player_two.username.toUpperCase();
             }
@@ -375,7 +377,7 @@ export default Vue.extend({
 
                     <div style="display:inline-block;width:19%;text-align:center;">
                         <div :style="[ playerSide == 'right' ? {'background':'#5310a9'} : {} ]"
-                            id="rightPlayer">PLAYER TWO {{ playerSide }}</div>
+                            id="rightPlayer">PLAYER TWO</div>
                         <div style="font-weight: bold;font-size: 50px;" >{{ rightScore }}</div>
                     </div>
                 </div>

@@ -36,8 +36,8 @@ export class Games
 	@Column({ default: 0 })
 	finished: number = 0;
 
-	@Column()
-	type: number = 1;
+	@Column({ default: 1 })
+	type: number;
 	// 1 : normal game
 	// 2 : speedy game
 

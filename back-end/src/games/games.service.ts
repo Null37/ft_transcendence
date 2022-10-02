@@ -76,6 +76,13 @@ export class GamesService {
 			gm.score_one = left_score;
 			gm.score_two = right_score;
 
+			// game ended before the second player participates
+			if (gm.player_two === null) {
+				// erase to game to avoid missing player game history
+				this.gamesdata.delete(gm.id);
+				return ;
+			}
+
 			// p one wins
 			if (gm.score_one == 11 && gm.player_one.first_win === "") {
 				gm.player_one.first_win = "/public/achievements/success.png";
@@ -132,5 +139,7 @@ export class GamesService {
 
 		invited.match = gameid;
 		this.playersdata.save(invited);
+
+		return invited;
 	}
 }
