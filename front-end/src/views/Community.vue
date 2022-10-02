@@ -430,14 +430,7 @@ export default Vue.extend({
       }}).then(res => {
         this.users = res.data;
         
-        console.log("users == >");
-        console.log(this.users);
-        this.users = this.users.filter((el) => {
-            return this.me.some((f) => {
-              return f.username !== el.username;
-            });
-          });
-        
+
         axios.get('/friend/find', {
           headers: {
             Authorization: token
@@ -527,6 +520,8 @@ export default Vue.extend({
 
       
     }
+
+    console.log("final users array=> ", this.users)
   },
   components: { TopBar, UserAvatar, FriendList, FriendsStatus, Profile }
 
