@@ -24,7 +24,7 @@ export default Vue.extend({
     name: "App",
 
     methods: {
-    changeAvatarC: function(newavatar)
+    changeAvatarC: function(newavatar: any)
     {
       this.avatar = newavatar;
     },
@@ -70,6 +70,7 @@ export default Vue.extend({
         console.log('EMITTING JOIN');
         
         this.gameSocket.emit('joinQueue');
+        this.isSpeedyLoading = false;
         this.isLoading = true;
       },
       emitCancel() {
@@ -84,6 +85,7 @@ export default Vue.extend({
         console.log('EMITTING JOIN');
         
         this.gameSocket.emit('joinSpeedyQueue');
+        this.isLoading = false;
         this.isSpeedyLoading = true;
       },
       emitSpeedyCancel() {
@@ -92,17 +94,17 @@ export default Vue.extend({
         this.gameSocket.emit('cancelSpeedyQueue');
         this.isSpeedyLoading = false;
       },
-	  statusChanged(data)
+	  statusChanged(data: any)
 	  {
 
-      console.log("dattta === ", data, " | friendlist length == ", this.friendlist.length);
-      console.log(this.friendlist);
+      // console.log("dattta === ", data, " | friendlist length == ", this.friendlist.length);
+      // console.log(this.friendlist);
       for (let i = 0; i < this.friendlist.length; i++)
       {
         if (this.friendlist[i].username === data.username)
         {
           this.friendlist[i].status = data.status;
-          console.log("this.friendlist[i].status == ", this.friendlist[i].status ," | data.status == ", data.status, " | data.username == ", data.username);
+          // console.log("this.friendlist[i].status == ", this.friendlist[i].status ," | data.status == ", data.status, " | data.username == ", data.username);
           return ;
         }
       }

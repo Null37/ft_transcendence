@@ -51,4 +51,7 @@ export class Users
 
     @Column({ default: 0 })
     level: number;
+
+	@Column({ default: "", nullable: false })
+	match: string;
 }

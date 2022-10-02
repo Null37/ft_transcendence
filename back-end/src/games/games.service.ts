@@ -26,12 +26,19 @@ export class GamesService {
 
 	async startGame(host: Users, guest: Users, gameType: number = 1) {
 
-		return await this.gamesdata
+		let gameid = await this.gamesdata
 				.createQueryBuilder()
 				.insert()
 				.values({player_one: host, player_two: guest, score_one: 0, score_two: 0, type: gameType, finished: 0})
 				.returning('id')
 				.execute();
+
+		host.match = gameid.generatedMaps[0].id;
+		this.playersdata.save(host);
+		guest.match = gameid.generatedMaps[0].id;
+		this.playersdata.save(guest);
+
+		return gameid;
 	}
 
 	get_game(id: string): Promise<Games | null> 
@@ -44,12 +51,17 @@ export class GamesService {
 
 	async invite_game(host: Users, gameType: number = 1)
 	{
-		return await this.gamesdata
+		let gameid = await this.gamesdata
 				.createQueryBuilder()
 				.insert()
 				.values({player_one: host, player_two: null, score_one: 0, score_two: 0, type: gameType, finished: 0})
 				.returning('id')
 				.execute();
+
+		host.match = gameid.generatedMaps[0].id;
+		this.playersdata.save(host);
+
+		return gameid;
 	}
 
 	finish_game(id: string, left_score: number, right_score: number)
@@ -117,5 +129,8 @@ export class GamesService {
 		.set({ player_two: invited })
 		.where("id = :id", { id: gameid })
 		.execute();
+
+		invited.match = gameid;
+		this.playersdata.save(invited);
 	}
 }
