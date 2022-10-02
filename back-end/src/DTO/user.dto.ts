@@ -8,7 +8,7 @@ export class user_dto
     intra_login: string
 
     avatar: string
-
+ 
     status: string
 
     secret?: string 
@@ -22,4 +22,5 @@ export class user_dto
     conquer?: string = ""
 
     level?: number = 0
+	match?: string = "";
 } 

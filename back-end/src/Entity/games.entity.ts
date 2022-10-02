@@ -33,7 +33,7 @@ export class Games
 	@Column()
 	score_two: number = 0;
 
-	@Column()
+	@Column({ default: 0 })
 	finished: number = 0;
 
 	@Column()
