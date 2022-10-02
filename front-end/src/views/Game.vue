@@ -162,7 +162,7 @@ export default Vue.extend({
         // redirection
         if (typeof data.identifiers === 'object' && typeof data.identifiers[0]?.id === 'string')
           // send id to ping pong view
-          this.$router.push({ name: 'Play', query: { match: "" + data.identifiers[0].id, } })
+          this.$router.push({ name: 'Play', query: { match: "" + data.identifiers[0].id, } }).catch(() => {})
         else
           // feedback
           console.error('Error Occured: queueResponse', );

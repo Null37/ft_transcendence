@@ -105,7 +105,7 @@ export default Vue.extend({
 
             if (res.data.finished == 0)
             {
-                let usr = JSON.parse(Buffer .from(token.split('.')[1], 'base64').toString('utf8')).catch(() => {});
+                let usr = JSON.parse(Buffer .from(token.split('.')[1], 'base64').toString('utf8'));
                 // console.log('PLAYER DETAILS', res.data.player_one, res.data.player_two);
                 console.table(usr);
 
