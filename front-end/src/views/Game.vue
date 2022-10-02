@@ -45,12 +45,14 @@ export default Vue.extend({
               { username: this.usernameEdit },
               { headers: { Authorization: token }
             })
-            .then(res => {
+            .then((function (res)  {
               this.username = this.usernameEdit;
               this.setUsername = false;
               this.isUsernameError = false;
               this.usernameError = "";
-            })
+			  console.log("connectUSer of ", this.usernameEdit)
+			  this.$socket.emit('connectUser', {username: this.usernameEdit, label: "Online"});
+            }).bind(this))
             .catch(error => {
               console.log(error);
               this.isUsernameError = true;
@@ -201,7 +203,7 @@ export default Vue.extend({
 			else
 			{
 				console.log("this.username ", this.username);
-				this.$socket.emit('connectUser', this.username, "Online");
+				this.$socket.emit('connectUser',  {username: this.username, label: "Online"});
 			}
         })
         .catch(error => {

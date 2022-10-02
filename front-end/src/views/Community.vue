@@ -375,6 +375,7 @@ export default Vue.extend({
 
           if (token)
           {
+			console.log("Zebi sghir walakin ", this.me.username)
             axios.patch('/update', {
               userame: this.me.username
             }, {
@@ -383,6 +384,9 @@ export default Vue.extend({
               }
             }).then(res => {
               this.setUsername = false;
+			  console.log("connectUSer of ", this.me.username)
+				  this.$socket.emit('connectUser', {username: "boodeer", label: "Online"});
+
             })
             .catch(error => {
               console.log(error);
@@ -408,7 +412,7 @@ export default Vue.extend({
         if (this.me[0].username === null)
 			this.setUsername = true;
 		else
-			this.$socket.emit('connectUser', this.me[0].username, "Online");
+			this.$socket.emit('connectUser', {username: this.me[0].username, label: "Online"});
 		console.log("this.me[0].username", this.me[0].username);
 	}).bind(this))
 	.catch(error => {
