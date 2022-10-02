@@ -48,7 +48,7 @@ export default Vue.extend({
 			this.gameSocket.close();
             const token = localStorage.getItem('token');
             this.$socket.emit('clearGame', token)
-			this.$router.push({ name: 'Game' });
+			this.$router.push({ name: 'Game' }).catch(() => {});
             
 		}
     },
@@ -67,7 +67,7 @@ export default Vue.extend({
         if (this.gameId === "") {
 
             console.log('redirecting with missing identifier error', this.gameId);
-            this.$router.push({ name: 'Game', params: { error: "Oops! Game was not found!" } }).catch(() => {}).catch(() => {}).catch(() => {});
+            this.$router.push({ name: 'Game', params: { error: "Oops! Game was not found!" } }).catch(() => {});
             return ;
         }
 
@@ -75,7 +75,7 @@ export default Vue.extend({
         if (!token)
         {
             console.log('redirecting with auth error');
-            this.$router.push({ name: 'Game', params: { error: "Who are you?! Are you logged in?" } }).catch(() => {}).catch(() => {});
+            this.$router.push({ name: 'Game', params: { error: "Who are you?! Are you logged in?" } }).catch(() => {});
             return ;
         }
 
@@ -105,7 +105,7 @@ export default Vue.extend({
 
             if (res.data.finished == 0)
             {
-                let usr = JSON.parse(Buffer .from(token.split('.')[1], 'base64').toString('utf8'));
+                let usr = JSON.parse(Buffer .from(token.split('.')[1], 'base64').toString('utf8')).catch(() => {});
                 // console.log('PLAYER DETAILS', res.data.player_one, res.data.player_two);
                 console.table(usr);
 
@@ -245,7 +245,7 @@ export default Vue.extend({
 					this.gameSocket.close();
                     const token = localStorage.getItem('token');
                     this.$socket.emit('clearGame', token)
-					this.$router.push({ name: 'Game' }).catch(() => {});
+					this.$router.push({ name: 'Game' });
                 }, 2 * 1000);
 
             }, 0.25 * 1000);

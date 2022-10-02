@@ -96,7 +96,7 @@ import axios from 'axios';
     methods: {
       redirectToGame: function (match)
       {
-        this.$router.push({ path: '/play?match='+match })
+        this.$router.push({ path: '/play?match='+match }).catch(() => {})
         this.$router.go(1);
       },
       unblockuser: function (user)
