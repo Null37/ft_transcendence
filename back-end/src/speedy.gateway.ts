@@ -3,11 +3,14 @@ import { Socket, Server } from "socket.io";
 import { GamesService } from "./games/games.service";
 
 interface GameObj {
-	p1SockId: string,
-	p2SockId: string,
+	// left player
+	p1SockId: string[],
+	// right player
+	p2SockId: string[],
 	gameid: string,
 	spectators: string[],
 	finished: number,
+	started: number,
 }
 
 const searchForGame = (gp: GameObj[], gid: string) => {
@@ -17,14 +20,12 @@ const searchForGame = (gp: GameObj[], gid: string) => {
 	return ind;
 }
 
-// const WIDTH: number = 1000;
-// const HEIGHT: number = WIDTH / 2;
 const WIDTH: number = 1000;
 const HEIGHT: number = WIDTH / 2;
 const BARWIDTH: number = 20;
 const BARHEIGHT: number = 100;
-const BARSPEED: number = 10; // speedy version
-const WINSCORE: number = 8;
+const BARSPEED: number = 8; // speedy version
+const WINSCORE: number = 11;
 
 const BALLRADIUS: number = 20;
 var HBALLSPEED: number = 10; // speedy version
@@ -74,36 +75,41 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 		this.startTimers[ind] = setTimeout(() => {
 			this.wss.to(
-				[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
-					(this.gamePlayers[ind].spectators)
+				[...this.gamePlayers[ind].p1SockId,
+				 ...this.gamePlayers[ind].p2SockId,
+				 ...this.gamePlayers[ind].spectators]
 			).emit('setCountdownSpeedy', { seconds: 5, });
 
 			this.startTimers[ind] = setTimeout(() => {
 				this.wss.to(
-					[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
-						(this.gamePlayers[ind].spectators)
+					[...this.gamePlayers[ind].p1SockId,
+					 ...this.gamePlayers[ind].p2SockId,
+					 ...this.gamePlayers[ind].spectators]
 				).emit('setCountdownSpeedy', { seconds: 4, });
 
 				this.startTimers[ind] = setTimeout(() => {
 					this.wss.to(
-						[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
-							(this.gamePlayers[ind].spectators)
+						[...this.gamePlayers[ind].p1SockId,
+						 ...this.gamePlayers[ind].p2SockId,
+						 ...this.gamePlayers[ind].spectators]
 					).emit('setCountdownSpeedy', { seconds: 3, });
 
 					this.startTimers[ind] = setTimeout(() => {
 						this.wss.to(
-							[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
-								(this.gamePlayers[ind].spectators)
+							[...this.gamePlayers[ind].p1SockId,
+							 ...this.gamePlayers[ind].p2SockId,
+							 ...this.gamePlayers[ind].spectators]
 						).emit('setCountdownSpeedy', { seconds: 2, });
 
 						this.startTimers[ind] = setTimeout(() => {
 							this.wss.to(
-								[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
-									(this.gamePlayers[ind].spectators)
+								[...this.gamePlayers[ind].p1SockId,
+								 ...this.gamePlayers[ind].p2SockId,
+								 ...this.gamePlayers[ind].spectators]
 							).emit('setCountdownSpeedy', { seconds: 1, });
 
-							this.startTimers[ind] = setTimeout(() => {
-								this.startGame(ind);
+							this.startTimers[ind] = setTimeout(async () => {
+								await this.startGame(ind);
 
 							}, 1000);
 						}, 1000);
@@ -113,24 +119,27 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 		}, 1000);
 	}
 
-	startGame(ind: number) {
+	async startGame(ind: number) {
 
 		this.leftScore[ind] = 0;
 		this.rightScore[ind] = 0;
 
-		this.gameTimers[ind] = setInterval(() => {
+		this.gameTimers[ind] = setInterval(async () => {
 
-			this.ballH[ind] += HBALLSPEED;
-			this.ballV[ind] += VBALLSPEED;
-
-			if (this.ballH[ind] <= BARWIDTH || this.ballH[ind] >= WIDTH - BARWIDTH) {
-				HBALLSPEED *= -1;
-
-				// left goal
-				if (this.ballH[ind] - BALLRADIUS / 2 < BARWIDTH &&
-					(this.ballV[ind] < this.leftbarV[ind] ||
-						this.ballV[ind] > this.leftbarV[ind] + BARHEIGHT)) {
-					// score for p2
+			// Ball touched left
+			if (this.ballH[ind] - BALLRADIUS / 2 <= BARWIDTH) {
+				// Bounce
+				if (
+					(this.ballV[ind] >= this.leftbarV[ind] &&
+						this.ballV[ind] <= this.leftbarV[ind] + BARHEIGHT)
+				) {
+					HBALLSPEED *= -1;
+				}
+				// Score
+				else if ( // passed behind the bar
+					(this.ballH[ind] <= BARWIDTH)
+				) {
+					// score for p1
 					this.rightScore[ind] += 1;
 					if (this.rightScore[ind] >= WINSCORE) {
 
@@ -139,12 +148,11 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 						// update game in DB
 						this.finishGame(ind);
+						this.wss.to(this.gamePlayers[ind].p2SockId)
+							.emit("setTextSpeedy", { message: "WINNER" });
 
 						this.wss.to(this.gamePlayers[ind].p1SockId)
 							.emit("setTextSpeedy", { message: "LOST" });
-
-						this.wss.to(this.gamePlayers[ind].p2SockId)
-							.emit("setTextSpeedy", { message: "WINNER" });
 
 						// game over for spectators
 						if (this.gamePlayers[ind].spectators.length > 0) {
@@ -153,12 +161,24 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 						}
 					}
 					this.initBallnBar(ind);
-				}
 
-				// right goal
-				if (this.ballH[ind] + BALLRADIUS / 2 > WIDTH - BARWIDTH &&
-					(this.ballV[ind] < this.rightbarV[ind] ||
-						this.ballV[ind] > this.rightbarV[ind] + BARHEIGHT)) {
+					HBALLSPEED *= -1;
+				}
+			}
+
+			// Ball touched right
+			if (this.ballH[ind] + BALLRADIUS / 2 >= WIDTH - BARWIDTH) {
+				// Bounce
+				if (
+					(this.ballV[ind] >= this.rightbarV[ind] &&
+						this.ballV[ind] <= this.rightbarV[ind] + BARHEIGHT)
+				) {
+					HBALLSPEED *= -1;
+				}
+				// Score
+				else if ( // passed behind the bar
+					(this.ballH[ind] >= WIDTH - BARWIDTH)
+				) {
 					// score for p1
 					this.leftScore[ind] += 1;
 					if (this.leftScore[ind] >= WINSCORE) {
@@ -168,10 +188,10 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 						// update game in DB
 						this.finishGame(ind);
-						this.wss.to(this.gamePlayers[ind].p1SockId)
+						this.wss.to(this.gamePlayers[ind].p2SockId)
 							.emit("setTextSpeedy", { message: "WINNER" });
 
-						this.wss.to(this.gamePlayers[ind].p2SockId)
+						this.wss.to(this.gamePlayers[ind].p1SockId)
 							.emit("setTextSpeedy", { message: "LOST" });
 
 						// game over for spectators
@@ -181,16 +201,31 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 						}
 					}
 					this.initBallnBar(ind);
+
+					// pause for a second after scoring
+					const date = Date.now();
+					let currentDate = null;
+					do {
+						currentDate = Date.now();
+					} while (currentDate - date < 1000);
+
+					HBALLSPEED *= -1;
 				}
 			}
 
-			if (this.ballV[ind] - BALLRADIUS / 2 < 0 || this.ballV[ind] + BALLRADIUS / 2 > HEIGHT)
+			// Ball touched top or bottom
+			if (this.ballV[ind] - BALLRADIUS / 2 < 0 ||
+				this.ballV[ind] + BALLRADIUS / 2 > HEIGHT)
 				VBALLSPEED *= -1;
 
+			this.ballH[ind] += HBALLSPEED;
+			this.ballV[ind] += VBALLSPEED;
+
 			this.wss.to(
-				[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
-					(this.gamePlayers[ind].spectators)
-			).emit("recieveCoordSpeedy", {
+				[...this.gamePlayers[ind].p1SockId,
+				 ...this.gamePlayers[ind].p2SockId,
+				 ...this.gamePlayers[ind].spectators]
+			).emit('recieveCoordSpeedy', {
 				ballH: this.ballH[ind],
 				ballV: this.ballV[ind],
 				leftbarH: this.leftbarH[ind],
@@ -200,7 +235,7 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 				leftScore: this.leftScore[ind],
 				rightScore: this.rightScore[ind],
 			});
-		}, 0.01 * 1000);
+		}, 0.009 * 1000);
 	}
 
 	finishGame(ind: number) {
@@ -213,8 +248,9 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 		// notify player and spectators
 		this.wss.to(
-			[this.gamePlayers[ind].p1SockId, this.gamePlayers[ind].p2SockId].concat
-				(this.gamePlayers[ind].spectators)).emit("gamefinishedSpeedy");
+			[...this.gamePlayers[ind].p1SockId,
+			 ...this.gamePlayers[ind].p2SockId,
+			 ...this.gamePlayers[ind].spectators]).emit("gamefinishedSpeedy");
 	}
 
 
@@ -223,7 +259,7 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 
 		// initialized game object
-		let gp: GameObj = { p1SockId: "", p2SockId: "", gameid: "", spectators: [], finished: 0 };
+		let gp: GameObj = { p1SockId: [], p2SockId: [], gameid: "", spectators: [], finished: 0, started: 0 };
 
 
 		// if game already saved
@@ -238,12 +274,12 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 
 		// left player entering
-		if (args[0].side == 'left')
-			gp.p1SockId = client.id;
+		if (args[0].side == 'left' && !(gp.p1SockId.includes(client.id)))
+		gp.p1SockId.push(client.id);
 
 		// right player entering
-		if (args[0].side == 'right')
-			gp.p2SockId = client.id;
+		if (args[0].side == 'right' && !(gp.p2SockId.includes(client.id)))
+		gp.p2SockId.push(client.id);
 
 		// guest watching
 		if (args[0].side == 'seat') {
@@ -259,14 +295,14 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 			this.gamePlayers[ind] = gp;
 
 
-		if (args[0].side == 'left' || args[0].side == 'right') {
-
+		// initialize and start game only on
+		if (((this.gamePlayers[ind].p1SockId.length == 1 && this.gamePlayers[ind].p2SockId.length > 0) ||
+			 (this.gamePlayers[ind].p1SockId.length == 1 && this.gamePlayers[ind].p2SockId.length > 0)) &&
+			this.gamePlayers[ind].started == 0)
+		{
 			this.initBallnBar(ind);
-
-			if (this.gamePlayers[ind].p1SockId !== "" && this.gamePlayers[ind].p2SockId !== "") {
-
-				this.startCountdown(ind);
-			}
+			this.gamePlayers[ind].started = 1;
+			this.startCountdown(ind);
 		}
 
 
@@ -282,7 +318,8 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 		let ind = searchForGame(this.gamePlayers, args[0].id);
 
-		if (args[0].side === 'right') {
+		//                              additional check for security: same socket of player
+		if (args[0].side === 'right' && this.gamePlayers[ind].p2SockId.includes(client.id)) {
 
 			this.rightbarV[ind] -= BARSPEED;
 
@@ -290,7 +327,7 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 				this.rightbarV[ind] = 0;
 		}
 
-		if (args[0].side === 'left') {
+		if (args[0].side === 'left' && this.gamePlayers[ind].p1SockId.includes(client.id)) {
 
 			this.leftbarV[ind] -= BARSPEED;
 
@@ -312,7 +349,7 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 		if (ind === -1)
 			return;
 
-		if (args[0].side === 'right') {
+		if (args[0].side === 'right' && this.gamePlayers[ind].p2SockId.includes(client.id)) {
 
 			this.rightbarV[ind] += BARSPEED;
 
@@ -320,7 +357,7 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 				this.rightbarV[ind] = HEIGHT - BARHEIGHT;
 		}
 
-		if (args[0].side === 'left') {
+		if (args[0].side === 'left' && this.gamePlayers[ind].p1SockId.includes(client.id)) {
 
 			this.leftbarV[ind] += BARSPEED;
 
@@ -334,61 +371,11 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {
+		// console.log("SERVER: Match client connected", client.id);
 	}
 
 	handleDisconnect(client: Socket) {
-
-		// game over if clients disconnects
-
-		// search games
-		let ind: number = this.gamePlayers.findIndex(
-			(elm: any) => elm.p1SockId === client.id || elm.p2SockId === client.id);
-
-		// get game player matching this client id
-		if (ind !== -1) {
-
-			// if game has not ended
-			if (this.gamePlayers[ind].finished == 0) {
-
-				// stop streaming
-				clearInterval(this.gameTimers[ind]);
-				clearInterval(this.startTimers[ind]);
-
-				// left player quitted
-				if (client.id === this.gamePlayers[ind].p1SockId) {
-					this.leftScore[ind] = 0;
-					this.rightScore[ind] = 11;
-				}
-				// right player quitted
-				if (client.id === this.gamePlayers[ind].p2SockId) {
-					this.leftScore[ind] = 11;
-					this.rightScore[ind] = 0;
-				}
-
-				// finish game
-				// and broadcast gameover
-				this.finishGame(ind);
-
-				// win for other player
-				if (client.id === this.gamePlayers[ind].p2SockId) {
-
-					this.wss.to(this.gamePlayers[ind].p1SockId)
-						.emit("setTextSpeedy", { message: "WINNER" });
-				}
-
-				if (client.id === this.gamePlayers[ind].p1SockId) {
-
-					this.wss.to(this.gamePlayers[ind].p2SockId)
-						.emit("setTextSpeedy", { message: "WINNER" });
-				}
-
-				// game over for spectators
-
-				if (this.gamePlayers[ind].spectators.length > 0)
-					this.wss.to(this.gamePlayers[ind].spectators)
-						.emit("setTextSpeedy", { message: "GAME OVER" });
-			}
-		}
+		// console.log("SERVER: Match client disconnected", client.id);
 
 		// remove disconnected spectator
 		this.gamePlayers.forEach((elment, index) => {
@@ -396,6 +383,68 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 			if (ind2 !== -1)
 				this.gamePlayers[index].spectators.splice(ind2, 1);
 		});
-	}
 
+		// game over if player disconnected every socket
+
+		// search games
+		let ind: number = this.gamePlayers.findIndex(
+			(elm: any) => elm.p1SockId.includes(client.id) || elm.p2SockId.includes(client.id));
+		console.log('SERVER: CLIENT LEFT. INDEX : ', ind);
+
+
+		// diconnected client is not a player!
+		if (ind === -1)
+			return ;
+
+		let side: string
+		if (this.gamePlayers[ind].p1SockId.includes(client.id))
+			side = 'l'
+		if (this.gamePlayers[ind].p2SockId.includes(client.id))
+			side = 'r'
+
+		// game has ended; no more further action is needed
+		if (this.gamePlayers[ind].finished === 1)
+			return ;
+
+		if (side == 'l' && this.gamePlayers[ind].p1SockId.length == 2)
+			return this.gamePlayers[ind].p1SockId.splice(this.gamePlayers[ind].p1SockId.indexOf(client.id));
+		if (side == 'r' && this.gamePlayers[ind].p2SockId.length == 2)
+			return this.gamePlayers[ind].p2SockId.splice(this.gamePlayers[ind].p2SockId.indexOf(client.id));
+
+		// stop streaming
+		clearInterval(this.gameTimers[ind]);
+		clearInterval(this.startTimers[ind]);
+
+		// left player quitted
+		if (side == 'l') {
+			this.leftScore[ind] = 0;
+			this.rightScore[ind] = WINSCORE;
+		}
+		// right player quitted
+		if (side == 'r') {
+			this.leftScore[ind] = WINSCORE;
+			this.rightScore[ind] = 0;
+		}
+
+		// finish game
+		// and broadcast gameover
+		this.finishGame(ind);
+
+		// win for other player
+		if (side == 'r') {
+			this.wss.to(this.gamePlayers[ind].p1SockId)
+				.emit("setTextSpeedy", { message: "WINNER" });
+		}
+		if (side == 'l') {
+			this.wss.to(this.gamePlayers[ind].p2SockId)
+				.emit("setTextSpeedy", { message: "WINNER" });
+		}
+
+		// game over for spectators
+		console.log('SERVER: Sending GAME OVER to ', this.gamePlayers[ind].spectators);
+
+		if (this.gamePlayers[ind].spectators.length > 0)
+			this.wss.to(this.gamePlayers[ind].spectators)
+				.emit("setTextSpeedy", { message: "GAME OVER" });
+	}
 }

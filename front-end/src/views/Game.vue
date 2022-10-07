@@ -32,7 +32,6 @@ export default Vue.extend({
 		{
 
 			this.$socket.emit('disconnectUser', this.username);
-			
 		},
 		setUsernameMethod: function() {
         if (this.usernameEdit.length >= 5 && this.usernameEdit.length <= 10)
@@ -45,13 +44,12 @@ export default Vue.extend({
               { username: this.usernameEdit },
               { headers: { Authorization: token }
             })
-            .then((function (res)  {
+            .then((function ()  {
               this.username = this.usernameEdit;
               this.setUsername = false;
               this.isUsernameError = false;
               this.usernameError = "";
-
-			  this.$socket.emit('connectUser', {username: this.usernameEdit, label: "Online"});
+			        this.$socket.emit('connectUser', {username: this.usernameEdit, label: "Online"});
             }).bind(this))
             .catch(error => {
 
@@ -82,16 +80,16 @@ export default Vue.extend({
 
       // speedy game
       emitSpeedyJoin() {
+        console.log('EMITTING JOIN');
 
-        
-        this.gameSocket.emit('joinSpeedyQueue');
+        this.gameSocketSpeedy.emit('joinSpeedyQueue');
         this.isLoading = false;
         this.isSpeedyLoading = true;
       },
       emitSpeedyCancel() {
+        console.log('EMITTING CANCEL');
 
-
-        this.gameSocket.emit('cancelSpeedyQueue');
+        this.gameSocketSpeedy.emit('cancelSpeedyQueue');
         this.isSpeedyLoading = false;
       },
 	  statusChanged(data: any)
@@ -137,17 +135,26 @@ export default Vue.extend({
       username: "" as string,
       drawer: null,
       gameSocket: null as any,
+      gameSocketSpeedy: null as any,
       isLoading: false as Boolean,
       isSpeedyLoading: false as Boolean,
       socketURL: "" as string,
+      socketSpeedyURL: "" as string,
       isUsernameError: false as Boolean,
       usernameError: "" as string,
     }),
 
     created () {
       this.socketURL = location.protocol + "//" + location.hostname + ":" + 3000 + "/game";
+      this.socketSpeedyURL = location.protocol + "//" + location.hostname + ":" + 3000 + "/game";
+      // console.log(this.socketURL, 'SOCKET URL GAME.VUE');
 
       this.gameSocket = io(this.socketURL, {
+        transportOptions: {
+          polling: { extraHeaders: { Authorization: 'Bearer ' + localStorage.getItem('token') } },
+        },
+      });
+      this.gameSocketSpeedy = io(this.socketSpeedyURL, {
         transportOptions: {
           polling: { extraHeaders: { Authorization: 'Bearer ' + localStorage.getItem('token') } },
         },
@@ -164,7 +171,8 @@ export default Vue.extend({
         this.isLoading = false;
       });
 
-      this.gameSocket.on('queueSpeedyResponse', (data: any) => {
+      this.gameSocketSpeedy.on('queueSpeedyResponse', (data: any) => {
+        console.log('CLIENT: GOT ACKNOWLEDGMENT FROM SERVER');
 
         // redirection
         if (typeof data.identifiers === 'object' && typeof data.identifiers[0]?.id === 'string')

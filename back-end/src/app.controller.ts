@@ -232,7 +232,7 @@ export class AppController {
         throw new BadRequestException()
     try {
       let invited = await this.userdata.findbyId(userid);
-      this.gamesservice.accept_invite(invited, gameid);
+      return this.gamesservice.accept_invite(invited, gameid);
     }
     catch (error) {  }
   }
