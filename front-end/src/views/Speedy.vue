@@ -14,7 +14,7 @@ const HEIGHT = WIDTH / 2;
 const BARWIDTH = 20;
 const BARHEIGHT = 100;
 const BALLRADIUS = 20;
-
+// speedy
 export default Vue.extend({
 	data: () => ({
 		socketURL: "" as string,
@@ -44,11 +44,12 @@ export default Vue.extend({
 	}),
 
 	methods: {
-		back2game () {
-			this.gameSocket.close();
+		back2game() {
+			this.gameSocket.disconnect();
 			const token = localStorage.getItem('token');
-            this.$socket.emit('clearGame', token)
-			this.$router.push({ name: 'Game' });
+			this.$socket.emit('clearGame', token)
+			this.$router.push({ name: 'Game' }).catch(() => { });
+			this.p5?.noLoop();
 		}
 	},
 
@@ -66,14 +67,14 @@ export default Vue.extend({
 		if (this.gameId === "") {
 
 			console.log('redirecting with missing identifier error', this.gameId);
-			this.$router.push({ name: 'Game', params: { error: "Oops! Game was not found!" } });
+			this.$router.push({ name: 'Game', params: { error: "Oops! Game was not found!" } }).catch(() => { });
 			return;
 		}
 
 		// search id in database
 		if (!token) {
 			console.log('redirecting with auth error');
-			this.$router.push({ name: 'Game', params: { error: "Who are you?! Are you logged in?" } });
+			this.$router.push({ name: 'Game', params: { error: "Who are you?! Are you logged in?" } }).catch(() => { });
 			return;
 		}
 
@@ -81,12 +82,11 @@ export default Vue.extend({
 			{ headers: { Authorization: token } })
 
 			.then((res: any) => {
-				console.table(res.data);
 
 				// data not recieved properly
 				if (typeof res.data !== 'object') {
 					console.log('redirecting with data error: axios');
-					this.$router.push({ name: 'Game', params: { error: "Oops! Something went wrong!" } });
+					this.$router.push({ name: 'Game', params: { error: "Oops! Something went wrong!" } }).catch(() => { });
 					return 1;
 				}
 
@@ -94,8 +94,8 @@ export default Vue.extend({
 				if (res.data.finished == 1) {
 					console.log('redirecting with expiration error');
 					const token = localStorage.getItem('token');
-                	this.$socket.emit('clearGame', token)
-					this.$router.push({ name: 'Game', params: { error: "This game has already finished!" } });
+					this.$socket.emit('clearGame', token)
+					this.$router.push({ name: 'Game', params: { error: "This game has already finished!" } }).catch(() => { });
 					return 1;
 				}
 
@@ -109,32 +109,38 @@ export default Vue.extend({
 					}
 
 					// invited player
-					if (usr.sub !== res.data.player_one.id && !res.data.player_two) {
+					if (usr.sub !== res.data.player_one.id
+						&& !res.data.player_two) {
 
-						console.log('PROBABLY INVITED');
+						// console.log('PROBABLY INVITED');
 						axios.get('/accept_invite/' + usr.sub + '/' + this.gameId,
 							{ headers: { Authorization: token } })
 							.then((ress) => {
+								res.data.player_tow = ress.data
+								window.document.querySelector("#rightPlayer")!.innerHTML = ress.data.username.toUpperCase();
 							})
 							.catch((err2) => {
 								Vue.$toast.error('An error occured! Going back to lobby in 5s');
 								console.error('axios : verify_game ERROR', err2);
 
 								setTimeout(() => {
-									this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } });
+									this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } }).catch(() => { });
 								}, 5 * 1000);
 							});
 
 						this.playerMode = 'player';
 						this.playerSide = 'right';
 					}
-					else if (res.data.player_two && usr.sub === res.data.player_two.id) {
+					else if (res.data.player_two &&
+						usr.sub === res.data.player_two.id) {
 
 						this.playerMode = 'player';
 						this.playerSide = 'right';
 					}
-
+					if (this.playerMode !== 'spectator')
+						this.$socket.emit('connectUserGame', { token: localStorage.getItem('token'), GameId: this.gameId });
 					window.document.querySelector("#leftPlayer")!.innerHTML = res.data.player_one.username.toUpperCase();
+
 					if (res.data.player_two) // protecting for game invite
 						window.document.querySelector("#rightPlayer")!.innerHTML = res.data.player_two.username.toUpperCase();
 				}
@@ -148,7 +154,7 @@ export default Vue.extend({
 				console.error('axios : verify_game ERROR', err);
 
 				setTimeout(() => {
-					this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } });
+					this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } }).catch(() => { });
 				}, 5 * 1000);
 				return 1;
 			});
@@ -235,27 +241,28 @@ export default Vue.extend({
 
 					this.gameSocket.close();
 					const token = localStorage.getItem('token');
-                    this.$socket.emit('clearGame', token)
-					this.$router.push({ name: 'Game', });
+					this.$socket.emit('clearGame', token)
+					this.$router.push({ name: 'Game', }).catch(() => { });
 				}, 2 * 1000);
 
 			}, 0.25 * 1000);
 		});
 	},
-	beforeDestroy () {
-        const token = localStorage.getItem('token');
-        this.$socket.emit('clearGame', token)      
-    },
+	beforeDestroy() {
+		const token = localStorage.getItem('token');
+		this.$socket.emit('clearGame', token)
+	},
 	mounted() {
+		// Creating the sketch itself
 		if (this.playerMode !== 'spectator')
-        	this.$socket.emit('connectUserGame', {token: localStorage.getItem('token'), GameId : this.gameId});
+			this.$socket.emit('connectUserGame', { token: localStorage.getItem('token'), GameId: this.gameId });
 
 		// Creating the sketch itself
 		const sketch = (p5: P5) => {
 
 			p5.windowResized = () => {
-				p5.resizeCanvas(p5.windowWidth, p5.windowWidth / 2);
-				p5.redraw();
+				// p5.resizeCanvas(p5.windowWidth, p5.windowWidth / 2);
+				// p5.redraw();
 			}
 
 			// The sketch setup method 
@@ -301,8 +308,8 @@ export default Vue.extend({
 
 
 				this.p5?.fill('yellow');
-				this.p5?.triangle(320 + WIDTH/2, 80 + HEIGHT/2, 160 + WIDTH/2, 160 + HEIGHT/2, 240 + WIDTH/2, 160 + HEIGHT/2);
-				this.p5?.triangle(3*80-10 + WIDTH/2, 2*80-10 + HEIGHT/2, 4*80-10 + WIDTH/2, 2*80-10 + HEIGHT/2, 2*80-10 + WIDTH/2, 3*80-10 + HEIGHT/2);
+				this.p5?.triangle(320 + WIDTH / 2, 80 + HEIGHT / 2, 160 + WIDTH / 2, 160 + HEIGHT / 2, 240 + WIDTH / 2, 160 + HEIGHT / 2);
+				this.p5?.triangle(3 * 80 - 10 + WIDTH / 2, 2 * 80 - 10 + HEIGHT / 2, 4 * 80 - 10 + WIDTH / 2, 2 * 80 - 10 + HEIGHT / 2, 2 * 80 - 10 + WIDTH / 2, 3 * 80 - 10 + HEIGHT / 2);
 
 
 				// ping pong ball
@@ -359,7 +366,7 @@ export default Vue.extend({
 
 							<div style="display:inline-block;width:19%;text-align:center;">
 								<div :style="[ playerSide == 'right' ? {'background':'#5310a9'} : {} ]"
-									id="rightPlayer">PLAYER TWO {{ playerSide }}</div>
+									id="rightPlayer">PLAYER TWO</div>
 								<div style="font-weight: bold;font-size: 50px;">{{ rightScore }}</div>
 							</div>
 						</div>
