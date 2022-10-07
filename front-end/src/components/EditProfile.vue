@@ -204,7 +204,6 @@ import axios from 'axios';
       {
         if (this.usernameEdit && this.usernameEdit.length >= 5 && this.usernameEdit.length <= 10 && this.usernameEdit !== this.username)
         {
-			console.log("username == ", this.usernameEdit);
           const token = localStorage.getItem('token');
 
           if (token)
@@ -236,7 +235,6 @@ import axios from 'axios';
               number: +this.verification
             };
   
-            console.log(data);
             axios.put('/2FA/verify', data, {}).then((function (res) {
               this.dialod = false;
               this.error = false;

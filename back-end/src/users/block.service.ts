@@ -38,8 +38,7 @@ export class blockService {
   async block(block_dto: block_dto, me: number, friend_id: number)
   {
     const user = await this.friend_base.remove_friend(friend_id, me)
-    if(user == null)
-      console.log("not frined")
+
       const findrow  = await this.block_base.createQueryBuilder('block')
       .leftJoinAndSelect("block.block_list", "blocklist")
       .where("block.user_id = :userid", {userid: me})
@@ -59,12 +58,10 @@ export class blockService {
     .where("block.user_id = :userid", {userid: me})
     .andWhere("list.id = :id", { id: block_id })
     .getOne()
-    console.log("bruh id row ==>", findrow.id)
     const userfound = await this.block_base.findOneBy({id: findrow.id})
     if(userfound == null)
       return userfound
     let user_id = await this.block_base.remove(userfound);
-    console.log("user_id ==> ", user_id);
 
     return await this.userdata.findbyId(block_id);
   }

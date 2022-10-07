@@ -24,7 +24,6 @@ export class AppController {
   {
     if(req.user.two_factor_authentication == true)
     {
-      // console.log("id ===> " , req.user.id)
       // redirect to new 2fa without set token
        return res.redirect("http://"+process.env.HOSTIP+":"+process.env.FRONTPORT+"/2FA?id=" + req.user.id)
     }
@@ -32,9 +31,7 @@ export class AppController {
     {
       
         const accessToken = this.authService.login(req.user)
-        // console.log(accessToken)
-        // console.log("username ==> ", req.user.username);
-        // console.log("false")
+
         return res.redirect("http://"+process.env.HOSTIP+":"+process.env.FRONTPORT+"/Game?token="+accessToken);
       }
 
@@ -50,16 +47,13 @@ export class AppController {
     if(user.two_factor_authentication == false)
     {
       // start generate secret 
-      // console.log("here")
       var secret = speakeasy.generateSecret({name: "ft_transcendence (" + user.username +")"});
-      // console.log("secret obj", secret)
       await this.authService.update_info({id: user.id, secret: secret.base32})
       var QRcode = require('qrcode')
       const generateQR = async (text) => {
         try {
           return await QRcode.toDataURL(text)
         } catch (err) {
-          console.error(err)
         }
       }
       return await generateQR(secret.otpauth_url)
@@ -184,8 +178,7 @@ export class AppController {
   {
     if(file.filename == 'null')
       throw new BadGatewayException("not an image") // req 502
-    console.log("start upload file") 
-    console.log(file);
+
     let path_file = "http://" + process.env.HOSTIP + ":" + process.env.BACKPORT + "/public/" + file.filename
     this.authService.update_info({id: req.user.sub, avatar: path_file})
     return path_file;
@@ -204,7 +197,7 @@ export class AppController {
     let game = null;
 
     try { game = await this.gamesservice.get_game(gameId); }
-    catch (error) { console.log('ERROR OCCURED VERIFY GAME', error); }
+    catch (error) {  }
 
     return game;
   }
@@ -222,7 +215,7 @@ export class AppController {
       let findit = await this.userdata.findbyId(userId);
       game = await this.gamesservice.invite_game(findit);
     }
-    catch (error) { console.log('ERROR OCCURED VERIFY USER', error); }
+    catch (error) {  }
 
     return game;
   }
@@ -241,7 +234,7 @@ export class AppController {
       let invited = await this.userdata.findbyId(userid);
       return this.gamesservice.accept_invite(invited, gameid);
     }
-    catch (error) { console.log('ERROR OCCURED VERIFY USER', error); }
+    catch (error) {  }
   }
 
   @UseGuards(jwtGuard)

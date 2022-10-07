@@ -178,7 +178,6 @@ export default Vue.extend({
         this.gameSocket.emit("playerReady", { gameid: this.gameId, side: this.playerSide });
 
         this.gameSocket.on("recieveCoord", (data: any) => {
-            console.log("CLIENT: GOT COORDINATION FROM SERVER!", data);
 
             // start game for the first time ever
             if (this.p5?.isLooping() === false && this.gameover === false)
@@ -203,7 +202,6 @@ export default Vue.extend({
 
         this.gameSocket.on("gamefinished", (data: any) => {
 
-            console.log("CLIENT: GAME OVER!");
             this.p5?.noLoop();
             this.gameover = true;
             // redirect
@@ -211,7 +209,6 @@ export default Vue.extend({
 
         // timer from server for starting the game
         this.gameSocket?.on("setCountdown", (data: any) => {
-            console.log("CLIENT: Got countdown!", data);
 
             this.isLoading = true;
             this.seconds = data.seconds;
@@ -221,7 +218,6 @@ export default Vue.extend({
 
         // timer from server for starting the game
         this.gameSocket?.on("setText", (data: any) => {
-            console.log("CLIENT: Text from server!", data);
 
             this.p5?.noLoop();
             this.gameover = true;
@@ -288,7 +284,6 @@ export default Vue.extend({
             // The sketch draw method
             // Game lo-op
             p5.draw = () => {
-                console.log('still going');
 
                 if (this.playerMode !== "spectator") {
 
@@ -326,7 +321,6 @@ export default Vue.extend({
                     }
 
                     if (this.displayText !== "") {
-                        console.log('SHOULD WRITE ------');
                         this.p5?.textAlign(this.p5.CENTER);
                         this.p5?.fill('yellow');
                         this.p5?.textSize(100);
@@ -344,9 +338,7 @@ export default Vue.extend({
 <template>
     <v-app id="inspire" style="width:auto;">
         <v-main>
-            <v-container class="fill-height" fluid>
-                <v-row justify="center">
-                    <div class="text-center">
+			back2game             <div class="text-center">
                         <div style="max-width:auto;">
                             <div style="display:inline-block;width:20%;text-align:center;">
                                 <div :style="[ playerSide == 'left' ? {'background':'#5310a9'} : {} ]" id="leftPlayer">

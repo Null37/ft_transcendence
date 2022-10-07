@@ -15,7 +15,6 @@
 //       _exception: ForbiddenException | UnauthorizedException,
 //       host: ArgumentsHost,
 //     ) {
-//       console.log(
 //         _exception instanceof ForbiddenException ? `@Forbidden` : `@Unauthorized`,
 //       )
 //       const ctx = host.switchToHttp()

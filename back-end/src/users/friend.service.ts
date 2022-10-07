@@ -29,7 +29,6 @@ export class FriendService {
   }
   async add_frined(friend_dto: friend_dto )
   {
-    console.log("data dto", friend_dto)
     const findrow  = await this.friend_base.createQueryBuilder('friend')
     .leftJoinAndSelect("friend.friend_id", "friend_id")
     .where("friend.user_id = :userid", {userid: friend_dto.user_id})
@@ -44,14 +43,12 @@ export class FriendService {
 
   async remove_friend(friend_id: number, me: number)
   { 
-    console.log("start remove");
     
     const findrow  = await this.friend_base.createQueryBuilder('friend')
     .leftJoinAndSelect("friend.friend_id", "friend_id")
     .where("friend.user_id = :userid", {userid: me})
     .andWhere("friend_id.id = :id", { id: friend_id })
     .getMany()
-    console.log("many==> ", findrow)
     let remove = new Array()
      findrow.forEach(( async function (element) {
         const removed = await this.friend_base.find({where:{id: element.id}})
