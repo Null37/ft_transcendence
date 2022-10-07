@@ -34,6 +34,7 @@
       dialog: false,
       games: [],
       ach: [],
+      uri: 'http://'+process.env.VUE_APP_HOSTIP+':'+process.env.VUE_APP_BACKPORT,
     }),
     props: ['avatar', 'username', 'id']
   }
@@ -90,7 +91,7 @@
                 justify="center">
                 <v-avatar tile size="30">
                     <img
-                        :src="'http://localhost:3000'+ach[0].conquer"
+                        :src="uri+ach[0].conquer"
                         alt="Conquer"
                     >
                 </v-avatar>
@@ -100,7 +101,7 @@
                 justify="center">
                 <v-avatar tile size="30">
                     <img
-                        :src="'http://localhost:3000'+ach[0].first_win"
+                        :src="uri+ach[0].first_win"
                         alt="First Win"
                     >
                 </v-avatar>
