@@ -32,7 +32,6 @@ export default Vue.extend({
 		{
 			console.log("disconnecting the user from the website")
 			this.$socket.emit('disconnectUser', this.username);
-			
 		},
 		setUsernameMethod: function() {
         if (this.usernameEdit.length >= 5 && this.usernameEdit.length <= 10)
@@ -45,13 +44,12 @@ export default Vue.extend({
               { username: this.usernameEdit },
               { headers: { Authorization: token }
             })
-            .then((function (res)  {
+            .then((function ()  {
               this.username = this.usernameEdit;
               this.setUsername = false;
               this.isUsernameError = false;
               this.usernameError = "";
-			  console.log("connectUSer of ", this.usernameEdit)
-			  this.$socket.emit('connectUser', {username: this.usernameEdit, label: "Online"});
+			        this.$socket.emit('connectUser', {username: this.usernameEdit, label: "Online"});
             }).bind(this))
             .catch(error => {
               console.log(error);
@@ -83,14 +81,6 @@ export default Vue.extend({
       // speedy game
       emitSpeedyJoin() {
         console.log('EMITTING JOIN');
-
-        console.log('');
-        console.log('');
-        console.log('');
-        console.log(this.gameSocketSpeedy.id);
-        console.log('');
-        console.log('');
-        console.log('');
 
         this.gameSocketSpeedy.emit('joinSpeedyQueue');
         this.isLoading = false;
@@ -203,7 +193,6 @@ export default Vue.extend({
 
     mounted () {
       const token = localStorage.getItem('token');
-          console.log('===========', token);
 
       if (token)
       {
