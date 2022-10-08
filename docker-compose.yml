@@ -44,7 +44,7 @@ services:
         - ./front-end:/front-end
      #   - ./images:/front-end/public/images
       ports:
-        - 8080:8080
+        - 8080:3000
       networks:
         default:
           aliases:

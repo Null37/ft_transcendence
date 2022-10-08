@@ -486,6 +486,8 @@ import * as bcrypt from 'bcrypt';
 
 		let userProfile = await this.usersService.findbyId(message.userID)
 
+		if (message.text.startsWith("/"))
+			return ;
 		client.broadcast.to(message.room).emit('msgToRoom',
 		{
 			roomName: message.room,

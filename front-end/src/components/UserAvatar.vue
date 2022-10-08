@@ -15,7 +15,6 @@ export default Vue.extend({
       },
       changeAvatarC: function(avatar)
       {
-        this.avatar = avatar;
         this.$emit('changeAvatar', avatar);
       }
     },

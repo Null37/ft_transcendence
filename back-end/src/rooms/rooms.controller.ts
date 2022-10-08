@@ -33,7 +33,7 @@ export class RoomController {
 			
 			
 			if (typeof res == "string")
-				throw new HttpException(res, HttpStatus.NOT_FOUND)
+				throw new HttpException(res, HttpStatus.FORBIDDEN)
 			else
 				throw new HttpException(res, HttpStatus.OK)
 		}

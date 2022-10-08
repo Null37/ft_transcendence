@@ -297,7 +297,7 @@ export default Vue.extend({
                   }
                 }).then((function (res) {
 
-                  this.placeHolder = "http://localhost:8080/play?match="+res.data.generatedMaps[0].id;
+                  this.placeHolder = "http://"+process.env.VUE_APP_HOSTIP+":8080/play?match="+res.data.generatedMaps[0].id;
                   this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, sender: this.me[0].id, receiver: this.receiverID})
                   this.placeHolder = "";
                   this.$router.push({ path: '/play?match='+res.data.generatedMaps[0].id }).catch(() => {})

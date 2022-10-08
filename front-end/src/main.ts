@@ -8,12 +8,12 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 
 Vue.config.productionTip = false
-export const SocketInstance =  socketio('http://127.0.0.1:3000', {
+export const SocketInstance =  socketio('http://'+location.hostname+':3000', {
 	transportOptions: {
 	  polling: { extraHeaders: { Authorization: localStorage.getItem('token') } },
 	},
   });
-export const GameSocket =  socketio('http://127.0.0.1:3000/test');
+export const GameSocket =  socketio('http://'+location.hostname+':3000/test');
 
 Vue.use(new VueSocketIO({
 	debug: true,

@@ -31,6 +31,7 @@ import axios from 'axios';
           }).bind(this))
           .catch(error => {
             this.error = true;
+			console.log(error);
           });
         }
       },
