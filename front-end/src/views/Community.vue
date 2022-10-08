@@ -8,6 +8,7 @@ import Profile from '@/components/Profile.vue';
 import axios from 'axios';
 import io from 'socket.io-client';
 import { SocketInstance } from '@/main';
+import Ladder from '@/components/Ladder.vue';
 
 // SocketInstance.on('msgToClient')
 // SocketInstance.on('msgToClient', (msg: any) => {
@@ -524,7 +525,7 @@ export default Vue.extend({
     }
 
   },
-  components: { TopBar, UserAvatar, FriendList, FriendsStatus, Profile }
+  components: { TopBar, UserAvatar, FriendList, FriendsStatus, Profile, Ladder }
 
   },
 );
@@ -543,7 +544,7 @@ export default Vue.extend({
       <UserAvatar @showChatroom="showChatroom" @changeAvatar="changeAvatar" @Addroom="addroom" :rooms="rooms" :avatar="avatar" />
 
       <v-sheet
-        height="164"
+        height="205"
         width="100%"
       >
       
@@ -571,6 +572,7 @@ export default Vue.extend({
                     
                 </v-list-item>
             </router-link>
+            <Ladder />
             <router-link style="text-decoration: none;" to="/Logout">
                 <v-list-item
                     link

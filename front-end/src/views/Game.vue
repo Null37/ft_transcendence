@@ -18,6 +18,7 @@ import { HalfCircleSpinner } from 'epic-spinners';
 
 import VueToast from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
+import Ladder from '@/components/Ladder.vue';
 Vue.use(VueToast, { position: 'top-right' });
 
 export default Vue.extend({
@@ -214,7 +215,7 @@ export default Vue.extend({
         Vue.$toast.error(this.$route.params.error);
       }
     },
-    components: { TopBar, UserAvatar, FriendList, FriendsStatus, EditProfile, FingerprintSpinner, AtomSpinner, SelfBuildingSquareSpinner, OrbitSpinner, SemipolarSpinner, FulfillingSquareSpinner, SpringSpinner, HalfCircleSpinner }
+    components: { TopBar, UserAvatar, FriendList, FriendsStatus, EditProfile, FingerprintSpinner, AtomSpinner, SelfBuildingSquareSpinner, OrbitSpinner, SemipolarSpinner, FulfillingSquareSpinner, SpringSpinner, HalfCircleSpinner, Ladder }
 });
 </script>
 
@@ -269,6 +270,7 @@ export default Vue.extend({
                     
                 </v-list-item>
             </router-link>
+            <Ladder />
             <router-link style="text-decoration: none;" to="/Logout">
                 <v-list-item
                     link
@@ -280,6 +282,7 @@ export default Vue.extend({
                     
                 </v-list-item>
             </router-link>
+            
         </v-list>
       
       </v-sheet>
@@ -344,6 +347,7 @@ export default Vue.extend({
       </v-container>
 
     </v-main>
+    
     <v-row justify="center">
     <v-dialog
       v-model="setUsername"
