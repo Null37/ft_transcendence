@@ -165,10 +165,11 @@ export class AppController {
         //parse(file.originalname).name.replace('\/s/g', '')
         const fullpath: string =  file.originalname // full path of requset file
         const path_parse: path.ParsedPath = path.parse(fullpath)
-        let file_name = req.user['name']
+        let date: Date = new Date()
+        let file_name = req.user['name'] + "_" + file.originalname
         const extension: string = path_parse.ext.toLowerCase();
        if(extension == '.png' || extension == '.jpeg' ||  extension == '.jpg' || extension == '.bmp' || extension == '.ico')
-          cp(null, `${file_name}${extension}`)
+          cp(null, `${file_name}`)
        else 
           cp(null, 'null')
       }
@@ -178,7 +179,6 @@ export class AppController {
   {
     if(file.filename == 'null')
       throw new BadGatewayException("not an image") // req 502
-
     let path_file = "http://" + process.env.HOSTIP + ":" + process.env.BACKPORT + "/public/" + file.filename
     this.authService.update_info({id: req.user.sub, avatar: path_file})
     return path_file;
