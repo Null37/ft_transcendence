@@ -18,28 +18,31 @@ export default Vue.extend({
     name: "App",
     sockets: {
       msgToClient(data) {
-
+        
         this.messages.push({id: this.messages.length, from: data.sender, room: data.roomName, message: data.message});
         if (this.currentRoom == data.roomName)
           this.showmessages.push({id: this.showmessages.length, from: data.sender, room: data.roomName, message: data.message});
       },
       msgToRoom(data) {
-        
+        for(let i = 0; i < this.blocked.length; i++)
+        {
+          if(this.blocked[i].username === data.sender.username)
+            return;
+        }
         this.messages.push({id: this.messages.length, from: data.sender, room: data.roomName, message: data.message});
         if (this.currentRoom == data.roomName)
           this.showmessages.push({id: this.showmessages.length, from: data.sender, room: data.roomName, message: data.message});
       },
 	  leaveRoom(data)
 	  {
-		if (this.me[0].username === data[0])
-		{
+      if (this.me[0].username === data[0])
+      {
 
-			this.rooms = this.rooms.filter(r => r.roomName !== data[1]);
-			this.$socket.emit('leaveRoom', data[0]);
-			this.currentRoom = "";
-			
-		}
-		// receive username and roomName than remove it from arr
+        this.rooms = this.rooms.filter(r => r.roomName !== data[1]);
+        this.$socket.emit('leaveRoom', data[0]);
+        this.currentRoom = "";
+        
+      }
 	  },
 	  statusChanged(data)
 	  {
@@ -224,12 +227,12 @@ export default Vue.extend({
         if ((!this.roomorfriend || this.currentRoom === '') && e.target.value === '/help')
         {
           this.showmessages.push({
-            message: "Use /ban [duration] [username] to ban a user for a limited time",
+            message: "Use /ban [username] [duration] to ban a user for a limited time",
             roomName: this.currentRoom,
             from: this.me[0],
           });
           this.showmessages.push({
-            message: "Use /mute [duration] [username] to mute a user for a limited time",
+            message: "Use /mute [username] [duration] to mute a user for a limited time",
             roomName: this.currentRoom,
             from: this.me[0],
           });
