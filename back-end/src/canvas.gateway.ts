@@ -388,7 +388,6 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 		// search games
 		let ind: number = this.gamePlayers.findIndex(
 			(elm: any) => elm.p1SockId.includes(client.id) || elm.p2SockId.includes(client.id));
-		console.log('SERVER: CLIENT LEFT. INDEX : ', ind);
 
 
 		// diconnected client is not a player!
@@ -440,7 +439,6 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 		}
 
 		// game over for spectators
-		console.log('SERVER: Sending GAME OVER to ', this.gamePlayers[ind].spectators);
 
 		if (this.gamePlayers[ind].spectators.length > 0)
 			this.wss.to(this.gamePlayers[ind].spectators)
