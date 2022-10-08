@@ -29,7 +29,7 @@ import { GamesModule } from './games/games.module';
         username: process.env.POSTGRES_USER,
         password: process.env.POSTGRES_PASSWORD,
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: true, // remove this shit 
     },
     ),
     //, {serveStaticOptions: {index: false , extensions: ['png', 'jpeg', 'jpg', 'bmp', 'ico']}}
