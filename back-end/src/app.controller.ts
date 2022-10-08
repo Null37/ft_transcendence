@@ -165,11 +165,10 @@ export class AppController {
         //parse(file.originalname).name.replace('\/s/g', '')
         const fullpath: string =  file.originalname // full path of requset file
         const path_parse: path.ParsedPath = path.parse(fullpath)
-        let date: Date = new Date()
-        let file_name = req.user['name'] + "_" + file.originalname
+        let file_name = req.user['name'] + "_" + Date.now();
         const extension: string = path_parse.ext.toLowerCase();
        if(extension == '.png' || extension == '.jpeg' ||  extension == '.jpg' || extension == '.bmp' || extension == '.ico')
-          cp(null, `${file_name}`)
+          cp(null, `${file_name}${extension}`)
        else 
           cp(null, 'null')
       }
