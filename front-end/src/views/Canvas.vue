@@ -258,6 +258,12 @@ export default Vue.extend({
     beforeDestroy() {
         const token = localStorage.getItem('token');
         this.$socket.emit('clearGame', token)
+        this.gameSocket.off('recieveCoord');
+        this.gameSocket.off('gamefinished');
+        this.gameSocket.off('setCountdown');
+        this.gameSocket.off('setText');
+        this.gameSocket.off('updateInvitedUsername');
+        this.gameSocket.close();
     },
     mounted() {
 
