@@ -28,8 +28,6 @@ const BARSPEED: number = 5;
 const WINSCORE: number = 11;
 
 const BALLRADIUS: number = 20;
-var HBALLSPEED: number = 5;
-var VBALLSPEED: number = HBALLSPEED * -1;
 
 @WebSocketGateway({
 	cors: { origin: "*" },
@@ -47,6 +45,9 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 	private ballH: Array<number> = [];
 	private ballV: Array<number> = [];
 
+	private HBALLSPEED: Array<number> = []; // 5;
+	private VBALLSPEED: Array<number> = []; // HBALLSPEED * -1;
+
 	private leftbarH: Array<number> = [];
 	private leftbarV: Array<number> = [];
 
@@ -63,6 +64,9 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 		this.ballH[ind] = WIDTH / 2;
 		this.ballV[ind] = HEIGHT / 2;
+
+		this.HBALLSPEED[ind] = 5;
+		this.VBALLSPEED[ind] = this.HBALLSPEED[ind] * -1;
 
 		this.leftbarH[ind] = 0;
 		this.leftbarV[ind] = HEIGHT / 2 - BARHEIGHT / 2;
@@ -134,8 +138,8 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 				{
 					if (this.ballH[ind] < WIDTH / 2)
 					{
-						if (HBALLSPEED < 0)
-							HBALLSPEED *= -1;
+						if (this.HBALLSPEED[ind] < 0)
+						this.HBALLSPEED[ind] *= -1;
 					}
 				}
 				// Score
@@ -165,7 +169,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 					}
 					this.initBallnBar(ind);
 
-					HBALLSPEED *= -1;
+					this.HBALLSPEED[ind] *= -1;
 				}
 			}
 
@@ -177,8 +181,8 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 				{
 					if (this.ballH[ind] > WIDTH / 2)
 					{
-						if (HBALLSPEED > 0)
-							HBALLSPEED *= -1;
+						if (this.HBALLSPEED[ind] > 0)
+						this.HBALLSPEED[ind] *= -1;
 					}
 				}
 				// Score
@@ -207,17 +211,17 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 						}
 					}
 					this.initBallnBar(ind);
-					HBALLSPEED *= -1;
+					this.HBALLSPEED[ind] *= -1;
 				}
 			}
 
 			// Ball touched top or bottom
 			if (this.ballV[ind] - BALLRADIUS / 2 < 0 ||
 				this.ballV[ind] + BALLRADIUS / 2 > HEIGHT)
-				VBALLSPEED *= -1;
+				this.VBALLSPEED[ind] *= -1;
 
-			this.ballH[ind] += HBALLSPEED;
-			this.ballV[ind] += VBALLSPEED;
+			this.ballH[ind] += this.HBALLSPEED[ind];
+			this.ballV[ind] += this.VBALLSPEED[ind];
 
 			this.wss.to(
 				[...this.gamePlayers[ind].p1SockId,
