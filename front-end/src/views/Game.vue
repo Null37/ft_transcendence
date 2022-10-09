@@ -66,15 +66,12 @@ export default Vue.extend({
         }
       },
       emitJoin() {
-
-        
-        this.gameSocket.emit('joinQueue');
+        const tkn = localStorage.getItem('token');
+        this.gameSocket.emit('joinQueue', { token: tkn });
         this.isSpeedyLoading = false;
         this.isLoading = true;
       },
       emitCancel() {
-
-
         this.gameSocket.emit('cancelQueue');
         this.isLoading = false;
       },
@@ -83,7 +80,8 @@ export default Vue.extend({
       emitSpeedyJoin() {
         console.log('EMITTING JOIN');
 
-        this.gameSocketSpeedy.emit('joinSpeedyQueue');
+        const tkn = localStorage.getItem('token');
+        this.gameSocketSpeedy.emit('joinSpeedyQueue', { token: tkn });
         this.isLoading = false;
         this.isSpeedyLoading = true;
       },

@@ -49,10 +49,14 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 
 
 	@SubscribeMessage('joinQueue')
-	async handleJoinQueue(client: Socket) {
+	async handleJoinQueue(client: Socket, ...args: any[]) {
 
-		let tkn = JSON.parse(Buffer.from(client.handshake.headers.authorization.split('.')[1], 'base64').toString('utf8'));
+		if (!args || !args[0] || !args[0].token)
+			return ;
 
+		console.log(args[0].token, 'TOKEN ARRIVED');
+
+		let tkn = JSON.parse(Buffer.from(args[0].token.split('.')[1], 'base64').toString('utf8'));
 
 
 		// user already joined
@@ -80,12 +84,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 
 			this.queuePlayers.splice(0, 2);
 		}
-
 	}
 
 
 	@SubscribeMessage('cancelSpeedyQueue')
-	handleCancelSpeedyQueue(client: Socket) {
+	handleCancelSpeedyQueue(client: Socket, ...args: any[]) {
 
 		let ind = this.queueSpeedyPlayers.findIndex((elm: any) => elm.sockId == client.id );
 		if (ind != -1)
@@ -95,9 +98,12 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 
 
 	@SubscribeMessage('joinSpeedyQueue')
-	async handleJoinSpeedyQueue(client: Socket) {
+	async handleJoinSpeedyQueue(client: Socket, ...args: any[]) {
 
-		let tkn = JSON.parse(Buffer.from(client.handshake.headers.authorization.split('.')[1], 'base64').toString('utf8'));
+		if (!args || !args[0] || !args[0].token)
+			return ;
+
+		let tkn = JSON.parse(Buffer.from(args[0].token.split('.')[1], 'base64').toString('utf8'));
 
 
 		// user already joined
@@ -120,7 +126,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 			let new_game_id = await this.gamesservice.startGame(usr1, usr2, 2);
 
 			console.log('SENDING TO', [this.queueSpeedyPlayers[0].sockId, this.queueSpeedyPlayers[1].sockId]);
-			
+
 			this.wss.to([this.queueSpeedyPlayers[0].sockId, this.queueSpeedyPlayers[1].sockId]).emit('queueSpeedyResponse', new_game_id);
 
 			this.queueSpeedyPlayers.splice(0, 2);
