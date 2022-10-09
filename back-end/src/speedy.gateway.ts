@@ -129,11 +129,14 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 			// Ball touched left
 			if (this.ballH[ind] - BALLRADIUS / 2 <= BARWIDTH) {
 				// Bounce
-				if (
-					(this.ballV[ind] >= this.leftbarV[ind] &&
-						this.ballV[ind] <= this.leftbarV[ind] + BARHEIGHT)
-				) {
-					HBALLSPEED *= -1;
+				if ( (this.ballV[ind] >= this.leftbarV[ind] &&
+						this.ballV[ind] <= this.leftbarV[ind] + BARHEIGHT) )
+				{
+					if (this.ballH[ind] < WIDTH / 2)
+					{
+						if (HBALLSPEED < 0)
+							HBALLSPEED *= -1;
+					}
 				}
 				// Score
 				else if ( // passed behind the bar
@@ -173,7 +176,11 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 					(this.ballV[ind] >= this.rightbarV[ind] &&
 						this.ballV[ind] <= this.rightbarV[ind] + BARHEIGHT)
 				) {
-					HBALLSPEED *= -1;
+					if (this.ballH[ind] > WIDTH / 2)
+					{
+						if (HBALLSPEED > 0)
+							HBALLSPEED *= -1;
+					}
 				}
 				// Score
 				else if ( // passed behind the bar
@@ -188,10 +195,10 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 						// update game in DB
 						this.finishGame(ind);
-						this.wss.to(this.gamePlayers[ind].p2SockId)
+						this.wss.to(this.gamePlayers[ind].p1SockId)
 							.emit("setTextSpeedy", { message: "WINNER" });
 
-						this.wss.to(this.gamePlayers[ind].p1SockId)
+						this.wss.to(this.gamePlayers[ind].p2SockId)
 							.emit("setTextSpeedy", { message: "LOST" });
 
 						// game over for spectators
