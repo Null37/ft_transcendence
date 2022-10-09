@@ -142,6 +142,8 @@ export default Vue.extend({
       socketSpeedyURL: "" as string,
       isUsernameError: false as Boolean,
       usernameError: "" as string,
+      livegames: null as any,
+      livegamestimer: 0,
     }),
 
     created () {
@@ -182,6 +184,18 @@ export default Vue.extend({
 
         this.isLoading = false;
       });
+
+      // LIVE GAMES TIMER
+      // this.livegamestimer = setInterval(() => {
+        // axios
+        //   .get('get_live_games', {
+        //     headers: {
+        //       Authorization: localStorage.getItem('token')
+        //     }
+        //   })
+        //   .then((res) => { this.livegames = res.data; })
+        //   .catch(err => { this.livegames = []; });
+      // }, 2 * 1000);
     },
 
     mounted () {
@@ -213,6 +227,10 @@ export default Vue.extend({
 
         Vue.$toast.error(this.$route.params.error);
       }
+    },
+    beforeDestroy () {
+      // LIVE GAME INTERVAL TIMER
+      // clearInterval(this.livegamestimer);
     },
     components: { TopBar, UserAvatar, FriendList, FriendsStatus, EditProfile, FingerprintSpinner, AtomSpinner, SelfBuildingSquareSpinner, OrbitSpinner, SemipolarSpinner, FulfillingSquareSpinner, SpringSpinner, HalfCircleSpinner }
 });
@@ -341,6 +359,34 @@ export default Vue.extend({
             </div>
           </v-col>
         </v-row>
+        <!-- LIVE GAMES -->
+        <!-- <v-row
+          justify="center"
+        >
+          <div class="live-games">
+            <v-row v-for="game in livegames" :key="game.id" class="live-game" align-content="center">
+              <v-col class="mx-5" align-self="center">
+                <v-avatar size="102">
+                  <img
+                    :src=game.player_one.avatar
+                    alt="">
+                </v-avatar>
+              </v-col>
+
+              <v-col class="mx-8" align-self="center">
+                <h1 class="font-weight-regular">VS</h1>
+              </v-col>
+
+              <v-col class="mx-5" align-self="center">
+                <v-avatar size="102">
+                  <img
+                    :src=game.player_two.avatar
+                    alt="">
+                </v-avatar>
+              </v-col>
+            </v-row>
+          </div>
+        </v-row> -->
       </v-container>
 
     </v-main>
@@ -390,6 +436,17 @@ export default Vue.extend({
 </template>
 
 <style lang="scss" scoped>
+.live-games {
+  padding: 5px 20px;
+}
+.live-game {
+  border-radius: 10px;
+  background-color: white;
+  color: black;
+  padding: 5px 20px;
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
 .v-avatar.on-hover
 {
   box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
