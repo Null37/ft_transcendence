@@ -99,6 +99,12 @@ export default Vue.extend({
                     return 1;
                 }
 
+                // game is not normal theme redirect to speedy
+                if (res.data.type == 2) {
+                    this.$router.push({ name: 'Speedy', query: { match: res.data.id } }).catch(() => { });
+                    return 1;
+                }
+
                 if (res.data.finished == 0) {
                     let usr = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString('utf8'));
 
