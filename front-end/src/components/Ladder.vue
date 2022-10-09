@@ -3,7 +3,19 @@
   
   export default {
     mounted (){
+        const token = localStorage.getItem('token');
 
+        if (token)
+        {
+            axios.get('/users', {
+            headers: {
+                Authorization: token
+            }}).then(res => {
+                this.userdata = res.data;
+            })
+            .catch(error => {
+            });
+        }
     },
     data: () => ({
       ladder: false,
@@ -12,19 +24,11 @@
             text: 'Username',
             align: 'start',
             sortable: false,
-            value: 'name',
+            value: 'username',
           },
-          { text: 'Wins', value: 'wins' },
-          { text: 'Loses', value: 'loses' },
-          { text: 'XP', value: 'xp' },
+          { text: 'Level', value: 'level' },
         ],
         userdata: [
-            {
-                name: 'Akira',
-                wins: 10,
-                loses: 6,
-                xp: 304,
-            },
         ]
 
     }),
@@ -64,6 +68,8 @@
                 :headers="headers"
                 :items="userdata"
                 :items-per-page="10"
+                :sort-by="['level']"
+                :sort-desc="[true]"
                 class="elevation-1"
             ></v-data-table>
           </v-card-text>
