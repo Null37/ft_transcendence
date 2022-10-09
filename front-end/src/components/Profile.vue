@@ -31,7 +31,7 @@
       dialog: false,
       games: [],
       ach: [],
-      uri: 'http://'+process.env.VUE_APP_HOSTIP+':'+process.env.VUE_APP_BACKPORT,
+      uri: 'http://'+process.env.VUE_APP_HOSTIP+':'+3000,
     }),
     props: ['avatar', 'username', 'id']
   }
