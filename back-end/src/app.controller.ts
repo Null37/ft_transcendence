@@ -255,4 +255,10 @@ export class AppController {
       throw new BadRequestException()
     return (await this.gamesservice.get_achievm(userid));
   }
+  @UseGuards(jwtGuard)
+  @Get('get_live_games')
+  async get_live_games() // get information about active games
+  {
+    return await this.gamesservice.get_live_games();
+  }
 }
