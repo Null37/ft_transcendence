@@ -93,6 +93,16 @@ export default Vue.extend({
         this.gameSocketSpeedy.emit('cancelSpeedyQueue');
         this.isSpeedyLoading = false;
       },
+      lookForGames() {
+        axios
+          .get('get_live_games', {
+            headers: {
+              Authorization: localStorage.getItem('token')
+            }
+          })
+          .then((res) => { this.livegames = res.data; })
+          .catch(err => { this.livegames = []; });
+      },
 	  statusChanged(data: any)
 	  {
 
@@ -185,18 +195,6 @@ export default Vue.extend({
 
         this.isLoading = false;
       });
-
-      // LIVE GAMES TIMER
-      // this.livegamestimer = setInterval(() => {
-        // axios
-        //   .get('get_live_games', {
-        //     headers: {
-        //       Authorization: localStorage.getItem('token')
-        //     }
-        //   })
-        //   .then((res) => { this.livegames = res.data; })
-        //   .catch(err => { this.livegames = []; });
-      // }, 2 * 1000);
     },
 
     mounted () {
@@ -313,7 +311,7 @@ export default Vue.extend({
             class="fill-height"
             fluid
         >
-            <v-row
+        <v-row
             justify="center"
             >
           <v-col
@@ -363,11 +361,20 @@ export default Vue.extend({
           </v-col>
         </v-row>
         <!-- LIVE GAMES -->
-        <!-- <v-row
+        <v-row
           justify="center"
         >
-          <div class="live-games">
+          <div class="live-games text-center" justify="center">
+            <v-btn
+            color="white" class="black--text btn-m"
+            x-large
+            v-on:click="lookForGames()"
+            >
+                Look for Games
+            </v-btn>
             <v-row v-for="game in livegames" :key="game.id" class="live-game" align-content="center">
+              <!-- according to game.type == 1 || 2 -->
+              <!-- <a href="/speedy?match={{game.id}}" > -->
               <v-col class="mx-5" align-self="center">
                 <v-avatar size="102">
                   <img
@@ -387,9 +394,10 @@ export default Vue.extend({
                     alt="">
                 </v-avatar>
               </v-col>
+              <!-- </a> -->
             </v-row>
           </div>
-        </v-row> -->
+        </v-row>
       </v-container>
 
     </v-main>
