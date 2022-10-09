@@ -405,7 +405,7 @@ import * as bcrypt from 'bcrypt';
 		{
 			return ;
 		}
-		if (message.text.split(" ")[0] == "/leave")
+		if (message.text == "/leave")
 		{
 			if (usr)
 			{
@@ -416,7 +416,7 @@ import * as bcrypt from 'bcrypt';
 				let roomnb = await this.roomsService.roomUser.find({where: {roomName: message.room}})
 				if (roomnb.length == 0)
 					await this.roomsService.rooms.delete({roomName: message.room})
-				this.wss.to(message.room).emit('leaveRoom', tmp69.username, message.room);
+				this.wss.emit('leaveRoom', tmp69.username, message.room);
 				return ;
 			}
 		}
@@ -486,6 +486,8 @@ import * as bcrypt from 'bcrypt';
 
 		let userProfile = await this.usersService.findbyId(message.userID)
 
+		if (message.text.startsWith("/"))
+			return ;
 		client.broadcast.to(message.room).emit('msgToRoom',
 		{
 			roomName: message.room,

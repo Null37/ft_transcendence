@@ -15,7 +15,6 @@ export default Vue.extend({
       },
       changeAvatarC: function(avatar)
       {
-        this.avatar = avatar;
         this.$emit('changeAvatar', avatar);
       }
     },
@@ -36,7 +35,7 @@ export default Vue.extend({
         <v-hover
         v-slot="{ hover }"
         v-for="r in rooms"
-		v-if="r.duration <= Date.now()"
+		    v-if="r.duration <= Date.now() || r.status != 2"
         :key="r.id"
         >
           <v-avatar

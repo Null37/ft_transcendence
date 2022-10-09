@@ -8,6 +8,7 @@ import Profile from '@/components/Profile.vue';
 import axios from 'axios';
 import io from 'socket.io-client';
 import { SocketInstance } from '@/main';
+import Ladder from '@/components/Ladder.vue';
 
 // SocketInstance.on('msgToClient')
 // SocketInstance.on('msgToClient', (msg: any) => {
@@ -18,28 +19,31 @@ export default Vue.extend({
     name: "App",
     sockets: {
       msgToClient(data) {
-
+        
         this.messages.push({id: this.messages.length, from: data.sender, room: data.roomName, message: data.message});
         if (this.currentRoom == data.roomName)
           this.showmessages.push({id: this.showmessages.length, from: data.sender, room: data.roomName, message: data.message});
       },
       msgToRoom(data) {
-        
+        for(let i = 0; i < this.blocked.length; i++)
+        {
+          if(this.blocked[i].username === data.sender.username)
+            return;
+        }
         this.messages.push({id: this.messages.length, from: data.sender, room: data.roomName, message: data.message});
         if (this.currentRoom == data.roomName)
           this.showmessages.push({id: this.showmessages.length, from: data.sender, room: data.roomName, message: data.message});
       },
 	  leaveRoom(data)
 	  {
-		if (this.me[0].username === data[0])
-		{
+      if (this.me[0].username === data[0])
+      {
 
-			this.rooms = this.rooms.filter(r => r.roomName !== data[1]);
-			this.$socket.emit('leaveRoom', data[0]);
-			this.currentRoom = "";
-			
-		}
-		// receive username and roomName than remove it from arr
+        this.rooms = this.rooms.filter(r => r.roomName !== data[1]);
+        this.$socket.emit('leaveRoom', data[0]);
+        this.currentRoom = "";
+        
+      }
 	  },
 	  statusChanged(data)
 	  {
@@ -224,12 +228,12 @@ export default Vue.extend({
         if ((!this.roomorfriend || this.currentRoom === '') && e.target.value === '/help')
         {
           this.showmessages.push({
-            message: "Use /ban [duration] [username] to ban a user for a limited time",
+            message: "Use /ban [username] [duration] to ban a user for a limited time",
             roomName: this.currentRoom,
             from: this.me[0],
           });
           this.showmessages.push({
-            message: "Use /mute [duration] [username] to mute a user for a limited time",
+            message: "Use /mute [username] [duration] to mute a user for a limited time",
             roomName: this.currentRoom,
             from: this.me[0],
           });
@@ -297,7 +301,7 @@ export default Vue.extend({
                   }
                 }).then((function (res) {
 
-                  this.placeHolder = "http://localhost:8080/play?match="+res.data.generatedMaps[0].id;
+                  this.placeHolder = "http://"+process.env.VUE_APP_HOSTIP+":8080/play?match="+res.data.generatedMaps[0].id;
                   this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, sender: this.me[0].id, receiver: this.receiverID})
                   this.placeHolder = "";
                   this.$router.push({ path: '/play?match='+res.data.generatedMaps[0].id }).catch(() => {})
@@ -521,7 +525,7 @@ export default Vue.extend({
     }
 
   },
-  components: { TopBar, UserAvatar, FriendList, FriendsStatus, Profile }
+  components: { TopBar, UserAvatar, FriendList, FriendsStatus, Profile, Ladder }
 
   },
 );
@@ -540,7 +544,7 @@ export default Vue.extend({
       <UserAvatar @showChatroom="showChatroom" @changeAvatar="changeAvatar" @Addroom="addroom" :rooms="rooms" :avatar="avatar" />
 
       <v-sheet
-        height="164"
+        height="205"
         width="100%"
       >
       
@@ -568,6 +572,7 @@ export default Vue.extend({
                     
                 </v-list-item>
             </router-link>
+            <Ladder />
             <router-link style="text-decoration: none;" to="/Logout">
                 <v-list-item
                     link

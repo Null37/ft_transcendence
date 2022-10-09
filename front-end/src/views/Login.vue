@@ -4,8 +4,7 @@ import Vue from 'vue';
 export default Vue.extend({
     data: () => ({
       drawer: null,
-      loginLink: "http://"+process.env.VUE_APP_HOSTIP+":"+process.env.VUE_APP_BACKPORT+"/Login" as string,
-      // loginLink: "http://localhost:3000/Login" as string,
+      loginLink: "http://"+process.env.VUE_APP_HOSTIP+":3000"+"/Login" as string,
     }),
 });
 </script>
