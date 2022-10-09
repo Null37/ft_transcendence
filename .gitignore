@@ -1,8 +1,11 @@
 .DS_Store
 */node_modules
 */package-lock.json
-/dist
+back-end/dist
+front-end/dist
 back-end/src/public/*
+
+
 
 # local env files
 .env.local

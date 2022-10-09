@@ -10,11 +10,6 @@ import io from 'socket.io-client';
 import { SocketInstance } from '@/main';
 import Ladder from '@/components/Ladder.vue';
 
-// SocketInstance.on('msgToClient')
-// SocketInstance.on('msgToClient', (msg: any) => {
-
-// 	// this.messages.push({id: 0, from: "", message: msg, time: "", color: 'deep-purple lighten-1'}); // id should be dynamic
-// })
 export default Vue.extend({
     name: "App",
     sockets: {
@@ -285,6 +280,8 @@ export default Vue.extend({
             else
             {
               this.$socket.emit('msgToRoom', {text: this.placeHolder, room: this.currentRoom, userID: this.me[0].id})
+              this.messages.push({id: this.messages.length, from: this.me[0], room: this.currentRoom, message: this.placeHolder});
+
             }
           this.placeHolder = "";
         }
@@ -317,10 +314,14 @@ export default Vue.extend({
         {
           this.showmessages.push({id: this.showmessages.length, room: this.currentroom, from: this.me[0], message: e.target.value});
           if (this.roomorfriend == true)
-            this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, sender: this.me[0].id, receiver: this.receiverID})
-          else
           {
-            this.$socket.emit('msgToRoom', {text: this.placeHolder, room: this.currentRoom, userID: this.me[0].id})
+            this.$socket.emit('msgToClientDM', {text: this.placeHolder, room: this.currentRoom, sender: this.me[0].id, receiver: this.receiverID})
+              this.messages.push({id: this.messages.length, from: this.me[0], room: this.currentRoom, message: this.placeHolder});
+            }
+            else
+            {
+              this.$socket.emit('msgToRoom', {text: this.placeHolder, room: this.currentRoom, userID: this.me[0].id})
+              this.messages.push({id: this.messages.length, from: this.me[0], room: this.currentRoom, message: this.placeHolder});
           }
           this.placeHolder = "";
         }
@@ -341,7 +342,6 @@ export default Vue.extend({
           });
         }
         
-        // SocketInstance.join()
         
       },
       showChatroom: function(roomname)
@@ -363,7 +363,7 @@ export default Vue.extend({
       
       setUsernameMethod: function()
       {
-        if (this.me.username.length > 5 && this.me.username.length < 10)
+        if (this.username.length > 5 && this.username.length < 10)
         {
           const token = localStorage.getItem('token');
 
@@ -371,14 +371,15 @@ export default Vue.extend({
           {
 
             axios.patch('/update', {
-              userame: this.me.username
+              userame: this.username
             }, {
               headers: {
                 Authorization: token
               }
             }).then(res => {
               this.setUsername = false;
-				      this.$socket.emit('connectUser', {username: this.me.username, label: "Online"});
+              this.me[0].username = this.username;
+				      this.$socket.emit('connectUser', {username: this.me[0].username, label: "Online"});
 
             })
             .catch(error => {
@@ -541,7 +542,7 @@ export default Vue.extend({
       app
       width="300"
     >
-      <UserAvatar @showChatroom="showChatroom" @changeAvatar="changeAvatar" @Addroom="addroom" :rooms="rooms" :avatar="avatar" />
+      <UserAvatar :userme="username" @showChatroom="showChatroom" @changeAvatar="changeAvatar" @Addroom="addroom" :rooms="rooms" :avatar="avatar" />
 
       <v-sheet
         height="205"
