@@ -373,8 +373,8 @@ export default Vue.extend({
                 Look for Games
             </v-btn>
             <v-row v-for="game in livegames" :key="game.id" class="live-game" align-content="center">
-              <!-- according to game.type == 1 || 2 -->
-              <!-- <a href="/speedy?match={{game.id}}" > -->
+              <a v-bind:href="'/play?match='+game.id" style="text-decoration: none; color: inherit;">
+              <v-row align-content="center">
               <v-col class="mx-5" align-self="center">
                 <v-avatar size="102">
                   <img
@@ -394,7 +394,8 @@ export default Vue.extend({
                     alt="">
                 </v-avatar>
               </v-col>
-              <!-- </a> -->
+              </v-row>
+              </a>
             </v-row>
           </div>
         </v-row>
