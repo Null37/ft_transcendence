@@ -147,6 +147,12 @@ export class GamesService {
 
 	get_live_games()
 	{
-		return this.gamesdata.findBy({ finished: 0, });
+		return this.gamesdata.find({
+			where: {
+				finished: 0,
+			},
+
+			relations: ["player_one", "player_two"],
+		});
 	}
 }
