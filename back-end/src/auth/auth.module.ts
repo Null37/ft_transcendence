@@ -11,7 +11,7 @@ import { jwtStrategy } from './strategies/jwt.strategy';
     UsersModule,
     PassportModule,
     JwtModule.register({
-      secret: "My random secret key never let others"
+      secret: process.env.JWTSECRET
     })
   ],
   providers: [AuthService, passport_42, jwtStrategy],
