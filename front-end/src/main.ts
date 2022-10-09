@@ -16,7 +16,7 @@ export const SocketInstance =  socketio('http://'+location.hostname+':3000', {
 export const GameSocket =  socketio('http://'+location.hostname+':3000/test');
 
 Vue.use(new VueSocketIO({
-	debug: true,
+	// debug: true,
 	connection: SocketInstance
 }))
 
