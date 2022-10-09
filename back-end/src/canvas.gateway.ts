@@ -139,7 +139,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 					if (this.ballH[ind] < WIDTH / 2)
 					{
 						if (this.HBALLSPEED[ind] < 0)
-						this.HBALLSPEED[ind] *= -1;
+							this.HBALLSPEED[ind] *= -1;
 					}
 				}
 				// Score
@@ -182,7 +182,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 					if (this.ballH[ind] > WIDTH / 2)
 					{
 						if (this.HBALLSPEED[ind] > 0)
-						this.HBALLSPEED[ind] *= -1;
+							this.HBALLSPEED[ind] *= -1;
 					}
 				}
 				// Score

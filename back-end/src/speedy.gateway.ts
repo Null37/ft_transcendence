@@ -28,8 +28,6 @@ const BARSPEED: number = 8; // speedy version
 const WINSCORE: number = 11;
 
 const BALLRADIUS: number = 20;
-var HBALLSPEED: number = 10; // speedy version
-var VBALLSPEED: number = HBALLSPEED * -1; // speedy version
 
 @WebSocketGateway({
 	cors: { origin: "*" },
@@ -47,6 +45,9 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 	private ballH: Array<number> = [];
 	private ballV: Array<number> = [];
 
+	private HBALLSPEED: Array<number> = []; // 10;
+	private VBALLSPEED: Array<number> = []; // HBALLSPEED * -1;
+
 	private leftbarH: Array<number> = [];
 	private leftbarV: Array<number> = [];
 
@@ -63,6 +64,9 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 		this.ballH[ind] = WIDTH / 2;
 		this.ballV[ind] = HEIGHT / 2;
+
+		this.HBALLSPEED[ind] = 10;
+		this.VBALLSPEED[ind] = this.HBALLSPEED[ind] * -1;
 
 		this.leftbarH[ind] = 0;
 		this.leftbarV[ind] = HEIGHT / 2 - BARHEIGHT / 2;
@@ -134,8 +138,8 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 				{
 					if (this.ballH[ind] < WIDTH / 2)
 					{
-						if (HBALLSPEED < 0)
-							HBALLSPEED *= -1;
+						if (this.HBALLSPEED[ind] < 0)
+							this.HBALLSPEED[ind] *= -1;
 					}
 				}
 				// Score
@@ -172,21 +176,20 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 						currentDate = Date.now();
 					} while (currentDate - date < 1000);
 
-					HBALLSPEED *= -1;
+					this.HBALLSPEED[ind] *= -1;
 				}
 			}
 
 			// Ball touched right
 			if (this.ballH[ind] + BALLRADIUS / 2 >= WIDTH - BARWIDTH) {
 				// Bounce
-				if (
-					(this.ballV[ind] >= this.rightbarV[ind] &&
-						this.ballV[ind] <= this.rightbarV[ind] + BARHEIGHT)
-				) {
+				if ( (this.ballV[ind] >= this.rightbarV[ind] &&
+					this.ballV[ind] <= this.rightbarV[ind] + BARHEIGHT) )
+				{
 					if (this.ballH[ind] > WIDTH / 2)
 					{
-						if (HBALLSPEED > 0)
-							HBALLSPEED *= -1;
+						if (this.HBALLSPEED[ind] > 0)
+							this.HBALLSPEED[ind] *= -1;
 					}
 				}
 				// Score
@@ -223,17 +226,17 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 						currentDate = Date.now();
 					} while (currentDate - date < 1000);
 
-					HBALLSPEED *= -1;
+					this.HBALLSPEED[ind] *= -1;
 				}
 			}
 
 			// Ball touched top or bottom
 			if (this.ballV[ind] - BALLRADIUS / 2 < 0 ||
 				this.ballV[ind] + BALLRADIUS / 2 > HEIGHT)
-				VBALLSPEED *= -1;
+				this.VBALLSPEED[ind] *= -1;
 
-			this.ballH[ind] += HBALLSPEED;
-			this.ballV[ind] += VBALLSPEED;
+			this.ballH[ind] += this.HBALLSPEED[ind];
+			this.ballV[ind] += this.VBALLSPEED[ind];
 
 			this.wss.to(
 				[...this.gamePlayers[ind].p1SockId,
@@ -403,7 +406,6 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 		// search games
 		let ind: number = this.gamePlayers.findIndex(
 			(elm: any) => elm.p1SockId.includes(client.id) || elm.p2SockId.includes(client.id));
-		console.log('SERVER: CLIENT LEFT. INDEX : ', ind);
 
 
 		// diconnected client is not a player!
