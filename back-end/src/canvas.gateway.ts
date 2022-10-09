@@ -24,11 +24,11 @@ const WIDTH: number = 1000;
 const HEIGHT: number = WIDTH / 2;
 const BARWIDTH: number = 20;
 const BARHEIGHT: number = 100;
-const BARSPEED: number = 8;
+const BARSPEED: number = 5;
 const WINSCORE: number = 11;
 
 const BALLRADIUS: number = 20;
-var HBALLSPEED: number = 8;
+var HBALLSPEED: number = 5;
 var VBALLSPEED: number = HBALLSPEED * -1;
 
 @WebSocketGateway({
@@ -76,36 +76,36 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 		this.startTimers[ind] = setTimeout(() => {
 			this.wss.to(
 				[...this.gamePlayers[ind].p1SockId,
-				 ...this.gamePlayers[ind].p2SockId,
-				 ...this.gamePlayers[ind].spectators]
+				...this.gamePlayers[ind].p2SockId,
+				...this.gamePlayers[ind].spectators]
 			).emit('setCountdown', { seconds: 5, });
 
 			this.startTimers[ind] = setTimeout(() => {
 				this.wss.to(
 					[...this.gamePlayers[ind].p1SockId,
-					 ...this.gamePlayers[ind].p2SockId,
-					 ...this.gamePlayers[ind].spectators]
+					...this.gamePlayers[ind].p2SockId,
+					...this.gamePlayers[ind].spectators]
 				).emit('setCountdown', { seconds: 4, });
 
 				this.startTimers[ind] = setTimeout(() => {
 					this.wss.to(
 						[...this.gamePlayers[ind].p1SockId,
-						 ...this.gamePlayers[ind].p2SockId,
-						 ...this.gamePlayers[ind].spectators]
+						...this.gamePlayers[ind].p2SockId,
+						...this.gamePlayers[ind].spectators]
 					).emit('setCountdown', { seconds: 3, });
 
 					this.startTimers[ind] = setTimeout(() => {
 						this.wss.to(
 							[...this.gamePlayers[ind].p1SockId,
-							 ...this.gamePlayers[ind].p2SockId,
-							 ...this.gamePlayers[ind].spectators]
+							...this.gamePlayers[ind].p2SockId,
+							...this.gamePlayers[ind].spectators]
 						).emit('setCountdown', { seconds: 2, });
 
 						this.startTimers[ind] = setTimeout(() => {
 							this.wss.to(
 								[...this.gamePlayers[ind].p1SockId,
-								 ...this.gamePlayers[ind].p2SockId,
-								 ...this.gamePlayers[ind].spectators]
+								...this.gamePlayers[ind].p2SockId,
+								...this.gamePlayers[ind].spectators]
 							).emit('setCountdown', { seconds: 1, });
 
 							this.startTimers[ind] = setTimeout(async () => {
@@ -129,11 +129,14 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 			// Ball touched left
 			if (this.ballH[ind] - BALLRADIUS / 2 <= BARWIDTH) {
 				// Bounce
-				if (
-					(this.ballV[ind] >= this.leftbarV[ind] &&
-						this.ballV[ind] <= this.leftbarV[ind] + BARHEIGHT)
-				) {
-					HBALLSPEED *= -1;
+				if ( (this.ballV[ind] >= this.leftbarV[ind] &&
+						this.ballV[ind] <= this.leftbarV[ind] + BARHEIGHT) )
+				{
+					if (this.ballH[ind] < WIDTH / 2)
+					{
+						if (HBALLSPEED < 0)
+							HBALLSPEED *= -1;
+					}
 				}
 				// Score
 				else if ( // passed behind the bar
@@ -169,11 +172,14 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 			// Ball touched right
 			if (this.ballH[ind] + BALLRADIUS / 2 >= WIDTH - BARWIDTH) {
 				// Bounce
-				if (
-					(this.ballV[ind] >= this.rightbarV[ind] &&
-						this.ballV[ind] <= this.rightbarV[ind] + BARHEIGHT)
-				) {
-					HBALLSPEED *= -1;
+				if ( (this.ballV[ind] >= this.rightbarV[ind] &&
+						this.ballV[ind] <= this.rightbarV[ind] + BARHEIGHT) )
+				{
+					if (this.ballH[ind] > WIDTH / 2)
+					{
+						if (HBALLSPEED > 0)
+							HBALLSPEED *= -1;
+					}
 				}
 				// Score
 				else if ( // passed behind the bar
@@ -188,10 +194,10 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 						// update game in DB
 						this.finishGame(ind);
-						this.wss.to(this.gamePlayers[ind].p2SockId)
+						this.wss.to(this.gamePlayers[ind].p1SockId)
 							.emit("setText", { message: "WINNER" });
 
-						this.wss.to(this.gamePlayers[ind].p1SockId)
+						this.wss.to(this.gamePlayers[ind].p2SockId)
 							.emit("setText", { message: "LOST" });
 
 						// game over for spectators
@@ -201,13 +207,6 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 						}
 					}
 					this.initBallnBar(ind);
-
-					// pause for a second after scoring
-					const date = Date.now();
-					let currentDate = null;
-					do {
-						currentDate = Date.now();
-					} while (currentDate - date < 1000);
 
 					HBALLSPEED *= -1;
 				}
@@ -223,8 +222,8 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 			this.wss.to(
 				[...this.gamePlayers[ind].p1SockId,
-				 ...this.gamePlayers[ind].p2SockId,
-				 ...this.gamePlayers[ind].spectators]
+				...this.gamePlayers[ind].p2SockId,
+				...this.gamePlayers[ind].spectators]
 			).emit('recieveCoord', {
 				ballH: this.ballH[ind],
 				ballV: this.ballV[ind],
@@ -235,7 +234,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 				leftScore: this.leftScore[ind],
 				rightScore: this.rightScore[ind],
 			});
-		}, 0.015 * 1000);
+		}, 0.012 * 1000); // 1000 = SECOND, 1 MS
 	}
 
 	finishGame(ind: number) {
@@ -249,8 +248,8 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 		// notify player and spectators
 		this.wss.to(
 			[...this.gamePlayers[ind].p1SockId,
-			 ...this.gamePlayers[ind].p2SockId,
-			 ...this.gamePlayers[ind].spectators]).emit("gamefinished");
+			...this.gamePlayers[ind].p2SockId,
+			...this.gamePlayers[ind].spectators]).emit("gamefinished");
 	}
 
 
@@ -297,9 +296,8 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 		// initialize and start game only on
 		if (((this.gamePlayers[ind].p1SockId.length == 1 && this.gamePlayers[ind].p2SockId.length > 0) ||
-			 (this.gamePlayers[ind].p1SockId.length == 1 && this.gamePlayers[ind].p2SockId.length > 0)) &&
-			this.gamePlayers[ind].started == 0)
-		{
+			(this.gamePlayers[ind].p1SockId.length == 1 && this.gamePlayers[ind].p2SockId.length > 0)) &&
+			this.gamePlayers[ind].started == 0) {
 			this.initBallnBar(ind);
 			this.gamePlayers[ind].started = 1;
 			this.startCountdown(ind);
@@ -393,7 +391,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 		// diconnected client is not a player!
 		if (ind === -1)
-			return ;
+			return;
 
 		let side: string
 		if (this.gamePlayers[ind].p1SockId.includes(client.id))
@@ -403,7 +401,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 		// game has ended; no more further action is needed
 		if (this.gamePlayers[ind].finished === 1)
-			return ;
+			return;
 
 		if (side == 'l' && this.gamePlayers[ind].p1SockId.length == 2)
 			return this.gamePlayers[ind].p1SockId.splice(this.gamePlayers[ind].p1SockId.indexOf(client.id));
@@ -454,7 +452,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 		let ind = searchForGame(this.gamePlayers, args[0].gameid);
 
 		if (ind === -1)
-			return ;
+			return;
 
 		this.wss.to(this.gamePlayers[ind].p1SockId).emit('updateInvitedUsername', { username: args[0].username });
 	}

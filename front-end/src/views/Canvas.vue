@@ -66,14 +66,14 @@ export default Vue.extend({
         // no query in uri
         if (this.gameId === "") {
 
-            console.log('redirecting with missing identifier error', this.gameId);
+            // console.log('redirecting with missing identifier error', this.gameId);
             this.$router.push({ name: 'Game', params: { error: "Oops! Game was not found!" } }).catch(() => { });
             return;
         }
 
         // search id in database
         if (!token) {
-            console.log('redirecting with auth error');
+            // console.log('redirecting with auth error');
             this.$router.push({ name: 'Game', params: { error: "Who are you?! Are you logged in?" } }).catch(() => { });
             return;
         }
@@ -85,14 +85,14 @@ export default Vue.extend({
 
                 // data not recieved properly
                 if (typeof res.data !== 'object') {
-                    console.log('redirecting with data error: axios');
+                    // console.log('redirecting with data error: axios');
                     this.$router.push({ name: 'Game', params: { error: "Oops! Something went wrong!" } }).catch(() => { });
                     return 1;
                 }
 
                 // game already ended
                 if (res.data.finished == 1) {
-                    console.log('redirecting with expiration error');
+                    // console.log('redirecting with expiration error');
                     const token = localStorage.getItem('token');
                     this.$socket.emit('clearGame', token)
                     this.$router.push({ name: 'Game', params: { error: "This game has already finished!" } }).catch(() => { });
@@ -128,7 +128,7 @@ export default Vue.extend({
                             })
                             .catch((err2) => {
                                 Vue.$toast.error('An error occured! Going back to lobby in 5s');
-                                console.error('axios : verify_game ERROR', err2);
+                                // console.error('axios : verify_game ERROR', err2);
 
                                 setTimeout(() => {
                                     this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } }).catch(() => { });
@@ -158,7 +158,7 @@ export default Vue.extend({
             .catch((err: any) => {
 
                 Vue.$toast.error('An error occured! Going back to lobby in 5s');
-                console.error('axios : verify_game ERROR', err);
+                // console.error('axios : verify_game ERROR', err);
 
                 setTimeout(() => {
                     this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } }).catch(() => { });
