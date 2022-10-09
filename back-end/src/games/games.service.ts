@@ -1,8 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { exit } from "process";
-import { identity } from "rxjs";
-import { filter } from "src/DTO/filter.dto";
 import { Games } from "src/Entity/games.entity";
 import { Users } from "src/Entity/users.entity";
 import { Repository } from "typeorm";
@@ -84,22 +81,27 @@ export class GamesService {
 			}
 
 			// p one wins
-			if (gm.score_one == 11 && gm.player_one.first_win === "") {
-				gm.player_one.first_win = "/public/achievements/success.png";
+			if (gm.score_one == 11) {
+
+				if (gm.player_one.first_win === "")
+					gm.player_one.first_win = "/public/achievements/success.png";
+
+				gm.player_one.level += 1;
 			}
 
 			// p two wins
-			else if (gm.score_two == 11 && gm.player_two.first_win === "") {
-				gm.player_two.first_win = "/public/achievements/success.png";
+			else if (gm.score_two == 11) {
+
+				if (gm.player_two.first_win === "")
+					gm.player_two.first_win = "/public/achievements/success.png";
+
+				gm.player_two.level += 1;
 			}
 
 			// if (gm.player_two)
 			// 	exit();
 			gm.player_one.conquer = "/public/achievements/conquer.png";
 			gm.player_two.conquer = "/public/achievements/conquer.png";
-
-			gm.player_one.level += 1;
-			gm.player_two.level += 1;
 
 			this.gamesdata.save(gm);
 			this.playersdata.save(gm.player_one);
@@ -141,5 +143,10 @@ export class GamesService {
 		this.playersdata.save(invited);
 
 		return invited;
+	}
+
+	get_live_games()
+	{
+		return this.gamesdata.findBy({ finished: 0, });
 	}
 }
