@@ -114,7 +114,7 @@
                 <div v-if="games.length === 0" class="text-subtitle-1">
                       No history found
                 </div>
-                <div v-for="game in games" class="text-subtitle-1">
+                <div v-else v-for="game in games" class="text-subtitle-1">
                       {{game.player_one.username}} {{game.score_one}}-{{game.score_two}} {{game.player_two.username}}
                 </div>
    
