@@ -45,7 +45,12 @@ export default Vue.extend({
 
     methods: {
         back2game() {
-            this.gameSocket.disconnect();
+            this.gameSocket?.off('recieveCoord');
+            this.gameSocket?.off('gamefinished');
+            this.gameSocket?.off('setCountdown');
+            this.gameSocket?.off('setText');
+            this.gameSocket?.off('updateInvitedUsername');
+            this.gameSocket.close();
             const token = localStorage.getItem('token');
             this.$socket.emit('clearGame', token)
             this.$router.push({ name: 'Game' }).catch(() => { });
@@ -242,6 +247,11 @@ export default Vue.extend({
 
                 setTimeout(() => {
 
+                    this.gameSocket?.off('recieveCoord');
+                    this.gameSocket?.off('gamefinished');
+                    this.gameSocket?.off('setCountdown');
+                    this.gameSocket?.off('setText');
+                    this.gameSocket?.off('updateInvitedUsername');
                     this.gameSocket.close();
                     const token = localStorage.getItem('token');
                     this.$socket.emit('clearGame', token)
@@ -257,12 +267,12 @@ export default Vue.extend({
     },
     beforeDestroy() {
         const token = localStorage.getItem('token');
-        this.$socket.emit('clearGame', token)
-        this.gameSocket.off('recieveCoord');
-        this.gameSocket.off('gamefinished');
-        this.gameSocket.off('setCountdown');
-        this.gameSocket.off('setText');
-        this.gameSocket.off('updateInvitedUsername');
+        this.$socket.emit('clearGame', token);
+        this.gameSocket?.off('recieveCoord');
+        this.gameSocket?.off('gamefinished');
+        this.gameSocket?.off('setCountdown');
+        this.gameSocket?.off('setText');
+        this.gameSocket?.off('updateInvitedUsername');
         this.gameSocket.close();
     },
     mounted() {

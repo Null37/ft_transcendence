@@ -37,7 +37,12 @@ export default Vue.extend({
 	}),
 	methods: {
 		back2game() {
-			this.gameSocket.disconnect();
+			this.gameSocket?.off('recieveCoordSpeedy');
+			this.gameSocket?.off('gamefinishedSpeedy');
+			this.gameSocket?.off('setCountdownSpeedy');
+			this.gameSocket?.off('setTextSpeedy');
+			this.gameSocket?.off('updateInvitedUsernameSpeedy');
+			this.gameSocket.close();
 			const token = localStorage.getItem('token');
 			this.$socket.emit('clearGame', token)
 			this.$router.push({ name: 'Game' }).catch(() => { });
@@ -190,6 +195,11 @@ export default Vue.extend({
 				this.displayText = "";
 				this.isLoading = false;
 				setTimeout(() => {
+					this.gameSocket?.off('recieveCoordSpeedy');
+					this.gameSocket?.off('gamefinishedSpeedy');
+					this.gameSocket?.off('setCountdownSpeedy');
+					this.gameSocket?.off('setTextSpeedy');
+					this.gameSocket?.off('updateInvitedUsernameSpeedy');
 					this.gameSocket.close();
 					const token = localStorage.getItem('token');
 					this.$socket.emit('clearGame', token)
