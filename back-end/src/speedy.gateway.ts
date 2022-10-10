@@ -155,11 +155,13 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 						// update game in DB
 						this.finishGame(ind);
-						this.wss.to(this.gamePlayers[ind].p2SockId)
-							.emit("setTextSpeedy", { message: "WINNER" });
+						if (this.gamePlayers[ind].p2SockId.length > 0)
+							this.wss.to(this.gamePlayers[ind].p2SockId)
+								.emit("setTextSpeedy", { message: "WINNER" });
 
-						this.wss.to(this.gamePlayers[ind].p1SockId)
-							.emit("setTextSpeedy", { message: "LOST" });
+						if (this.gamePlayers[ind].p1SockId.length > 0)
+							this.wss.to(this.gamePlayers[ind].p1SockId)
+								.emit("setTextSpeedy", { message: "LOST" });
 
 						// game over for spectators
 						if (this.gamePlayers[ind].spectators.length > 0) {
@@ -205,11 +207,13 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 						// update game in DB
 						this.finishGame(ind);
-						this.wss.to(this.gamePlayers[ind].p1SockId)
-							.emit("setTextSpeedy", { message: "WINNER" });
+						if (this.gamePlayers[ind].p1SockId.length > 0)
+							this.wss.to(this.gamePlayers[ind].p1SockId)
+								.emit("setTextSpeedy", { message: "WINNER" });
 
-						this.wss.to(this.gamePlayers[ind].p2SockId)
-							.emit("setTextSpeedy", { message: "LOST" });
+						if (this.gamePlayers[ind].p2SockId.length > 0)
+							this.wss.to(this.gamePlayers[ind].p2SockId)
+								.emit("setTextSpeedy", { message: "LOST" });
 
 						// game over for spectators
 						if (this.gamePlayers[ind].spectators.length > 0) {
@@ -315,8 +319,7 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 		// initialize and start game only on
 		if (((this.gamePlayers[ind].p1SockId.length == 1 && this.gamePlayers[ind].p2SockId.length > 0) ||
 			 (this.gamePlayers[ind].p1SockId.length == 1 && this.gamePlayers[ind].p2SockId.length > 0)) &&
-			this.gamePlayers[ind].started == 0)
-		{
+			this.gamePlayers[ind].started == 0) {
 			this.initBallnBar(ind);
 			this.gamePlayers[ind].started = 1;
 			this.startCountdown(ind);
@@ -355,7 +358,6 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 	@SubscribeMessage('moveBarDownSpeedy')
 	handleMoveBarDown(client: Socket, ...args: any[]) {
-
 
 		if (args[0].id === undefined ||
 			args[0].side === undefined)
@@ -448,12 +450,14 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 
 		// win for other player
 		if (side == 'r') {
-			this.wss.to(this.gamePlayers[ind].p1SockId)
-				.emit("setTextSpeedy", { message: "WINNER" });
+			if (this.gamePlayers[ind].p1SockId.length > 0)
+				this.wss.to(this.gamePlayers[ind].p1SockId)
+					.emit("setTextSpeedy", { message: "WINNER" });
 		}
 		if (side == 'l') {
-			this.wss.to(this.gamePlayers[ind].p2SockId)
-				.emit("setTextSpeedy", { message: "WINNER" });
+			if (this.gamePlayers[ind].p2SockId.length > 0)
+				this.wss.to(this.gamePlayers[ind].p2SockId)
+					.emit("setTextSpeedy", { message: "WINNER" });
 		}
 
 		// game over for spectators

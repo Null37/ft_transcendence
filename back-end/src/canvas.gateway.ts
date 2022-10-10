@@ -155,11 +155,13 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 						// update game in DB
 						this.finishGame(ind);
-						this.wss.to(this.gamePlayers[ind].p2SockId)
-							.emit("setText", { message: "WINNER" });
+						if (this.gamePlayers[ind].p2SockId.length > 0)
+							this.wss.to(this.gamePlayers[ind].p2SockId)
+								.emit("setText", { message: "WINNER" });
 
-						this.wss.to(this.gamePlayers[ind].p1SockId)
-							.emit("setText", { message: "LOST" });
+						if (this.gamePlayers[ind].p1SockId.length > 0)
+							this.wss.to(this.gamePlayers[ind].p1SockId)
+								.emit("setText", { message: "LOST" });
 
 						// game over for spectators
 						if (this.gamePlayers[ind].spectators.length > 0) {
@@ -198,11 +200,13 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 						// update game in DB
 						this.finishGame(ind);
-						this.wss.to(this.gamePlayers[ind].p1SockId)
-							.emit("setText", { message: "WINNER" });
+						if (this.gamePlayers[ind].p1SockId.length > 0)
+							this.wss.to(this.gamePlayers[ind].p1SockId)
+								.emit("setText", { message: "WINNER" });
 
-						this.wss.to(this.gamePlayers[ind].p2SockId)
-							.emit("setText", { message: "LOST" });
+						if (this.gamePlayers[ind].p2SockId.length > 0)
+							this.wss.to(this.gamePlayers[ind].p2SockId)
+								.emit("setText", { message: "LOST" });
 
 						// game over for spectators
 						if (this.gamePlayers[ind].spectators.length > 0) {
@@ -393,7 +397,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 		// diconnected client is not a player!
 		if (ind === -1)
-			return;
+			return ;
 
 		let side: string
 		if (this.gamePlayers[ind].p1SockId.includes(client.id))
@@ -403,7 +407,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 		// game has ended; no more further action is needed
 		if (this.gamePlayers[ind].finished === 1)
-			return;
+			return ;
 
 		if (side == 'l' && this.gamePlayers[ind].p1SockId.length == 2)
 			return this.gamePlayers[ind].p1SockId.splice(this.gamePlayers[ind].p1SockId.indexOf(client.id));
@@ -431,12 +435,14 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 
 		// win for other player
 		if (side == 'r') {
-			this.wss.to(this.gamePlayers[ind].p1SockId)
-				.emit("setText", { message: "WINNER" });
+			if (this.gamePlayers[ind].p1SockId.length > 0)
+				this.wss.to(this.gamePlayers[ind].p1SockId)
+					.emit("setText", { message: "WINNER" });
 		}
 		if (side == 'l') {
-			this.wss.to(this.gamePlayers[ind].p2SockId)
-				.emit("setText", { message: "WINNER" });
+			if (this.gamePlayers[ind].p2SockId.length > 0)
+				this.wss.to(this.gamePlayers[ind].p2SockId)
+					.emit("setText", { message: "WINNER" });
 		}
 
 		// game over for spectators
@@ -455,6 +461,7 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 		if (ind === -1)
 			return;
 
-		this.wss.to(this.gamePlayers[ind].p1SockId).emit('updateInvitedUsername', { username: args[0].username });
+		if (this.gamePlayers[ind].p1SockId.length > 0)
+			this.wss.to(this.gamePlayers[ind].p1SockId).emit('updateInvitedUsername', { username: args[0].username });
 	}
 }
