@@ -376,11 +376,9 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {
-		// console.log("SERVER: Match client connected", client.id);
 	}
 
 	handleDisconnect(client: Socket) {
-		// console.log("SERVER: Match client disconnected", client.id);
 
 		// remove disconnected spectator
 		this.gamePlayers.forEach((elment, index) => {
@@ -447,7 +445,6 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 		}
 
 		// game over for spectators
-		console.log('SERVER: Sending GAME OVER to ', this.gamePlayers[ind].spectators);
 
 		if (this.gamePlayers[ind].spectators.length > 0)
 			this.wss.to(this.gamePlayers[ind].spectators)

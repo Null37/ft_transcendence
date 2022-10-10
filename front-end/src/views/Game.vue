@@ -98,7 +98,6 @@ export default Vue.extend({
 
       // speedy game
       emitSpeedyJoin() {
-        console.log('EMITTING JOIN');
 
         const tkn = localStorage.getItem('token');
         this.gameSocket?.emit('joinSpeedyQueue', { token: tkn });
@@ -106,7 +105,6 @@ export default Vue.extend({
         this.isSpeedyLoading = true;
       },
       emitSpeedyCancel() {
-        console.log('EMITTING CANCEL');
 
         this.gameSocket?.emit('cancelSpeedyQueue');
         this.isSpeedyLoading = false;
@@ -178,7 +176,6 @@ export default Vue.extend({
     created () {
       this.socketURL = location.protocol + "//" + location.hostname + ":" + 3000 + "/game";
       this.socketSpeedyURL = location.protocol + "//" + location.hostname + ":" + 3000 + "/game";
-      // console.log(this.socketURL, 'SOCKET URL GAME.VUE');
 
       this.gameSocket = io(this.socketURL, {
         transportOptions: {
@@ -203,7 +200,6 @@ export default Vue.extend({
       });
 
       this.gameSocket?.on('queueSpeedyResponse', (data: any) => {
-        console.log('CLIENT: GOT ACKNOWLEDGMENT FROM SERVER');
 
         // redirection
         if (typeof data.identifiers === 'object' && typeof data.identifiers[0]?.id === 'string')

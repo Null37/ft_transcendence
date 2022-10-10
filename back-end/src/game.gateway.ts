@@ -54,8 +54,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 		if (!args || !args[0] || !args[0].token)
 			return ;
 
-		console.log(args[0].token, 'TOKEN ARRIVED');
-
 		let tkn = JSON.parse(Buffer.from(args[0].token.split('.')[1], 'base64').toString('utf8'));
 
 
@@ -78,8 +76,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 
 			let new_game_id = await this.gamesservice.startGame(usr1, usr2);
 
-			// this.gamesservice.getAll().then(res => console.table('GAMES HERE', res) );
-
 			this.wss.to([this.queuePlayers[0].sockId, this.queuePlayers[1].sockId]).emit('queueResponse', new_game_id);
 
 			this.queuePlayers.splice(0, 2);
@@ -93,7 +89,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 		let ind = this.queueSpeedyPlayers.findIndex((elm: any) => elm.sockId == client.id );
 		if (ind != -1)
 			this.queueSpeedyPlayers.splice(ind,1);
-		// console.log("SERVER: TOTAL QUEUE PLAYERS NOW", this.queueSpeedyPlayers.length);
 	}
 
 
@@ -118,14 +113,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection{
 			{ this.queueSpeedyPlayers.push({ sockId: client.id, token: tkn }); }
 
 		if (this.queueSpeedyPlayers.length >= 2) {
-			console.log("SERVER: Good");
 
 			let usr1 = await this.userservice.findOne(this.queueSpeedyPlayers[0].token.name);
 			let usr2 = await this.userservice.findOne(this.queueSpeedyPlayers[1].token.name);
 
 			let new_game_id = await this.gamesservice.startGame(usr1, usr2, 2);
-
-			console.log('SENDING TO', [this.queueSpeedyPlayers[0].sockId, this.queueSpeedyPlayers[1].sockId]);
 
 			this.wss.to([this.queueSpeedyPlayers[0].sockId, this.queueSpeedyPlayers[1].sockId]).emit('queueSpeedyResponse', new_game_id);
 

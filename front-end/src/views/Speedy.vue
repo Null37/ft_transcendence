@@ -59,13 +59,11 @@ export default Vue.extend({
 			this.gameId = this.$route.query.match
 		// no query in uri
 		if (this.gameId === "") {
-			// console.log('redirecting with missing identifier error', this.gameId);
 			this.$router.push({ name: 'Game', params: { error: "Oops! Game was not found!" } }).catch(() => { });
 			return;
 		}
 		// search id in database
 		if (!token) {
-			// console.log('redirecting with auth error');
 			this.$router.push({ name: 'Game', params: { error: "Who are you?! Are you logged in?" } }).catch(() => { });
 			return;
 		}
@@ -74,13 +72,11 @@ export default Vue.extend({
 			.then((res: any) => {
 				// data not recieved properly
 				if (typeof res.data !== 'object') {
-					// console.log('redirecting with data error: axios');
 					this.$router.push({ name: 'Game', params: { error: "Oops! Something went wrong!" } }).catch(() => { });
 					return 1;
 				}
 				// game already ended
 				if (res.data.finished == 1) {
-					// console.log('redirecting with expiration error');
 					const token = localStorage.getItem('token');
 					this.$socket.emit('clearGame', token)
 					this.$router.push({ name: 'Game', params: { error: "This game has already finished!" } }).catch(() => { });
@@ -95,7 +91,6 @@ export default Vue.extend({
 					// invited player
 					if (usr.sub !== res.data.player_one.id
 						&& !res.data.player_two) {
-						// console.log('PROBABLY INVITED');
 						axios.get('/accept_invite/' + usr.sub + '/' + this.gameId,
 							{ headers: { Authorization: token } })
 							.then((ress) => {
@@ -104,7 +99,6 @@ export default Vue.extend({
 							})
 							.catch((err2) => {
 								Vue.$toast.error('An error occured! Going back to lobby in 5s');
-								// console.error('axios : verify_game ERROR', err2);
 								setTimeout(() => {
 									this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } }).catch(() => { });
 								}, 5 * 1000);
@@ -127,7 +121,6 @@ export default Vue.extend({
 			})
 			.catch((err: any) => {
 				Vue.$toast.error('An error occured! Going back to lobby in 5s');
-				// console.error('axios : verify_game ERROR', err);
 				setTimeout(() => {
 					this.$router.push({ name: 'Game', params: { error: "Sorry for the inconvience please report this incident!" } }).catch(() => { });
 				}, 5 * 1000);
@@ -148,7 +141,6 @@ export default Vue.extend({
 		// Infrom the server that the current player/ready is ready to receive data
 		this.gameSocket?.emit("playerReadySpeedy", { gameid: this.gameId, side: this.playerSide });
 		this.gameSocket?.on("recieveCoordSpeedy", (data: any) => {
-			// console.log("CLIENT: GOT COORDINATION FROM SERVER!", data);
 			// start game for the first time ever
 			if (this.p5?.isLooping() === false && this.gameover === false)
 				this.p5?.loop();
@@ -166,14 +158,12 @@ export default Vue.extend({
 			this.rightScore = data.rightScore;
 		});
 		this.gameSocket?.on("gamefinishedSpeedy", (data: any) => {
-			// console.log("CLIENT: GAME OVER!");
 			this.p5?.noLoop();
 			this.gameover = true;
 			// redirect
 		});
 		// timer from server for starting the game
 		this.gameSocket?.on("setCountdownSpeedy", (data: any) => {
-			// console.log("CLIENT: Got countdown!", data);
 			this.isLoading = true;
 			this.seconds = data.seconds;
 			this.p5?.redraw();
@@ -181,7 +171,6 @@ export default Vue.extend({
 		});
 		// timer from server for starting the game
 		this.gameSocket?.on("setTextSpeedy", (data: any) => {
-			// console.log("CLIENT: Text from server!", data);
 			this.p5?.noLoop();
 			this.gameover = true;
 			this.isLoading = true;
@@ -236,7 +225,6 @@ export default Vue.extend({
 			// The sketch draw method
 			// Game lo-op
 			p5.draw = () => {
-				// console.log('still going');
 				if (this.playerMode !== "spectator") {
 					if (p5.keyIsDown(p5.UP_ARROW)) {
 						this.gameSocket?.emit('moveBarUpSpeedy', { id: this.gameId, side: this.playerSide });
@@ -266,7 +254,6 @@ export default Vue.extend({
 						this.p5?.text(this.seconds, WIDTH / 2, HEIGHT / 2);
 					}
 					if (this.displayText !== "") {
-						// console.log('SHOULD WRITE ------');
 						this.p5?.textAlign(this.p5.CENTER);
 						this.p5?.fill('yellow');
 						this.p5?.textSize(100);

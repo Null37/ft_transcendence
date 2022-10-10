@@ -375,11 +375,9 @@ export class CanvasGateway implements OnGatewayInit, OnGatewayConnection {
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {
-		// console.log("SERVER: Match client connected", client.id);
 	}
 
 	handleDisconnect(client: Socket) {
-		// console.log("SERVER: Match client disconnected", client.id);
 
 		// remove disconnected spectator
 		this.gamePlayers.forEach((elment, index) => {
