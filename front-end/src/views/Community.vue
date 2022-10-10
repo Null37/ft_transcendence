@@ -6,15 +6,12 @@ import FriendList from '../components/FriendList.vue';
 import FriendsStatus from '../components/FriendsStatus.vue';
 import Profile from '@/components/Profile.vue';
 import axios from 'axios';
-import io from 'socket.io-client';
-import { SocketInstance } from '@/main';
 import Ladder from '@/components/Ladder.vue';
 
 export default Vue.extend({
     name: "App",
     sockets: {
       msgToClient(data) {
-        
         this.messages.push({id: this.messages.length, from: data.sender, room: data.roomName, message: data.message});
         if (this.currentRoom == data.roomName)
           this.showmessages.push({id: this.showmessages.length, from: data.sender, room: data.roomName, message: data.message});
@@ -104,6 +101,25 @@ export default Vue.extend({
 
     }),
     methods: {
+    loadImage(event) {
+      const token = localStorage.getItem('token');
+      const { files } = event.target;
+      if (token && files && files[0]) {
+        const data = new FormData();
+        data.append("file", files[0]);
+        
+        axios.post("/upload/image", data, {
+          headers: {
+              Authorization: token
+            }
+        }).then((function (res) {
+          this.error = false;
+          this.avatar = res.data;
+        }).bind(this)).catch((function (err) {
+          this.error = true;
+        }).bind(this));
+      }
+    },
 		logout: function()
 		{
 
@@ -649,6 +665,24 @@ export default Vue.extend({
         </v-card-title>
         <v-card-text>
           <v-container>
+            <v-row>
+              <v-col align="center"
+                justify="center">
+                 <v-avatar size="102">
+                    <img
+                        :src="avatar"
+                        alt="John"
+                    >
+                </v-avatar>
+              </v-col>
+              
+            </v-row>
+
+            <v-row>
+              <v-col>
+                <input ref="file" type="file" accept="image/*" @submit.prevent @change="loadImage($event)" />
+              </v-col>
+            </v-row>
             <v-row>
               <v-col
               >

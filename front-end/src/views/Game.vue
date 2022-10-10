@@ -25,6 +25,26 @@ export default Vue.extend({
     name: "App",
 
     methods: {
+    loadImage(event) {
+      const token = localStorage.getItem('token');
+      const { files } = event.target;
+      if (token && files && files[0]) {
+        const data = new FormData();
+        data.append("file", files[0]);
+        
+        axios.post("/upload/image", data, {
+          headers: {
+              Authorization: token
+            }
+        }).then((function (res) {
+          this.isUsernameError = false;
+          this.avatar = res.data;
+        }).bind(this)).catch((function (err) {
+          this.isUsernameError = true;
+          this.usernameError = "Error while updating image!";
+        }).bind(this));
+      }
+    },
     changeAvatarC: function(newavatar: any)
     {
       this.avatar = newavatar;
@@ -416,6 +436,23 @@ export default Vue.extend({
         </v-card-text>
         <v-card-text>
           <v-container>
+            <v-row>
+              <v-col align="center"
+                justify="center">
+                 <v-avatar size="102">
+                    <img
+                        :src="avatar"
+                        alt="John"
+                    >
+                </v-avatar>
+              </v-col>
+              
+            </v-row>
+            <v-row>
+              <v-col>
+                <input ref="file" type="file" accept="image/*" @submit.prevent @change="loadImage($event)" />
+              </v-col>
+            </v-row>
             <v-row>
               <v-col
               >
