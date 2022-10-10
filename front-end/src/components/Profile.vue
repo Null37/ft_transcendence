@@ -13,6 +13,12 @@
           }
         }).then((function (res) {
           this.games = res.data;
+
+
+          this.games = this.games.filter(function (el){
+            return el.finished === 1;
+          });
+
         }).bind(this))
         .catch(error => {
         });
