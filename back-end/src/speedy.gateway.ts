@@ -171,13 +171,6 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 					}
 					this.initBallnBar(ind);
 
-					// pause for a second after scoring
-					const date = Date.now();
-					let currentDate = null;
-					do {
-						currentDate = Date.now();
-					} while (currentDate - date < 1000);
-
 					this.HBALLSPEED[ind] *= -1;
 				}
 			}
@@ -222,13 +215,6 @@ export class SpeedyGateway implements OnGatewayInit, OnGatewayConnection {
 						}
 					}
 					this.initBallnBar(ind);
-
-					// pause for a second after scoring
-					const date = Date.now();
-					let currentDate = null;
-					do {
-						currentDate = Date.now();
-					} while (currentDate - date < 1000);
 
 					this.HBALLSPEED[ind] *= -1;
 				}
