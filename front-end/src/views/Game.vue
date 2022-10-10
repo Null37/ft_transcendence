@@ -67,12 +67,12 @@ export default Vue.extend({
       },
       emitJoin() {
         const tkn = localStorage.getItem('token');
-        this.gameSocket.emit('joinQueue', { token: tkn });
+        this.gameSocket?.emit('joinQueue', { token: tkn });
         this.isSpeedyLoading = false;
         this.isLoading = true;
       },
       emitCancel() {
-        this.gameSocket.emit('cancelQueue');
+        this.gameSocket?.emit('cancelQueue');
         this.isLoading = false;
       },
 
@@ -81,14 +81,14 @@ export default Vue.extend({
         console.log('EMITTING JOIN');
 
         const tkn = localStorage.getItem('token');
-        this.gameSocketSpeedy.emit('joinSpeedyQueue', { token: tkn });
+        this.gameSocket?.emit('joinSpeedyQueue', { token: tkn });
         this.isLoading = false;
         this.isSpeedyLoading = true;
       },
       emitSpeedyCancel() {
         console.log('EMITTING CANCEL');
 
-        this.gameSocketSpeedy.emit('cancelSpeedyQueue');
+        this.gameSocket?.emit('cancelSpeedyQueue');
         this.isSpeedyLoading = false;
       },
       lookForGames() {
@@ -171,7 +171,7 @@ export default Vue.extend({
         },
       });
 
-      this.gameSocket.on('queueResponse', (data: any) => {
+      this.gameSocket?.on('queueResponse', (data: any) => {
 
         // redirection
         if (typeof data.identifiers === 'object' && typeof data.identifiers[0]?.id === 'string')
@@ -182,7 +182,7 @@ export default Vue.extend({
         this.isLoading = false;
       });
 
-      this.gameSocketSpeedy.on('queueSpeedyResponse', (data: any) => {
+      this.gameSocket?.on('queueSpeedyResponse', (data: any) => {
         console.log('CLIENT: GOT ACKNOWLEDGMENT FROM SERVER');
 
         // redirection

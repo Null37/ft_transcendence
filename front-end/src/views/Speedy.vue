@@ -42,7 +42,7 @@ export default Vue.extend({
 			this.gameSocket?.off('setCountdownSpeedy');
 			this.gameSocket?.off('setTextSpeedy');
 			this.gameSocket?.off('updateInvitedUsernameSpeedy');
-			this.gameSocket.close();
+			this.gameSocket?.close();
 			const token = localStorage.getItem('token');
 			this.$socket.emit('clearGame', token)
 			this.$router.push({ name: 'Game' }).catch(() => { });
@@ -146,8 +146,8 @@ export default Vue.extend({
 			},
 		});
 		// Infrom the server that the current player/ready is ready to receive data
-		this.gameSocket.emit("playerReadySpeedy", { gameid: this.gameId, side: this.playerSide });
-		this.gameSocket.on("recieveCoordSpeedy", (data: any) => {
+		this.gameSocket?.emit("playerReadySpeedy", { gameid: this.gameId, side: this.playerSide });
+		this.gameSocket?.on("recieveCoordSpeedy", (data: any) => {
 			// console.log("CLIENT: GOT COORDINATION FROM SERVER!", data);
 			// start game for the first time ever
 			if (this.p5?.isLooping() === false && this.gameover === false)
@@ -165,7 +165,7 @@ export default Vue.extend({
 			this.leftScore = data.leftScore;
 			this.rightScore = data.rightScore;
 		});
-		this.gameSocket.on("gamefinishedSpeedy", (data: any) => {
+		this.gameSocket?.on("gamefinishedSpeedy", (data: any) => {
 			// console.log("CLIENT: GAME OVER!");
 			this.p5?.noLoop();
 			this.gameover = true;
@@ -200,7 +200,7 @@ export default Vue.extend({
 					this.gameSocket?.off('setCountdownSpeedy');
 					this.gameSocket?.off('setTextSpeedy');
 					this.gameSocket?.off('updateInvitedUsernameSpeedy');
-					this.gameSocket.close();
+					this.gameSocket?.close();
 					const token = localStorage.getItem('token');
 					this.$socket.emit('clearGame', token)
 					this.$router.push({ name: 'Game', }).catch(() => { });
@@ -239,10 +239,10 @@ export default Vue.extend({
 				// console.log('still going');
 				if (this.playerMode !== "spectator") {
 					if (p5.keyIsDown(p5.UP_ARROW)) {
-						this.gameSocket.emit('moveBarUpSpeedy', { id: this.gameId, side: this.playerSide });
+						this.gameSocket?.emit('moveBarUpSpeedy', { id: this.gameId, side: this.playerSide });
 					}
 					if (p5.keyIsDown(p5.DOWN_ARROW)) {
-						this.gameSocket.emit('moveBarDownSpeedy', { id: this.gameId, side: this.playerSide });
+						this.gameSocket?.emit('moveBarDownSpeedy', { id: this.gameId, side: this.playerSide });
 					}
 				}
 				p5.background(51);

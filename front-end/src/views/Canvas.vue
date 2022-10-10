@@ -50,7 +50,7 @@ export default Vue.extend({
             this.gameSocket?.off('setCountdown');
             this.gameSocket?.off('setText');
             this.gameSocket?.off('updateInvitedUsername');
-            this.gameSocket.close();
+            this.gameSocket?.close();
             const token = localStorage.getItem('token');
             this.$socket.emit('clearGame', token)
             this.$router.push({ name: 'Game' }).catch(() => { });
@@ -129,7 +129,7 @@ export default Vue.extend({
                             .then((ress) => {
                                 res.data.player_tow = ress.data
                                 window.document.querySelector("#rightPlayer")!.innerHTML = ress.data.username.toUpperCase();
-                                this.gameSocket.emit('updateInvitedUsername', { gameid: this.gameId, username: ress.data.username });
+                                this.gameSocket?.emit('updateInvitedUsername', { gameid: this.gameId, username: ress.data.username });
                             })
                             .catch((err2) => {
                                 Vue.$toast.error('An error occured! Going back to lobby in 5s');
@@ -186,9 +186,9 @@ export default Vue.extend({
         });
 
         // Infrom the server that the current player/ready is ready to receive data
-        this.gameSocket.emit("playerReady", { gameid: this.gameId, side: this.playerSide });
+        this.gameSocket?.emit("playerReady", { gameid: this.gameId, side: this.playerSide });
 
-        this.gameSocket.on("recieveCoord", (data: any) => {
+        this.gameSocket?.on("recieveCoord", (data: any) => {
 
             // start game for the first time ever
             if (this.p5?.isLooping() === false && this.gameover === false)
@@ -211,7 +211,7 @@ export default Vue.extend({
             this.rightScore = data.rightScore;
         });
 
-        this.gameSocket.on("gamefinished", (data: any) => {
+        this.gameSocket?.on("gamefinished", (data: any) => {
 
             this.p5?.noLoop();
             this.gameover = true;
@@ -252,7 +252,7 @@ export default Vue.extend({
                     this.gameSocket?.off('setCountdown');
                     this.gameSocket?.off('setText');
                     this.gameSocket?.off('updateInvitedUsername');
-                    this.gameSocket.close();
+                    this.gameSocket?.close();
                     const token = localStorage.getItem('token');
                     this.$socket.emit('clearGame', token)
                     this.$router.push({ name: 'Game' }).catch(() => { });
@@ -273,7 +273,7 @@ export default Vue.extend({
         this.gameSocket?.off('setCountdown');
         this.gameSocket?.off('setText');
         this.gameSocket?.off('updateInvitedUsername');
-        this.gameSocket.close();
+        this.gameSocket?.close();
     },
     mounted() {
 
@@ -310,10 +310,10 @@ export default Vue.extend({
                 if (this.playerMode !== "spectator") {
 
                     if (p5.keyIsDown(p5.UP_ARROW)) {
-                        this.gameSocket.emit('moveBarUp', { id: this.gameId, side: this.playerSide });
+                        this.gameSocket?.emit('moveBarUp', { id: this.gameId, side: this.playerSide });
                     }
                     if (p5.keyIsDown(p5.DOWN_ARROW)) {
-                        this.gameSocket.emit('moveBarDown', { id: this.gameId, side: this.playerSide });
+                        this.gameSocket?.emit('moveBarDown', { id: this.gameId, side: this.playerSide });
                     }
                 }
 
